@@ -21,7 +21,8 @@ const checkoutItems: CartItem[] = [
     size: "L",
     colorName: "BlUE",
     colorCategory: "BLUE",
-    imageLink: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSajKaXR50x3qV73W5SE8Fm3ia5xK1zJki8SOSkVkOR4w&s=10",
+    imageLink:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSajKaXR50x3qV73W5SE8Fm3ia5xK1zJki8SOSkVkOR4w&s=10",
     price: 1000.0,
     sku: "00000021",
     quantity: 1,
