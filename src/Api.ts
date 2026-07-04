@@ -43,6 +43,7 @@ export const fetchListings = () => {
   return getWithConfig<Listing[]>(TEMP_LISTINGS_API_URL);
 };
 
+
 export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
   const response = await postWithConfig<PlaceOrderRequest, string | Order>(
     TEMP_ORDER_API_URL,
@@ -55,3 +56,9 @@ export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
 
   return response.id;
 };
+
+
+export const fetchListingById = (id: string) => {
+  return getWithConfig<Listing>(`${TEMP_LISTINGS_API_URL}/${id}`);
+};
+
