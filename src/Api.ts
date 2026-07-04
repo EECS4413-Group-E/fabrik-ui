@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { User } from "./models/User";
-import type { CreateOrderRequest, Order } from "./models/Order";
+import type { Order, PlaceOrderRequest } from "./models/Order";
 
 // Temporary user API URL for testing purposes, replace if needed
 // To be removed once the gateway is set up properly
@@ -33,9 +33,15 @@ export const fetchUserData = (id: string) => {
   return getWithConfig<User>(`${TEMP_USER_API_URL}/${id}`);
 };
 
-export const addOrder = (orderRequest: CreateOrderRequest) => {
-  return postWithConfig<CreateOrderRequest, Order>(
+export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
+  const response = await postWithConfig<PlaceOrderRequest, string | Order>(
     TEMP_ORDER_API_URL,
     orderRequest,
   );
+
+  if (typeof response === "string") {
+    return response;
+  }
+
+  return response.id;
 };
