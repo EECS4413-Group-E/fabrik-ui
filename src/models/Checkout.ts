@@ -3,7 +3,15 @@ export const PaymentMethod = {
   PayPal: "PAYPAL",
 } as const;
 
-export type PaymentMethod = typeof PaymentMethod[keyof typeof PaymentMethod];
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
+
+export interface PaymentDetails {
+  paymentMethod: PaymentMethod;
+  cardNumber?: string;
+  expiryDate?: string;
+  cvv?: string;
+  paypalEmail?: string;
+}
 
 export interface CheckoutFormValues {
   userId: string;

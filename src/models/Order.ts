@@ -1,3 +1,5 @@
+import type { PaymentDetails } from "./Checkout";
+
 export const OrderStatus = {
   Preparing: "PREPARING",
   Shipped: "SHIPPED",
@@ -5,19 +7,18 @@ export const OrderStatus = {
   Cancelled: "CANCELLED",
 } as const;
 
-export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
-export interface CreateOrderItem {
+export interface PlaceOrderItem {
   productId: string;
   quantity: number;
   price: number;
 }
 
-export interface CreateOrderRequest {
-  totalPrice: number;
-  orderItems: CreateOrderItem[];
-  orderStatus: OrderStatus;
+export interface PlaceOrderRequest {
   userId: string;
+  orderItems: PlaceOrderItem[];
+  paymentDetails: PaymentDetails;
 }
 
 export interface OrderItem {
