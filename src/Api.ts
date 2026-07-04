@@ -1,44 +1,14 @@
 import axios from "axios";
 import type { User } from "./models/User";
-
-// Will be using this once the gateway is set up properly
-//const API_BASE_URL = "http://localhost:xxxx/api";
+import type { CreateOrderRequest, Order } from "./models/Order";
 
 // Temporary user API URL for testing purposes, replace if needed
 // To be removed once the gateway is set up properly
 const TEMP_USER_API_URL = "http://localhost:4007/user";
 
-// Temporary payment API URL for testing purposes
+// Temporary order API URL for testing purposes
 // To be removed once the gateway is set up properly
-const TEMP_PAYMENT_API_URL = "http://localhost:4005/payment";
-
-export type PaymentMethod = "CREDIT_CARD" | "PAYPAL";
-
-export type PaymentStatus = "APPROVED" | "DECLINED";
-
-export type ProcessPaymentRequest = {
-  orderId: string;
-  amount: number;
-  currency: string;
-  paymentMethod: PaymentMethod;
-  cardNumber?: string;
-  expiryDate?: string;
-  cvv?: string;
-  paypalEmail?: string;
-};
-
-export type PaymentResponse = {
-  id: string | null;
-  paymentNumber: string | null;
-  orderId: string;
-  amount: number;
-  currency: string;
-  paymentMethod: PaymentMethod;
-  status: PaymentStatus;
-  paymentReference: string | null;
-  message: string;
-  createdDate: string | null;
-};
+const TEMP_ORDER_API_URL = "http://localhost:4004/order";
 
 // Helper function to get axios config, to later include any headers, auth, etc.
 const getAxiosConfig = () => {
@@ -63,9 +33,9 @@ export const fetchUserData = (id: string) => {
   return getWithConfig<User>(`${TEMP_USER_API_URL}/${id}`);
 };
 
-export const processPayment = (paymentRequest: ProcessPaymentRequest) => {
-  return postWithConfig<ProcessPaymentRequest, PaymentResponse>(
-    `${TEMP_PAYMENT_API_URL}/process`,
-    paymentRequest,
+export const addOrder = (orderRequest: CreateOrderRequest) => {
+  return postWithConfig<CreateOrderRequest, Order>(
+    TEMP_ORDER_API_URL,
+    orderRequest,
   );
 };
