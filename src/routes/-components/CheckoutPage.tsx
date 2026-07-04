@@ -10,7 +10,6 @@ import CheckoutPaymentCard from "./CheckoutPaymentCard";
 const TEMP_USER_ID = "8ecf8276-e555-41cc-b2ba-e42353dc72b4";
 
 // Temporary hardcoded cart items until the shopping cart page is connected.
-// This follows the flattened cart item shape discussed with the team lead.
 const checkoutItems: CartItem[] = [
   {
     id: "36299f29-e585-478b-ad9d-0019450c14ae",
