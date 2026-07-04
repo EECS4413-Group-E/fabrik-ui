@@ -1,313 +1,372 @@
-import { useState, type FormEvent } from "react";
-import {
-  processPayment,
-  type PaymentMethod,
-  type PaymentResponse,
-} from "../../Api";
+import type { CartItem } from "../../models/CartItem";
+import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
+import { addOrder } from "../../Api";
+import { PaymentMethod, type CheckoutFormValues } from "../../models/Checkout";
+import { OrderStatus, type CreateOrderRequest } from "../../models/Order";
 
-function createMockOrderId() {
-  return crypto.randomUUID();
-}
+const TEMP_USER_ID = "8ecf8276-e555-41cc-b2ba-e42353dc72b4";
 
-function CheckoutPage() {
-  const [orderId, setOrderId] = useState<string>(createMockOrderId());
-  const [amount, setAmount] = useState("149.99");
-  const [currency, setCurrency] = useState("CAD");
-  const [paymentMethod, setPaymentMethod] =
-    useState<PaymentMethod>("CREDIT_CARD");
+// Temporary hardcoded cart items until the shopping cart page is connected
+const checkoutItems: CartItem[] = [
+  {
+    id: "36299f29-e585-478b-ad9d-0019450c14ae",
+    clothingCategory: "OTHER",
+    departmentCategory: "OTHER",
+    productDescription: "Goat",
+    productName: "Messi Jersey",
+    size: "L",
+    colorName: "Blue",
+    colorCategory: "Blue",
+    imageLink: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSajKaXR50x3qV73W5SE8Fm3ia5xK1zJki8SOSkVkOR4w&s=10",
+    price: 1000.0,
+    sku: "00000021",
+    quantity: 1,
+  },
+];
 
-  const [cardNumber, setCardNumber] = useState("4111111111111111");
-  const [expiryDate, setExpiryDate] = useState("12/29");
-  const [cvv, setCvv] = useState("123");
-  const [paypalEmail, setPaypalEmail] = useState("customer@example.com");
+const orderTotal = checkoutItems.reduce(
+  (total, item) => total + item.quantity * item.price,
+  0,
+);
 
-  const [paymentResult, setPaymentResult] =
-    useState<PaymentResponse | null>(null);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleGenerateOrderId = () => {
-    setOrderId(createMockOrderId());
-    setPaymentResult(null);
-    setErrorMessage("");
+const getErrorMessage = (error: unknown) => {
+  const possibleApiError = error as {
+    response?: {
+      data?: {
+        error?: string;
+      };
+    };
   };
 
-  const handleApprovedCard = () => {
-    setPaymentMethod("CREDIT_CARD");
-    setCardNumber("4111111111111111");
-    setExpiryDate("12/29");
-    setCvv("123");
-    setPaymentResult(null);
-    setErrorMessage("");
-  };
+  return possibleApiError.response?.data?.error ?? "Unable to place order.";
+};
 
-  const handleDeclinedCard = () => {
-    setPaymentMethod("CREDIT_CARD");
-    setCardNumber("4000000000000002");
-    setExpiryDate("12/29");
-    setCvv("123");
-    setPaymentResult(null);
-    setErrorMessage("");
-  };
+const CheckoutPage = () => {
+  const placeOrderMutation = useMutation({
+    mutationFn: addOrder,
+    onSuccess: (createdOrder) => {
+      window.location.href = `/order-details/${createdOrder.id}`;
+    },
+  });
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    setIsSubmitting(true);
-    setPaymentResult(null);
-    setErrorMessage("");
-
-    try {
-      const request = {
-        orderId,
-        amount: Number(amount),
-        currency,
-        paymentMethod,
-        ...(paymentMethod === "CREDIT_CARD"
-          ? {
-              cardNumber,
-              expiryDate,
-              cvv,
-            }
-          : {
-              paypalEmail,
-            }),
+  const form = useForm({
+    defaultValues: {
+      userId: TEMP_USER_ID,
+      paymentMethod: PaymentMethod.CreditCard,
+      cardNumber: "",
+      expiryDate: "",
+      cvv: "",
+      paypalEmail: "",
+    } as CheckoutFormValues,
+    onSubmit: async ({ value }) => {
+      const orderRequest: CreateOrderRequest = {
+        userId: value.userId,
+        totalPrice: orderTotal,
+        orderStatus: OrderStatus.Preparing,
+        orderItems: checkoutItems.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
       };
 
-      const response = await processPayment(request);
-      setPaymentResult(response);
-    } catch (error: any) {
-      const apiError = error.response?.data?.error;
-
-      if (apiError) {
-        setErrorMessage(apiError);
-      } else {
-        setErrorMessage("Unable to process payment.");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      placeOrderMutation.mutate(orderRequest);
+    },
+  });
 
   return (
     <main>
       <h1>Checkout</h1>
 
-      <p>
-        This is a basic checkout page for testing the payment microservice.
-      </p>
+      <section>
+        <h2>Order Summary</h2>
 
-      <form onSubmit={handleSubmit}>
-        <fieldset>
-          <legend>Order Information</legend>
+<table>
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Product</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th>Color</th>
+      <th>Size</th>
+      <th>SKU</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
 
-          <div>
-            <label htmlFor="orderId">Order ID</label>
-            <br />
-            <input
-              id="orderId"
-              type="text"
-              value={orderId}
-              onChange={(event) => setOrderId(event.target.value)
-}
-              size={45}
-              required
-            />
-            <br />
-            <button type="button" onClick={handleGenerateOrderId}>
-              Generate New Mock Order ID
-            </button>
-          </div>
+  <tbody>
+    {checkoutItems.map((item) => (
+      <tr key={item.id}>
+        <td>
+          <img
+            src={item.imageLink}
+            alt={item.productName}
+            width="80"
+          />
+        </td>
+        <td>{item.productName}</td>
+        <td>{item.productDescription}</td>
+        <td>
+          {item.departmentCategory} / {item.clothingCategory}
+        </td>
+        <td>
+          {item.colorName} ({item.colorCategory})
+        </td>
+        <td>{item.size}</td>
+        <td>{item.sku}</td>
+        <td>{item.quantity}</td>
+        <td>${item.price.toFixed(2)}</td>
+        <td>${(item.quantity * item.price).toFixed(2)}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
 
-          <br />
-
-          <div>
-            <label htmlFor="amount">Amount</label>
-            <br />
-            <input
-              id="amount"
-              type="number"
-              min="0.01"
-              step="0.01"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-              required
-            />
-          </div>
-
-          <br />
-
-          <div>
-            <label htmlFor="currency">Currency</label>
-            <br />
-            <input
-              id="currency"
-              type="text"
-              value={currency}
-              onChange={(event) => setCurrency(event.target.value)}
-              required
-            />
-          </div>
-        </fieldset>
-
-        <br />
-
-        <fieldset>
-          <legend>Payment Method</legend>
-
-          <div>
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="CREDIT_CARD"
-                checked={paymentMethod === "CREDIT_CARD"}
-                onChange={() => setPaymentMethod("CREDIT_CARD")}
-              />
-              Credit Card
-            </label>
-          </div>
-
-          <div>
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="PAYPAL"
-                checked={paymentMethod === "PAYPAL"}
-                onChange={() => setPaymentMethod("PAYPAL")}
-              />
-              PayPal
-            </label>
-          </div>
-        </fieldset>
-
-        <br />
-
-        {paymentMethod === "CREDIT_CARD" && (
-          <fieldset>
-            <legend>Credit Card Details</legend>
-
-            <div>
-              <label htmlFor="cardNumber">Card Number</label>
-              <br />
-              <input
-                id="cardNumber"
-                type="text"
-                value={cardNumber}
-                onChange={(event) => setCardNumber(event.target.value)}
-                required
-              />
-            </div>
-
-            <br />
-
-            <div>
-              <label htmlFor="expiryDate">Expiry Date</label>
-              <br />
-              <input
-                id="expiryDate"
-                type="text"
-                value={expiryDate}
-                onChange={(event) => setExpiryDate(event.target.value)}
-                placeholder="MM/YY"
-                required
-              />
-            </div>
-
-            <br />
-
-            <div>
-              <label htmlFor="cvv">CVV</label>
-              <br />
-              <input
-                id="cvv"
-                type="text"
-                value={cvv}
-                onChange={(event) => setCvv(event.target.value)}
-                required
-              />
-            </div>
-
-            <br />
-
-            <button type="button" onClick={handleApprovedCard}>
-              Use Approved Test Card
-            </button>
-
-            <button type="button" onClick={handleDeclinedCard}>
-              Use Declined Test Card
-            </button>
-          </fieldset>
-        )}
-
-        {paymentMethod === "PAYPAL" && (
-          <fieldset>
-            <legend>PayPal Details</legend>
-
-            <div>
-              <label htmlFor="paypalEmail">PayPal Email</label>
-              <br />
-              <input
-                id="paypalEmail"
-                type="email"
-                value={paypalEmail}
-                onChange={(event) => setPaypalEmail(event.target.value)}
-                required
-              />
-            </div>
-          </fieldset>
-        )}
-
-        <br />
-
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Processing..." : "Process Payment"}
-        </button>
-      </form>
+        <p>
+          <strong>Total:</strong> ${orderTotal.toFixed(2)}
+        </p>
+      </section>
 
       <hr />
 
       <section>
-        <h2>Payment Result</h2>
+        <h2>Payment Details</h2>
 
-        {errorMessage && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <form.Field
+            name="userId"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) {
+                  return "User ID is required";
+                }
+
+                return undefined;
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <label htmlFor={field.name}>User ID:</label>
+                <br />
+                <input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  size={45}
+                />
+                {field.state.meta.errors.map((err) => (
+                  <div key={err}>{err}</div>
+                ))}
+              </div>
+            )}
+          </form.Field>
+
+          <br />
+
+          <form.Field name="paymentMethod">
+            {(field) => (
+              <div>
+                <p>Payment Method:</p>
+
+                <label>
+                  <input
+                    type="radio"
+                    name={field.name}
+                    value={PaymentMethod.CreditCard}
+                    checked={field.state.value === PaymentMethod.CreditCard}
+                    onBlur={field.handleBlur}
+                    onChange={() => field.handleChange(PaymentMethod.CreditCard)}
+                  />
+                  Credit Card
+                </label>
+
+                <br />
+
+                <label>
+                  <input
+                    type="radio"
+                    name={field.name}
+                    value={PaymentMethod.PayPal}
+                    checked={field.state.value === PaymentMethod.PayPal}
+                    onBlur={field.handleBlur}
+                    onChange={() => field.handleChange(PaymentMethod.PayPal)}
+                  />
+                  PayPal
+                </label>
+              </div>
+            )}
+          </form.Field>
+
+          <br />
+
+          <form.Subscribe selector={(state) => state.values.paymentMethod}>
+            {(paymentMethod) =>
+              paymentMethod === PaymentMethod.CreditCard ? (
+                <fieldset>
+                  <legend>Credit Card Information</legend>
+
+                  <form.Field
+                    name="cardNumber"
+                    validators={{
+                      onChange: ({ value }) => {
+                        if (!value) {
+                          return "Card number is required";
+                        }
+
+                        return undefined;
+                      },
+                    }}
+                  >
+                    {(field) => (
+                      <div>
+                        <label htmlFor={field.name}>Card Number:</label>
+                        <br />
+                        <input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        {field.state.meta.errors.map((err) => (
+                          <div key={err}>{err}</div>
+                        ))}
+                      </div>
+                    )}
+                  </form.Field>
+
+                  <br />
+
+                  <form.Field
+                    name="expiryDate"
+                    validators={{
+                      onChange: ({ value }) => {
+                        if (!value) {
+                          return "Expiry date is required";
+                        }
+
+                        return undefined;
+                      },
+                    }}
+                  >
+                    {(field) => (
+                      <div>
+                        <label htmlFor={field.name}>Expiry Date:</label>
+                        <br />
+                        <input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="MM/YY"
+                        />
+                        {field.state.meta.errors.map((err) => (
+                          <div key={err}>{err}</div>
+                        ))}
+                      </div>
+                    )}
+                  </form.Field>
+
+                  <br />
+
+                  <form.Field
+                    name="cvv"
+                    validators={{
+                      onChange: ({ value }) => {
+                        if (!value) {
+                          return "CVV is required";
+                        }
+
+                        return undefined;
+                      },
+                    }}
+                  >
+                    {(field) => (
+                      <div>
+                        <label htmlFor={field.name}>CVV:</label>
+                        <br />
+                        <input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        {field.state.meta.errors.map((err) => (
+                          <div key={err}>{err}</div>
+                        ))}
+                      </div>
+                    )}
+                  </form.Field>
+                </fieldset>
+              ) : (
+                <fieldset>
+                  <legend>PayPal Information</legend>
+
+                  <form.Field
+                    name="paypalEmail"
+                    validators={{
+                      onChange: ({ value }) => {
+                        if (!value) {
+                          return "PayPal email is required";
+                        }
+
+                        return undefined;
+                      },
+                    }}
+                  >
+                    {(field) => (
+                      <div>
+                        <label htmlFor={field.name}>PayPal Email:</label>
+                        <br />
+                        <input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          type="email"
+                        />
+                        {field.state.meta.errors.map((err) => (
+                          <div key={err}>{err}</div>
+                        ))}
+                      </div>
+                    )}
+                  </form.Field>
+                </fieldset>
+              )
+            }
+          </form.Subscribe>
+
+          <br />
+
+          <button type="submit" disabled={placeOrderMutation.isPending}>
+            {placeOrderMutation.isPending ? "Placing Order..." : "Place Order"}
+          </button>
+        </form>
+
+        {placeOrderMutation.isError && (
           <p>
-            <strong>Error:</strong> {errorMessage}
+            <strong>Error:</strong> {getErrorMessage(placeOrderMutation.error)}
           </p>
-        )}
-
-        {paymentResult && (
-          <div>
-            <p>
-              <strong>Status:</strong> {paymentResult.status}
-            </p>
-            <p>
-              <strong>Message:</strong> {paymentResult.message}
-            </p>
-            <p>
-              <strong>Payment Method:</strong> {paymentResult.paymentMethod}
-            </p>
-            <p>
-              <strong>Payment Reference:</strong>{" "}
-              {paymentResult.paymentReference ?? "Not saved"}
-            </p>
-            <p>
-              <strong>Payment Number:</strong>{" "}
-              {paymentResult.paymentNumber ?? "Not saved"}
-            </p>
-            <p>
-              <strong>Order ID:</strong> {paymentResult.orderId}
-            </p>
-            <p>
-              <strong>Amount:</strong> {paymentResult.amount}{" "}
-              {paymentResult.currency}
-            </p>
-          </div>
         )}
       </section>
     </main>
   );
-}
+};
 
 export default CheckoutPage;
