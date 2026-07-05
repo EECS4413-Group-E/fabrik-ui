@@ -1,7 +1,7 @@
 
 
 import IndividualProductPage from "./IndividualProductPage";
-import { Route } from "../products_.$listingId";
+import { Route } from "../products/$listingId";
 
 const ProductDetailsRoute = () => {
   const { listingId } = Route.useParams();

@@ -16,8 +16,6 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     } = useQuery(singleListingQueryOptions(listingId));
 
     const [selectedProductIndex, setSelectedProductIndex] = useState(0);
-    console.log("Individual page rendered", listingId);
-
     if (isLoading) {
         return <p>Loading product...</p>;
     }
