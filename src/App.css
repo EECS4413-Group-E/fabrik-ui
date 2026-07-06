@@ -182,3 +182,8 @@
     border-right-color: var(--border);
   }
 }
+
+.link{
+  text-decoration: none;
+  color: inherit;
+}

@@ -2,8 +2,11 @@ import axios from "axios";
 import type { LoginRegisterRequest, User } from "./models/User";
 import type { Listing } from "./models/Listing";
 import type { Order, PlaceOrderRequest } from "./models/Order";
+
 import { tokenStore } from "./tokenStore";
 import type { AccessTokenResponse } from "./models/AccessTokenResponse";
+
+import type { WishListItem } from "./models/WishList";
 
 // Will be using this once the gateway is set up properly
 const API_BASE_URL = "http://localhost:5000/api";
@@ -13,6 +16,7 @@ const API_BASE_URL = "http://localhost:5000/api";
 const TEMP_ORDER_API_URL = "http://localhost:4004/order";
 
 const TEMP_LISTINGS_API_URL = "http://localhost:4002/listing";
+
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -106,5 +110,13 @@ export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
 
 export const fetchListingById = (id: string) => {
   return getWithConfig<Listing>(`${TEMP_LISTINGS_API_URL}/${id}`);
+};
+
+export const fetchWishlist = () => {
+  return getWithConfig<WishListItem[]>(TEMP_WISHLIST_API_URL);
+};
+
+export const removeWishlistItem = async (listingId: string) => {
+  await axios.delete(`${TEMP_WISHLIST_API_URL}/${listingId}`, getAxiosConfig());
 };
 
