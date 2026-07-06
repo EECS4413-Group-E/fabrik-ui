@@ -1,6 +1,6 @@
 
 
-
+import { Link } from "@tanstack/react-router";
 import type { Listing } from "../../models/Listing";
 
 type ProductCardProps = {
@@ -17,20 +17,22 @@ const ProductCard = ({ listing }: ProductCardProps) => {
   const colors = listing.products.map((product) => product.colorName);
 
   return (
-    <div>
-      {firstImage && (
-        <img src={firstImage.imageLink} alt={listing.productName} width={150} />
-      )}
+    <Link to="/products/$listingId" params={{ listingId: listing.id }}>
+      <div>
+        {firstImage && (
+          <img src={firstImage.imageLink} alt={listing.productName} width={150} />
+        )}
 
-      <h2>{listing.productName}</h2>
-      <p>{listing.productDescription}</p>
-      <p>Category: {listing.clothingCategory}</p>
-      <p>Department: {listing.departmentCategory}</p>
+        <h2>{listing.productName}</h2>
+        <p>{listing.productDescription}</p>
+        <p>Category: {listing.clothingCategory}</p>
+        <p>Department: {listing.departmentCategory}</p>
 
-      {lowestPrice !== null && <p>Starting at: ${lowestPrice}</p>}
+        {lowestPrice !== null && <p>Starting at: ${lowestPrice}</p>}
 
-      {colors.length > 0 && <p>Available colors: {colors.join(", ")}</p>}
-    </div>
+        {colors.length > 0 && <p>Available colors: {colors.join(", ")}</p>}
+      </div>
+    </Link>
   );
 };
 
