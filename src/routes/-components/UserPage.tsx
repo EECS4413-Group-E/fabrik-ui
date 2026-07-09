@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { userQueryOptions } from "../../queries";
+import { currentUserQueryOptions } from "../../queries";
 
 export const UserPage = () => {
   const {
@@ -8,7 +8,7 @@ export const UserPage = () => {
     isLoading,
     error,
   } = useQuery(
-    userQueryOptions("8ecf8276-e555-41cc-b2ba-e42353dc72b4"),
+    currentUserQueryOptions(),
   );
 
   return (

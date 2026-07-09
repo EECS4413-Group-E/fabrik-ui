@@ -1,6 +1,3 @@
-
-
-
 export interface Availability {
   id: string;
   size: string;

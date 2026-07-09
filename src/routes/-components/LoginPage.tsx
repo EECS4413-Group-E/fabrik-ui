@@ -1,14 +1,21 @@
 import { useForm } from "@tanstack/react-form";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import type { LoginRegisterRequest } from "../../models/User";
+import { useLoginMutation } from "../../mutations";
 
 const LoginPage = () => {
+  const { mutate: login, isPending, error } = useLoginMutation();
+  const navigate = useNavigate();
+
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
-    },
+    } as LoginRegisterRequest,
     onSubmit: async ({ value }) => {
-      console.log(value);
+      login(value, {
+        onSuccess: () => navigate({ to: "/user", replace: true })
+      })
     },
   });
 
@@ -51,8 +58,12 @@ const LoginPage = () => {
             </div>
           )}
         </form.Field>
+        <button type="submit" disabled={isPending}>
+          {isPending ? "Logging in..." : "Login"}
+        </button>
       </form>
       <Link to="/register">Register</Link>
+      <p>{error?.message}</p>
     </div>
   );
 };

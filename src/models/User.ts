@@ -10,3 +10,8 @@ export interface User {
     email: string;
     role: UserRole;
 }
+
+export interface LoginRegisterRequest {
+    email: string;
+    password: string;
+}
