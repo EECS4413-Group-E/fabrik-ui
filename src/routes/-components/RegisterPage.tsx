@@ -1,6 +1,11 @@
 import { useForm } from "@tanstack/react-form";
+import { useRegisterMutation } from "../../mutations";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 const RegisterPage = () => {
+  const { mutate: register, isPending, error } = useRegisterMutation();
+  const navigate = useNavigate();
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -8,7 +13,9 @@ const RegisterPage = () => {
       confirmPassword: "",
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      register(value, {
+        onSuccess: () => navigate({ to: "/user", replace: true })
+      })
     },
   });
 
@@ -80,7 +87,12 @@ const RegisterPage = () => {
             </div>
           )}
         </form.Field>
+        <button type="submit" disabled={isPending}>
+          {isPending ? "Registering..." : "Register"}
+        </button>
       </form>
+      <Link to="/login">Login</Link>
+      <p>{error?.message}</p>
     </div>
   );
 };
