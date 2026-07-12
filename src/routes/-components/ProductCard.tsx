@@ -2,6 +2,8 @@
 
 import { Link } from "@tanstack/react-router";
 import type { Listing } from "../../models/Listing";
+import WishlistButton from "./WishlistButton";
+
 
 type ProductCardProps = {
   listing: Listing;
@@ -17,7 +19,9 @@ const ProductCard = ({ listing }: ProductCardProps) => {
   const colors = listing.products.map((product) => product.colorName);
 
   return (
-    <Link to="/products/$listingId" params={{ listingId: listing.id }}>
+    <article>
+      <WishlistButton listingId={listing.id} />
+      <Link to="/products/$listingId" params={{ listingId: listing.id }}>
       <div>
         {firstImage && (
           <img src={firstImage.imageLink} alt={listing.productName} width={150} />
@@ -28,11 +32,12 @@ const ProductCard = ({ listing }: ProductCardProps) => {
         <p>Category: {listing.clothingCategory}</p>
         <p>Department: {listing.departmentCategory}</p>
 
-        {lowestPrice !== null && <p>Starting at: ${lowestPrice}</p>}
+        {lowestPrice !== null && <p>Starting at: ${lowestPrice.toFixed(2)}</p>}
 
         {colors.length > 0 && <p>Available colors: {colors.join(", ")}</p>}
       </div>
     </Link>
+    </article>
   );
 };
 

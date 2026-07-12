@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { singleListingQueryOptions } from "../../queries";
 import type { Product } from "../../models/Listing";
+import WishlistButton from "./WishlistButton";
 
 type IndividualProductPageProps = {
   listingId: string;
@@ -39,6 +40,8 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     return (
         <main>
         <h1>{listing.productName}</h1>
+        <WishlistButton listingId={listing.id}showText/>
+
         {selectedImage && (
             <img
             src={selectedImage.imageLink}
@@ -52,7 +55,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
 
         <h2>Selected Color: {selectedProduct.colorName}</h2>
         <p>Color Category: {selectedProduct.colorCategory}</p>
-        <p>Price: ${selectedProduct.price}</p>
+        <p>Price: ${selectedProduct.price.toFixed(2)}</p>
         <p>SKU: {selectedProduct.sku}</p>
 
         <h3>Available Colors</h3>
