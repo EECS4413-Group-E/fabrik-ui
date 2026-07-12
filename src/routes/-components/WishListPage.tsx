@@ -1,7 +1,7 @@
 
 import { Link } from "@tanstack/react-router";
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { singleListingQueryOptions, queryKeys, wishlistQueryOptions } from "../../queries";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {queryKeys, wishlistQueryOptions } from "../../queries";
 import { removeWishlistItem } from "../../Api";
 
 const WishlistPage = () => {
@@ -14,14 +14,6 @@ const WishlistPage = () => {
     error,
   } = useQuery(wishlistQueryOptions());
 
-  const listingQueries = useQueries({
-    queries:
-      wishlistItems?.map((item) => ({
-        ...singleListingQueryOptions(item.listingId),
-        enabled: !!item.listingId,
-      })) ?? [],
-  });
-
   const removeMutation = useMutation({
     mutationFn: removeWishlistItem,
     onSuccess: () => {
@@ -30,11 +22,19 @@ const WishlistPage = () => {
   });
 
   if (isLoading) {
-    return <p>Loading wishlist...</p>;
+    return (<main>
+        <h1>Wishlist</h1>
+        <p>Loading wishlist...</p>
+      </main>);
   }
 
   if (isError) {
-    return <p>Error: {error.message}</p>;
+    return (<main>
+        <h1>Wishlist</h1>
+        <p>
+          Failed to load wishlist: {error.message}
+        </p>
+      </main>)
   }
 
   if (!wishlistItems || wishlistItems.length === 0) {
@@ -50,52 +50,38 @@ const WishlistPage = () => {
     <main>
       <h1>Wishlist</h1>
 
-      {wishlistItems.map((item, index) => {
-        const listingQuery = listingQueries[index];
-        const listing = listingQuery?.data;
+      {wishlistItems.map((item) => {
+        const isRemoving = removeMutation.isPending && removeMutation.variables === item.listingId;
+
+        const hasPriceRange = item.minPrice !== item.maxPrice;
 
         return (
           <div key={item.id}>
-            {listingQuery?.isLoading ? (
-              <p>Loading item...</p>
-            ) : listingQuery?.isError ? (
-              <p>Failed to load listing details.</p>
-            ) : listing ? (
-              <>
-                <Link to="/products/$listingId" params={{ listingId: listing.id }} className="link">
-                  <h2>{listing.productName}</h2>
+                <Link to="/products/$listingId" params={{ listingId: item.listingId }} className="link">
+                  <h2>{item.productName}</h2>
 
-                  {listing.products[0]?.images[0] && (
+                  {item.imageLink && (
                     <img
-                      src={listing.products[0].images[0].imageLink}
-                      alt={listing.productName}
+                      src={item.imageLink}
+                      alt={item.productName}
                       width={150}
                     />
                   )}
 
-                  <p>{listing.productDescription}</p>
-                  <p>Category: {listing.clothingCategory}</p>
-                  <p>Department: {listing.departmentCategory}</p>
-
-                  {listing.products.length > 0 && (
-                    <p>
-                      Starting at: $
-                      {Math.min(...listing.products.map((product) => product.price))}
-                    </p>
-                  )}
+                  <p>{item.productDescription}</p>
+                    
+                  <p>
+                    {hasPriceRange ?  `$${item.minPrice.toFixed(2)} – $${item.maxPrice.toFixed(2)}`:  `$${item.minPrice.toFixed(2)}`}
+                  </p>
                 </Link>
 
                 <button
                   type="button"
                   onClick={() => removeMutation.mutate(item.listingId)}
-                  disabled={removeMutation.isPending}
+                  disabled={isRemoving}
                 >
-                  Remove from Wishlist
+                  {isRemoving ? "Removing..." : "Remove from Wishlist"}
                 </button>
-              </>
-            ) : (
-              <p>Listing not found.</p>
-            )}
           </div>
         );
       })}

@@ -15,7 +15,6 @@ const API_BASE_URL = "http://localhost:5000/api";
 // To be removed once the gateway is set up properly
 const TEMP_ORDER_API_URL = "http://localhost:4004/order";
 
-const TEMP_LISTINGS_API_URL = "http://localhost:4002/listing";
 
 
 const apiClient = axios.create({
@@ -90,7 +89,7 @@ export const fetchCurrentUser = () => {
 };
 
 export const fetchListings = () => {
-  return getWithConfig<Listing[]>(TEMP_LISTINGS_API_URL);
+  return getWithConfig<Listing[]>("/catalogue/listings");
 };
 
 
@@ -108,15 +107,21 @@ export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
 };
 
 
-export const fetchListingById = (id: string) => {
-  return getWithConfig<Listing>(`${TEMP_LISTINGS_API_URL}/${id}`);
+export const fetchListingById = (listingid: string) => {
+  return getWithConfig<Listing>(`/catalogue/listing/${listingid}`);
 };
 
 export const fetchWishlist = () => {
-  return getWithConfig<WishListItem[]>(TEMP_WISHLIST_API_URL);
+  return getWithConfig<WishListItem[]>("/user/wishlist");
+};
+
+export const addWishlistItem = (listingId: string) => {
+  return postWithConfig<undefined, void>(
+    `/user/wishlist/${listingId}`,
+  );
 };
 
 export const removeWishlistItem = async (listingId: string) => {
-  await axios.delete(`${TEMP_WISHLIST_API_URL}/${listingId}`, getAxiosConfig());
+  return deleteWithConfig<void>(`/user/wishlist/${listingId}`);
 };
 
