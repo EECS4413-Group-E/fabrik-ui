@@ -1,11 +1,14 @@
 import { queryOptions } from "@tanstack/react-query";
-import { fetchCurrentUser, fetchListings, fetchListingById } from "./Api";
+
+import { fetchCurrentUser, fetchListings, fetchListingById, fetchWishlist } from "./Api";
+
 
 // --- Query keys ---
 export const queryKeys = {
   currentUser: () => ["currentUser"] as const,
   listings: () => ["listings"] as const,
-  listing: (id: string) => ["listing", id] as const
+  listing: (id: string) => ["listing", id] as const,
+   wishlist: () => ["wishlist"] as const,
 };
 
 // --- Query options ---
@@ -26,4 +29,10 @@ export const singleListingQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.listing(id),
     queryFn: () => fetchListingById(id),
+  });
+
+  export const wishlistQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.wishlist(),
+    queryFn: fetchWishlist,
   });

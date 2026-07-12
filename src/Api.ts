@@ -2,8 +2,11 @@ import axios from "axios";
 import type { LoginRegisterRequest, User } from "./models/User";
 import type { Listing } from "./models/Listing";
 import type { Order, PlaceOrderRequest } from "./models/Order";
+
 import { tokenStore } from "./tokenStore";
 import type { AccessTokenResponse } from "./models/AccessTokenResponse";
+
+import type { WishListItem } from "./models/WishList";
 
 // Will be using this once the gateway is set up properly
 const API_BASE_URL = "http://localhost:5000/api";
@@ -12,7 +15,7 @@ const API_BASE_URL = "http://localhost:5000/api";
 // To be removed once the gateway is set up properly
 const TEMP_ORDER_API_URL = "http://localhost:4004/order";
 
-const TEMP_LISTINGS_API_URL = "http://localhost:4002/listing";
+
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -86,7 +89,7 @@ export const fetchCurrentUser = () => {
 };
 
 export const fetchListings = () => {
-  return getWithConfig<Listing[]>(TEMP_LISTINGS_API_URL);
+  return getWithConfig<Listing[]>("/catalogue/listings");
 };
 
 
@@ -104,7 +107,21 @@ export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
 };
 
 
-export const fetchListingById = (id: string) => {
-  return getWithConfig<Listing>(`${TEMP_LISTINGS_API_URL}/${id}`);
+export const fetchListingById = (listingid: string) => {
+  return getWithConfig<Listing>(`/catalogue/listing/${listingid}`);
+};
+
+export const fetchWishlist = () => {
+  return getWithConfig<WishListItem[]>("/user/wishlist");
+};
+
+export const addWishlistItem = (listingId: string) => {
+  return postWithConfig<undefined, void>(
+    `/user/wishlist/${listingId}`,
+  );
+};
+
+export const removeWishlistItem = async (listingId: string) => {
+  return deleteWithConfig<void>(`/user/wishlist/${listingId}`);
 };
 
