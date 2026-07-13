@@ -8,7 +8,8 @@ const CheckoutItemSummaryCard = ({
   checkoutItems,
 }: CheckoutItemSummaryCardProps) => {
   const orderTotal = checkoutItems.reduce(
-    (total, item) => total + item.quantity * item.price,
+    (total, item) =>
+      total + item.quantity * item.price,
     0,
   );
 
@@ -22,8 +23,7 @@ const CheckoutItemSummaryCard = ({
             <th>Image</th>
             <th>Product</th>
             <th>Description</th>
-            <th>Category</th>
-            <th>Color</th>
+            <th>Colour</th>
             <th>Size</th>
             <th>SKU</th>
             <th>Quantity</th>
@@ -36,28 +36,40 @@ const CheckoutItemSummaryCard = ({
           {checkoutItems.map((item) => (
             <tr key={item.id}>
               <td>
-                <img src={item.imageLink} alt={item.productName} width="80" />
+                {item.imageLink ? (
+                  <img
+                    src={item.imageLink}
+                    alt={item.name}
+                    width={80}
+                  />
+                ) : (
+                  "No image"
+                )}
               </td>
-              <td>{item.productName}</td>
-              <td>{item.productDescription}</td>
-              <td>
-                {item.departmentCategory} / {item.clothingCategory}
-              </td>
-              <td>
-                {item.colorName} ({item.colorCategory})
-              </td>
+
+              <td>{item.name}</td>
+              <td>{item.description}</td>
+              <td>{item.colorName}</td>
               <td>{item.size}</td>
               <td>{item.sku}</td>
               <td>{item.quantity}</td>
               <td>${item.price.toFixed(2)}</td>
-              <td>${(item.quantity * item.price).toFixed(2)}</td>
+
+              <td>
+                $
+                {(
+                  item.quantity * item.price
+                ).toFixed(2)}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
       <p>
-        <strong>Total:</strong> ${orderTotal.toFixed(2)}
+        <strong>
+          Total: ${orderTotal.toFixed(2)}
+        </strong>
       </p>
     </section>
   );

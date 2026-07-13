@@ -7,12 +7,13 @@ export const OrderStatus = {
   Cancelled: "CANCELLED",
 } as const;
 
-export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+export type OrderStatus =
+  (typeof OrderStatus)[keyof typeof OrderStatus];
 
 export interface PlaceOrderItem {
   productId: string;
+  size: string;
   quantity: number;
-  price: number;
 }
 
 export interface PlaceOrderRequest {
@@ -24,6 +25,7 @@ export interface PlaceOrderRequest {
 export interface OrderItem {
   id: string;
   productId: string;
+  size: string;
   quantity: number;
   price: number;
 }
