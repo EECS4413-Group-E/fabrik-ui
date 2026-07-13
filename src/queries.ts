@@ -1,21 +1,25 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import { fetchCurrentUser, fetchListings, fetchListingById, fetchWishlist } from "./Api";
+import {
+  fetchCart,
+  fetchCurrentUser,
+  fetchListingById,
+  fetchListings,
+  fetchWishlist,
+} from "./Api";
 
-
-// --- Query keys ---
 export const queryKeys = {
   currentUser: () => ["currentUser"] as const,
   listings: () => ["listings"] as const,
   listing: (id: string) => ["listing", id] as const,
-   wishlist: () => ["wishlist"] as const,
+  wishlist: () => ["wishlist"] as const,
+  cart: () => ["cart"] as const,
 };
 
-// --- Query options ---
 export const currentUserQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.currentUser(),
-    queryFn: () => fetchCurrentUser(),
+    queryFn: fetchCurrentUser,
   });
 
 export const listingsQueryOptions = () =>
@@ -24,15 +28,20 @@ export const listingsQueryOptions = () =>
     queryFn: fetchListings,
   });
 
-
 export const singleListingQueryOptions = (id: string) =>
   queryOptions({
     queryKey: queryKeys.listing(id),
     queryFn: () => fetchListingById(id),
   });
 
-  export const wishlistQueryOptions = () =>
+export const wishlistQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.wishlist(),
     queryFn: fetchWishlist,
+  });
+
+export const cartQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.cart(),
+    queryFn: fetchCart,
   });

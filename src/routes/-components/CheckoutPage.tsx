@@ -1,32 +1,26 @@
+import { Link } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
+
 import { placeOrder } from "../../Api";
-import type { CartItem } from "../../models/CartItem";
-import { PaymentMethod, type CheckoutFormValues } from "../../models/Checkout";
+import { cartQueryOptions } from "../../queries";
+import { useClearCartMutation } from "../../mutations";
+
+import {
+  PaymentMethod,
+  type CheckoutFormValues,
+} from "../../models/Checkout";
+
 import type { PlaceOrderRequest } from "../../models/Order";
+
 import CheckoutItemSummaryCard from "./CheckoutItemSummaryCard";
 import CheckoutPaymentCard from "./CheckoutPaymentCard";
 
-const TEMP_USER_ID = "8ecf8276-e555-41cc-b2ba-e42353dc72b4";
-
-// Temporary hardcoded cart items until the shopping cart page is connected.
-const checkoutItems: CartItem[] = [
-  {
-    id: "36299f29-e585-478b-ad9d-0019450c14ae",
-    clothingCategory: "OTHER",
-    departmentCategory: "OTHER",
-    productDescription: "GOAT",
-    productName: "Messi Jersey",
-    size: "L",
-    colorName: "BlUE",
-    colorCategory: "BLUE",
-    imageLink:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSajKaXR50x3qV73W5SE8Fm3ia5xK1zJki8SOSkVkOR4w&s=10",
-    price: 1000.0,
-    sku: "00000021",
-    quantity: 1,
-  },
-];
+const TEMP_USER_ID =
+  "8ecf8276-e555-41cc-b2ba-e42353dc72b4";
 
 const getErrorMessage = (error: unknown) => {
   const possibleApiError = error as {
@@ -37,14 +31,28 @@ const getErrorMessage = (error: unknown) => {
     };
   };
 
-  return possibleApiError.response?.data?.error ?? "Unable to place order.";
+  return (
+    possibleApiError.response?.data?.error ??
+    "Unable to place order."
+  );
 };
 
 const CheckoutPage = () => {
+  const cartQuery = useQuery(cartQueryOptions());
+  const clearCartMutation = useClearCartMutation();
+
+  const checkoutItems = cartQuery.data ?? [];
+
   const placeOrderMutation = useMutation({
     mutationFn: placeOrder,
-    onSuccess: (createdOrderId) => {
-      window.location.href = `/order-details/${createdOrderId}`;
+
+    onSuccess: async (createdOrderId) => {
+      try {
+        await clearCartMutation.mutateAsync();
+      } finally {
+        window.location.href =
+          `/order-details/${createdOrderId}`;
+      }
     },
   });
 
@@ -57,9 +65,15 @@ const CheckoutPage = () => {
       cvv: "",
       paypalEmail: "",
     } as CheckoutFormValues,
+
     onSubmit: async ({ value }) => {
+      if (checkoutItems.length === 0) {
+        return;
+      }
+
       const paymentDetails =
-        value.paymentMethod === PaymentMethod.CreditCard
+        value.paymentMethod ===
+        PaymentMethod.CreditCard
           ? {
               paymentMethod: value.paymentMethod,
               cardNumber: value.cardNumber,
@@ -73,11 +87,13 @@ const CheckoutPage = () => {
 
       const orderRequest: PlaceOrderRequest = {
         userId: value.userId,
+
         orderItems: checkoutItems.map((item) => ({
-          productId: item.id,
+          productId: item.productId,
+          size: item.size,
           quantity: item.quantity,
-          price: item.price,
         })),
+
         paymentDetails,
       };
 
@@ -85,18 +101,56 @@ const CheckoutPage = () => {
     },
   });
 
+  if (cartQuery.isLoading) {
+    return <p>Loading checkout...</p>;
+  }
+
+  if (cartQuery.isError) {
+    return (
+      <main>
+        <h1>Checkout</h1>
+
+        <p>
+          Error loading cart:{" "}
+          {getErrorMessage(cartQuery.error)}
+        </p>
+      </main>
+    );
+  }
+
+  if (checkoutItems.length === 0) {
+    return (
+      <main>
+        <h1>Checkout</h1>
+
+        <p>Your shopping cart is empty.</p>
+
+        <Link to="/products">
+          Continue Shopping
+        </Link>
+      </main>
+    );
+  }
+
   return (
     <main>
       <h1>Checkout</h1>
 
-      <CheckoutItemSummaryCard checkoutItems={checkoutItems} />
+      <CheckoutItemSummaryCard
+        checkoutItems={checkoutItems}
+      />
+
+      <p>
+        Product availability and final prices will be
+        checked by the server when the order is placed.
+      </p>
 
       <hr />
 
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
           form.handleSubmit();
         }}
       >
@@ -104,14 +158,32 @@ const CheckoutPage = () => {
 
         <br />
 
-        <button type="submit" disabled={placeOrderMutation.isPending}>
-          {placeOrderMutation.isPending ? "Placing Order..." : "Place Order"}
+        <button
+          type="submit"
+          disabled={
+            placeOrderMutation.isPending ||
+            clearCartMutation.isPending
+          }
+        >
+          {placeOrderMutation.isPending
+            ? "Placing Order..."
+            : "Place Order"}
         </button>
       </form>
 
       {placeOrderMutation.isError && (
         <p>
-          <strong>Error:</strong> {getErrorMessage(placeOrderMutation.error)}
+          <strong>Error:</strong>{" "}
+          {getErrorMessage(
+            placeOrderMutation.error,
+          )}
+        </p>
+      )}
+
+      {clearCartMutation.isError && (
+        <p>
+          The order was placed, but the shopping cart
+          could not be cleared automatically.
         </p>
       )}
     </main>
