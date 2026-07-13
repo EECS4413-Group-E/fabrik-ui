@@ -17,7 +17,10 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
+import { Route as OrdersIndexRouteImport } from './routes/orders/index'
 import { Route as ProductsListingIdRouteImport } from './routes/products/$listingId'
+import { Route as OrdersOrderIdIndexRouteImport } from './routes/orders/$orderId/index'
+import { Route as OrdersOrderIdConfirmRouteImport } from './routes/orders/$orderId/confirm'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -59,9 +62,24 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrdersIndexRoute = OrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsListingIdRoute = ProductsListingIdRouteImport.update({
   id: '/products/$listingId',
   path: '/products/$listingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersOrderIdIndexRoute = OrdersOrderIdIndexRouteImport.update({
+  id: '/orders/$orderId/',
+  path: '/orders/$orderId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersOrderIdConfirmRoute = OrdersOrderIdConfirmRouteImport.update({
+  id: '/orders/$orderId/confirm',
+  path: '/orders/$orderId/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -74,7 +92,10 @@ export interface FileRoutesByFullPath {
   '/user': typeof UserRoute
   '/wishlist': typeof WishlistRoute
   '/products/$listingId': typeof ProductsListingIdRoute
+  '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/orders/$orderId/confirm': typeof OrdersOrderIdConfirmRoute
+  '/orders/$orderId/': typeof OrdersOrderIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -85,7 +106,10 @@ export interface FileRoutesByTo {
   '/user': typeof UserRoute
   '/wishlist': typeof WishlistRoute
   '/products/$listingId': typeof ProductsListingIdRoute
+  '/orders': typeof OrdersIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/orders/$orderId/confirm': typeof OrdersOrderIdConfirmRoute
+  '/orders/$orderId': typeof OrdersOrderIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,7 +121,10 @@ export interface FileRoutesById {
   '/user': typeof UserRoute
   '/wishlist': typeof WishlistRoute
   '/products/$listingId': typeof ProductsListingIdRoute
+  '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/orders/$orderId/confirm': typeof OrdersOrderIdConfirmRoute
+  '/orders/$orderId/': typeof OrdersOrderIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -110,7 +137,10 @@ export interface FileRouteTypes {
     | '/user'
     | '/wishlist'
     | '/products/$listingId'
+    | '/orders/'
     | '/products/'
+    | '/orders/$orderId/confirm'
+    | '/orders/$orderId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -121,7 +151,10 @@ export interface FileRouteTypes {
     | '/user'
     | '/wishlist'
     | '/products/$listingId'
+    | '/orders'
     | '/products'
+    | '/orders/$orderId/confirm'
+    | '/orders/$orderId'
   id:
     | '__root__'
     | '/'
@@ -132,7 +165,10 @@ export interface FileRouteTypes {
     | '/user'
     | '/wishlist'
     | '/products/$listingId'
+    | '/orders/'
     | '/products/'
+    | '/orders/$orderId/confirm'
+    | '/orders/$orderId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -144,7 +180,10 @@ export interface RootRouteChildren {
   UserRoute: typeof UserRoute
   WishlistRoute: typeof WishlistRoute
   ProductsListingIdRoute: typeof ProductsListingIdRoute
+  OrdersIndexRoute: typeof OrdersIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
+  OrdersOrderIdConfirmRoute: typeof OrdersOrderIdConfirmRoute
+  OrdersOrderIdIndexRoute: typeof OrdersOrderIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,11 +244,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/orders/': {
+      id: '/orders/'
+      path: '/orders'
+      fullPath: '/orders/'
+      preLoaderRoute: typeof OrdersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/$listingId': {
       id: '/products/$listingId'
       path: '/products/$listingId'
       fullPath: '/products/$listingId'
       preLoaderRoute: typeof ProductsListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders/$orderId/': {
+      id: '/orders/$orderId/'
+      path: '/orders/$orderId'
+      fullPath: '/orders/$orderId/'
+      preLoaderRoute: typeof OrdersOrderIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders/$orderId/confirm': {
+      id: '/orders/$orderId/confirm'
+      path: '/orders/$orderId/confirm'
+      fullPath: '/orders/$orderId/confirm'
+      preLoaderRoute: typeof OrdersOrderIdConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -224,7 +284,10 @@ const rootRouteChildren: RootRouteChildren = {
   UserRoute: UserRoute,
   WishlistRoute: WishlistRoute,
   ProductsListingIdRoute: ProductsListingIdRoute,
+  OrdersIndexRoute: OrdersIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
+  OrdersOrderIdConfirmRoute: OrdersOrderIdConfirmRoute,
+  OrdersOrderIdIndexRoute: OrdersOrderIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,63 +1,33 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { addWishlistItem, removeWishlistItem} from "../../Api";
-import {queryKeys,wishlistQueryOptions} from "../../queries";
+import { wishlistQueryOptions } from '../../queries';
+import { useWishlistMutation } from '../../mutations.ts';
 
 type WishlistButtonProps = {
   listingId: string;
   showText?: boolean;
 };
 
-const WishlistButton = ({
-  listingId,
-  showText = false,
-}: WishlistButtonProps) => {
-  const queryClient = useQueryClient();
+const WishlistButton = ({ listingId, showText = false }: WishlistButtonProps) => {
+  const { data: wishlistItems, isLoading } = useQuery(wishlistQueryOptions());
 
-  const {
-    data: wishlistItems,
-    isLoading,
-  } = useQuery(wishlistQueryOptions());
+  const isInWishlist = wishlistItems?.some((item) => item.listingId === listingId) ?? false;
 
-  const isInWishlist =
-    wishlistItems?.some( (item) => item.listingId === listingId) ?? false;
+  const { mutate, isPending } = useWishlistMutation(isInWishlist, listingId);
 
-  const wishlistMutation = useMutation({
-    mutationFn: () => {
-      if (isInWishlist) {
-        return removeWishlistItem(listingId);
-      }
-
-      return addWishlistItem(listingId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.wishlist(),
-      });
-    },
-  });
-
-  const buttonText = isInWishlist
-    ? "Remove from Wishlist"
-    : "Add to Wishlist";
+  const buttonText = isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist';
 
   return (
     <button
       type="button"
-      onClick={() => wishlistMutation.mutate()}
-      disabled={ isLoading || wishlistMutation.isPending }
+      onClick={() => mutate()}
+      disabled={isLoading || isPending}
       aria-label={buttonText}
       aria-pressed={isInWishlist}
     >
-      <span aria-hidden="true">
-        {isInWishlist ? "♥" : "♡"}
-      </span>
+      <span aria-hidden="true">{isInWishlist ? '♥' : '♡'}</span>
 
-      {showText && (
-        <span>
-          {wishlistMutation.isPending ? "Updating..." : buttonText}
-        </span>
-      )}
+      {showText && <span>{isPending ? 'Updating...' : buttonText}</span>}
     </button>
   );
 };

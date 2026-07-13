@@ -1,19 +1,20 @@
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
   addCartItem,
+  addWishlistItem,
   clearCart,
   loginUser,
+  placeOrder,
   registerUser,
   removeCartItem,
+  removeWishlistItem,
   updateCartItemQuantity,
-} from "./Api";
+} from './Api';
 
-import { queryKeys } from "./queries";
-import { tokenStore } from "./tokenStore";
+import { queryKeys } from './queries';
+import { tokenStore } from './tokenStore';
+import { useNavigate } from '@tanstack/react-router';
 
 export const useRegisterMutation = () =>
   useMutation({
@@ -79,6 +80,53 @@ export const useClearCartMutation = () => {
       return queryClient.invalidateQueries({
         queryKey: queryKeys.cart(),
       });
+    },
+  });
+};
+
+export const useWishlistMutation = (isInWishlist: boolean, listingId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => {
+      if (isInWishlist) {
+        return removeWishlistItem(listingId);
+      }
+
+      return addWishlistItem(listingId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.wishlist(),
+      });
+    },
+  });
+};
+
+export const useRemoveWishlistMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: removeWishlistItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.wishlist() });
+    },
+  });
+};
+
+export const useCreateOrderMutation = () => {
+  const navigate = useNavigate();
+  const { mutate: clearCart } = useClearCartMutation();
+
+  return useMutation({
+    mutationFn: placeOrder,
+
+    onSuccess: async (createdOrderId) => {
+      try {
+        clearCart();
+      } finally {
+        navigate({ to: '/orders/$orderId/confirm', params: { orderId: createdOrderId } });
+      }
     },
   });
 };
