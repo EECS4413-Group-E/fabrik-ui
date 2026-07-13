@@ -16,12 +16,14 @@ const getErrorMessage = (error: unknown) => {
   const possibleApiError = error as {
     response?: {
       data?: {
+        message?: string;
         error?: string;
       };
     };
   };
 
   return (
+    possibleApiError.response?.data?.message ??
     possibleApiError.response?.data?.error ??
     "Unable to add this item to the cart."
   );
