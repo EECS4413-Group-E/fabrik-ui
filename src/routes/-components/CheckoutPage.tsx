@@ -1,26 +1,18 @@
-import { Link } from "@tanstack/react-router";
-import { useForm } from "@tanstack/react-form";
-import {
-  useMutation,
-  useQuery,
-} from "@tanstack/react-query";
+import { Link } from '@tanstack/react-router';
+import { useForm } from '@tanstack/react-form';
+import { useQuery } from '@tanstack/react-query';
 
-import { placeOrder } from "../../Api";
-import { cartQueryOptions } from "../../queries";
-import { useClearCartMutation } from "../../mutations";
+import { cartQueryOptions } from '../../queries';
+import { useCreateOrderMutation } from '../../mutations';
 
-import {
-  PaymentMethod,
-  type CheckoutFormValues,
-} from "../../models/Checkout";
+import { PaymentMethod, type CheckoutFormValues } from '../../models/Checkout';
 
-import type { PlaceOrderRequest } from "../../models/Order";
+import type { PlaceOrderRequest } from '../../models/Order';
 
-import CheckoutItemSummaryCard from "./CheckoutItemSummaryCard";
-import CheckoutPaymentCard from "./CheckoutPaymentCard";
+import CheckoutItemSummaryCard from './CheckoutItemSummaryCard';
+import CheckoutPaymentCard from './CheckoutPaymentCard';
 
-const TEMP_USER_ID =
-  "8ecf8276-e555-41cc-b2ba-e42353dc72b4";
+const TEMP_USER_ID = '8ecf8276-e555-41cc-b2ba-e42353dc72b4';
 
 const getErrorMessage = (error: unknown) => {
   const possibleApiError = error as {
@@ -31,39 +23,24 @@ const getErrorMessage = (error: unknown) => {
     };
   };
 
-  return (
-    possibleApiError.response?.data?.error ??
-    "Unable to place order."
-  );
+  return possibleApiError.response?.data?.error ?? 'Unable to place order.';
 };
 
 const CheckoutPage = () => {
   const cartQuery = useQuery(cartQueryOptions());
-  const clearCartMutation = useClearCartMutation();
 
   const checkoutItems = cartQuery.data ?? [];
 
-  const placeOrderMutation = useMutation({
-    mutationFn: placeOrder,
-
-    onSuccess: async (createdOrderId) => {
-      try {
-        await clearCartMutation.mutateAsync();
-      } finally {
-        window.location.href =
-          `/order-details/${createdOrderId}`;
-      }
-    },
-  });
+  const { mutate, isPending, isError, error } = useCreateOrderMutation();
 
   const form = useForm({
     defaultValues: {
       userId: TEMP_USER_ID,
       paymentMethod: PaymentMethod.CreditCard,
-      cardNumber: "",
-      expiryDate: "",
-      cvv: "",
-      paypalEmail: "",
+      cardNumber: '',
+      expiryDate: '',
+      cvv: '',
+      paypalEmail: '',
     } as CheckoutFormValues,
 
     onSubmit: async ({ value }) => {
@@ -72,8 +49,7 @@ const CheckoutPage = () => {
       }
 
       const paymentDetails =
-        value.paymentMethod ===
-        PaymentMethod.CreditCard
+        value.paymentMethod === PaymentMethod.CreditCard
           ? {
               paymentMethod: value.paymentMethod,
               cardNumber: value.cardNumber,
@@ -97,7 +73,7 @@ const CheckoutPage = () => {
         paymentDetails,
       };
 
-      placeOrderMutation.mutate(orderRequest);
+      mutate(orderRequest);
     },
   });
 
@@ -110,10 +86,7 @@ const CheckoutPage = () => {
       <main>
         <h1>Checkout</h1>
 
-        <p>
-          Error loading cart:{" "}
-          {getErrorMessage(cartQuery.error)}
-        </p>
+        <p>Error loading cart: {getErrorMessage(cartQuery.error)}</p>
       </main>
     );
   }
@@ -125,9 +98,7 @@ const CheckoutPage = () => {
 
         <p>Your shopping cart is empty.</p>
 
-        <Link to="/products">
-          Continue Shopping
-        </Link>
+        <Link to="/products">Continue Shopping</Link>
       </main>
     );
   }
@@ -136,13 +107,11 @@ const CheckoutPage = () => {
     <main>
       <h1>Checkout</h1>
 
-      <CheckoutItemSummaryCard
-        checkoutItems={checkoutItems}
-      />
+      <CheckoutItemSummaryCard checkoutItems={checkoutItems} />
 
       <p>
-        Product availability and final prices will be
-        checked by the server when the order is placed.
+        Product availability and final prices will be checked by the server when the order is
+        placed.
       </p>
 
       <hr />
@@ -158,32 +127,14 @@ const CheckoutPage = () => {
 
         <br />
 
-        <button
-          type="submit"
-          disabled={
-            placeOrderMutation.isPending ||
-            clearCartMutation.isPending
-          }
-        >
-          {placeOrderMutation.isPending
-            ? "Placing Order..."
-            : "Place Order"}
+        <button type="submit" disabled={isPending}>
+          {isPending ? 'Placing Order...' : 'Place Order'}
         </button>
       </form>
 
-      {placeOrderMutation.isError && (
+      {isError && (
         <p>
-          <strong>Error:</strong>{" "}
-          {getErrorMessage(
-            placeOrderMutation.error,
-          )}
-        </p>
-      )}
-
-      {clearCartMutation.isError && (
-        <p>
-          The order was placed, but the shopping cart
-          could not be cleared automatically.
+          <strong>Error:</strong> {getErrorMessage(error)}
         </p>
       )}
     </main>

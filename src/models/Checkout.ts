@@ -5,7 +5,7 @@ export const PaymentMethod = {
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 
-export interface PaymentDetails {
+export interface PaymentDetailsRequest {
   paymentMethod: PaymentMethod;
   cardNumber?: string;
   expiryDate?: string;

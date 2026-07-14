@@ -1,25 +1,26 @@
-import axios from "axios";
+import axios from 'axios';
+import type { LoginRegisterRequest, User } from './models/User';
+import type { Listing } from './models/Listing';
+import type { Order, PlaceOrderRequest } from './models/Order';
 
-import type { LoginRegisterRequest, User } from "./models/User";
-import type { Listing } from "./models/Listing";
-import type { Order, PlaceOrderRequest } from "./models/Order";
-import type { AccessTokenResponse } from "./models/AccessTokenResponse";
-import type { WishListItem } from "./models/WishList";
+import { tokenStore } from './tokenStore';
+import type { AccessTokenResponse } from './models/AccessTokenResponse';
+
+import type { WishListItem } from './models/WishList';
+
 import type {
   AddCartItemRequest,
   CartItem,
   CartItemReference,
   RemoveCartItemRequest,
   UpdateCartItemQuantityRequest,
-} from "./models/CartItem";
+} from './models/CartItem';
 
-import { tokenStore } from "./tokenStore";
-
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // Temporary direct URL until the frontend order request is fully moved
 // to the Gateway.
-const TEMP_ORDER_API_URL = "http://localhost:4004/order";
+const TEMP_ORDER_API_URL = 'http://localhost:4004/order';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -40,27 +41,20 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const isAuthCall = originalRequest.url?.includes("/auth");
+    const isAuthCall = originalRequest.url?.includes('/auth');
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !isAuthCall
-    ) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthCall) {
       originalRequest._retry = true;
 
       try {
-        const { data } =
-          await apiClient.post<AccessTokenResponse>("/auth/refresh");
-
+        const { data } = await apiClient.post<AccessTokenResponse>('/auth/refresh');
         tokenStore.set(data.accessToken);
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
         return apiClient(originalRequest);
       } catch (refreshError) {
         tokenStore.set(null);
-        window.location.href = "/login";
-
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }
@@ -82,37 +76,33 @@ const postWithConfig = async <Request, Response>(
   return response.data;
 };
 
-const deleteWithConfig = async <Response>(
-  url: string,
-): Promise<Response> => {
+const deleteWithConfig = async <Response>(url: string): Promise<Response> => {
   const response = await apiClient.delete<Response>(url);
   return response.data;
 };
 
 export const registerUser = (data: LoginRegisterRequest) => {
-  return postWithConfig<LoginRegisterRequest, AccessTokenResponse>(
-    "/user/register",
-    data,
-  );
+  return postWithConfig<LoginRegisterRequest, AccessTokenResponse>('/user/register', data);
 };
 
 export const loginUser = (data: LoginRegisterRequest) => {
-  return postWithConfig<LoginRegisterRequest, AccessTokenResponse>(
-    "/auth/login",
-    data,
-  );
+  return postWithConfig<LoginRegisterRequest, AccessTokenResponse>('/auth/login', data);
 };
 
 export const fetchCurrentUser = () => {
-  return getWithConfig<User>("/user");
+  return getWithConfig<User>('/user');
 };
 
 export const fetchListings = () => {
-  return getWithConfig<Listing[]>("/catalogue/listings");
+  return getWithConfig<Listing[]>('/catalogue/listings');
 };
 
-export const fetchListingById = (listingId: string) => {
-  return getWithConfig<Listing>(`/catalogue/listing/${listingId}`);
+export const fetchOrders = () => {
+  return getWithConfig<Order[]>('/order/user');
+};
+
+export const fetchOrderDetails = (orderId: string) => {
+  return getWithConfig<Order>(`/order/${orderId}`);
 };
 
 export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
@@ -121,21 +111,23 @@ export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
     orderRequest,
   );
 
-  if (typeof response === "string") {
+  if (typeof response === 'string') {
     return response;
   }
 
   return response.id;
 };
 
+export const fetchListingById = (listingid: string) => {
+  return getWithConfig<Listing>(`/catalogue/listing/${listingid}`);
+};
+
 export const fetchWishlist = () => {
-  return getWithConfig<WishListItem[]>("/user/wishlist");
+  return getWithConfig<WishListItem[]>('/user/wishlist');
 };
 
 export const addWishlistItem = (listingId: string) => {
-  return postWithConfig<undefined, void>(
-    `/user/wishlist/${listingId}`,
-  );
+  return postWithConfig<undefined, void>(`/user/wishlist/${listingId}`);
 };
 
 export const removeWishlistItem = (listingId: string) => {
@@ -149,46 +141,33 @@ export const removeWishlistItem = (listingId: string) => {
  */
 
 export const fetchCart = () => {
-  return getWithConfig<CartItem[]>("/user/cart");
+  return getWithConfig<CartItem[]>('/user/cart');
 };
 
 export const addCartItem = (request: AddCartItemRequest) => {
-  return postWithConfig<AddCartItemRequest, CartItemReference>(
-    "/user/cart",
-    request,
-  );
+  return postWithConfig<AddCartItemRequest, CartItemReference>('/user/cart', request);
 };
 
-export const updateCartItemQuantity = async (
-  request: UpdateCartItemQuantityRequest,
-) => {
+export const updateCartItemQuantity = async (request: UpdateCartItemQuantityRequest) => {
   const productId = encodeURIComponent(request.productId);
   const size = encodeURIComponent(request.size);
 
-  const response = await apiClient.patch<void>(
-    `/user/cart/${productId}/${size}`,
-    undefined,
-    {
-      params: {
-        quantity: request.quantity,
-      },
+  const response = await apiClient.patch<void>(`/user/cart/${productId}/${size}`, undefined, {
+    params: {
+      quantity: request.quantity,
     },
-  );
+  });
 
   return response.data;
 };
 
-export const removeCartItem = (
-  request: RemoveCartItemRequest,
-) => {
+export const removeCartItem = (request: RemoveCartItemRequest) => {
   const productId = encodeURIComponent(request.productId);
   const size = encodeURIComponent(request.size);
 
-  return deleteWithConfig<void>(
-    `/user/cart/${productId}/${size}`,
-  );
+  return deleteWithConfig<void>(`/user/cart/${productId}/${size}`);
 };
 
 export const clearCart = () => {
-  return deleteWithConfig<void>("/user/cart");
+  return deleteWithConfig<void>('/user/cart');
 };

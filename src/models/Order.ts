@@ -1,14 +1,15 @@
-import type { PaymentDetails } from "./Checkout";
+import type { PaymentDetailsRequest } from './Checkout';
+import type { Size } from './Size.ts';
+import type { PaymentDetails } from './PaymentDetails.ts';
+import type { ShippingDetails } from './ShippingDetails.ts';
 
-export const OrderStatus = {
-  Preparing: "PREPARING",
-  Shipped: "SHIPPED",
-  Delivered: "DELIVERED",
-  Cancelled: "CANCELLED",
+export const ShippingStatus = {
+  Preparing: 'PREPARING',
+  Shipped: 'SHIPPED',
+  Delivered: 'DELIVERED',
 } as const;
 
-export type OrderStatus =
-  (typeof OrderStatus)[keyof typeof OrderStatus];
+export type ShippingStatusType = (typeof ShippingStatus)[keyof typeof ShippingStatus];
 
 export interface PlaceOrderItem {
   productId: string;
@@ -19,13 +20,19 @@ export interface PlaceOrderItem {
 export interface PlaceOrderRequest {
   userId: string;
   orderItems: PlaceOrderItem[];
-  paymentDetails: PaymentDetails;
+  paymentDetails: PaymentDetailsRequest;
 }
 
 export interface OrderItem {
   id: string;
   productId: string;
-  size: string;
+  listingId: string;
+  sku: string;
+  name: string;
+  description: string;
+  colorName: string;
+  imageLink: string;
+  size: Size;
   quantity: number;
   price: number;
 }
@@ -36,7 +43,8 @@ export interface Order {
   createdDate: string;
   deliveredDate: string | null;
   totalPrice: number;
-  orderItems: OrderItem[];
-  orderStatus: OrderStatus;
+  items: OrderItem[];
   userId: string;
+  paymentDetails: PaymentDetails;
+  shippingDetails: ShippingDetails;
 }

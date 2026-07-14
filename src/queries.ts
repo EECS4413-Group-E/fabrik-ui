@@ -1,19 +1,24 @@
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions } from '@tanstack/react-query';
 
 import {
   fetchCart,
   fetchCurrentUser,
-  fetchListingById,
   fetchListings,
+  fetchListingById,
   fetchWishlist,
-} from "./Api";
+  fetchOrderDetails,
+  fetchOrders,
+} from './Api';
 
+// --- Query keys ---
 export const queryKeys = {
-  currentUser: () => ["currentUser"] as const,
-  listings: () => ["listings"] as const,
-  listing: (id: string) => ["listing", id] as const,
-  wishlist: () => ["wishlist"] as const,
-  cart: () => ["cart"] as const,
+  currentUser: () => ['currentUser'] as const,
+  listings: () => ['listings'] as const,
+  listing: (id: string) => ['listing', id] as const,
+  wishlist: () => ['wishlist'] as const,
+  orders: () => ['orders'] as const,
+  order: (id: string) => ['order', id] as const,
+  cart: () => ['cart'] as const,
 };
 
 export const currentUserQueryOptions = () =>
@@ -38,6 +43,18 @@ export const wishlistQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.wishlist(),
     queryFn: fetchWishlist,
+  });
+
+export const orderDetailsQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: queryKeys.order(id),
+    queryFn: () => fetchOrderDetails(id),
+  });
+
+export const ordersQueryOptions = () =>
+  queryOptions({
+    queryKey: queryKeys.orders(),
+    queryFn: fetchOrders,
   });
 
 export const cartQueryOptions = () =>
