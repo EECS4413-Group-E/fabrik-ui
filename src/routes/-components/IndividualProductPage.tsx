@@ -1,12 +1,21 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from 'react';
+import { Link } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 
-import { singleListingQueryOptions } from "../../queries";
-import { useAddCartItemMutation } from "../../mutations";
-import type { Product } from "../../models/Listing";
+import { singleListingQueryOptions } from '../../queries';
+import { useAddCartItemMutation } from '../../mutations';
+import type { Product } from '../../models/Listing';
 
-import WishlistButton from "./WishlistButton";
+import WishlistButton from './WishlistButton';
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@mui/material';
 
 type IndividualProductPageProps = {
   listingId: string;
@@ -25,13 +34,11 @@ const getErrorMessage = (error: unknown) => {
   return (
     possibleApiError.response?.data?.message ??
     possibleApiError.response?.data?.error ??
-    "Unable to add this item to the cart."
+    'Unable to add this item to the cart.'
   );
 };
 
-const IndividualProductPage = ({
-  listingId,
-}: IndividualProductPageProps) => {
+const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
   const {
     data: listing,
     isError,
@@ -41,41 +48,38 @@ const IndividualProductPage = ({
 
   const addCartItemMutation = useAddCartItemMutation();
 
-  const [selectedProductIndex, setSelectedProductIndex] =
-    useState(0);
+  const [selectedProductIndex, setSelectedProductIndex] = useState(0);
 
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
 
   if (isLoading) {
-    return <p>Loading product...</p>;
+    return <Typography>Loading product...</Typography>;
   }
 
   if (isError) {
-    return <p>Error: {error.message}</p>;
+    return <Typography>Error: {error.message}</Typography>;
   }
 
   if (!listing) {
-    return <p>Product not found.</p>;
+    return <Typography>Product not found.</Typography>;
   }
 
-  const selectedProduct: Product | undefined =
-    listing.products[selectedProductIndex];
+  const selectedProduct: Product | undefined = listing.products[selectedProductIndex];
 
   if (!selectedProduct) {
-    return <p>No product variations available.</p>;
+    return <Typography>No product variations available.</Typography>;
   }
 
   const selectedImage = selectedProduct.images[0];
 
-  const selectedAvailability =
-    selectedProduct.availabilities.find(
-      (availability) => availability.size === selectedSize,
-    );
+  const selectedAvailability = selectedProduct.availabilities.find(
+    (availability) => availability.size === selectedSize,
+  );
 
   const handleProductSelection = (index: number) => {
     setSelectedProductIndex(index);
-    setSelectedSize("");
+    setSelectedSize('');
     setQuantity(1);
     addCartItemMutation.reset();
   };
@@ -86,18 +90,11 @@ const IndividualProductPage = ({
     addCartItemMutation.reset();
   };
 
-  const handleQuantityChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextQuantity = Number(event.target.value);
-    const maximumQuantity =
-      selectedAvailability?.availability ?? 1;
+    const maximumQuantity = selectedAvailability?.availability ?? 1;
 
-    if (
-      Number.isInteger(nextQuantity) &&
-      nextQuantity >= 1 &&
-      nextQuantity <= maximumQuantity
-    ) {
+    if (Number.isInteger(nextQuantity) && nextQuantity >= 1 && nextQuantity <= maximumQuantity) {
       setQuantity(nextQuantity);
     }
   };
@@ -115,123 +112,85 @@ const IndividualProductPage = ({
   };
 
   return (
-    <main>
-      <h1>{listing.productName}</h1>
+    <Box>
+      <Typography variant={'h1'}>{listing.productName}</Typography>
 
       <WishlistButton listingId={listing.id} showText />
 
-      {selectedImage && (
-        <img
-          src={selectedImage.imageLink}
-          alt={listing.productName}
-          width={300}
-        />
-      )}
+      {selectedImage && <img src={selectedImage.imageLink} alt={listing.productName} width={300} />}
 
-      <p>{listing.productDescription}</p>
-      <p>Category: {listing.clothingCategory}</p>
-      <p>Department: {listing.departmentCategory}</p>
+      <Typography>{listing.productDescription}</Typography>
+      <Typography>Category: {listing.clothingCategory}</Typography>
+      <Typography>Department: {listing.departmentCategory}</Typography>
 
-      <h2>Selected Color: {selectedProduct.colorName}</h2>
-      <p>Color Category: {selectedProduct.colorCategory}</p>
-      <p>Price: ${selectedProduct.price.toFixed(2)}</p>
-      <p>SKU: {selectedProduct.sku}</p>
+      <Typography variant={'h2'}>Selected Color: {selectedProduct.colorName}</Typography>
+      <Typography>Color Category: {selectedProduct.colorCategory}</Typography>
+      <Typography>Price: ${selectedProduct.price.toFixed(2)}</Typography>
+      <Typography>SKU: {selectedProduct.sku}</Typography>
 
-      <h3>Available Colors</h3>
+      <Typography variant={'h3'}>Available Colors</Typography>
 
-      <div>
+      <Box>
         {listing.products.map((product, index) => (
-          <button
+          <Button
             key={product.id}
-            type="button"
             onClick={() => handleProductSelection(index)}
             disabled={index === selectedProductIndex}
           >
             {product.colorName}
-          </button>
+          </Button>
         ))}
-      </div>
+      </Box>
 
-      <h3>Select a Size</h3>
+      <Typography variant={'h3'}>Select a Size</Typography>
 
-      <div>
-        {selectedProduct.availabilities.map(
-          (availability) => (
-            <label
-              key={availability.id}
-              style={{
-                display: "block",
-                marginBottom: "8px",
-              }}
-            >
-              <input
-                type="radio"
-                name="size"
-                value={availability.size}
-                checked={
-                  selectedSize === availability.size
-                }
-                disabled={availability.availability < 1}
-                onChange={() =>
-                  handleSizeSelection(availability.size)
-                }
-              />
-
-              {availability.size}:{" "}
-              {availability.availability > 0
-                ? `${availability.availability} available`
-                : "Out of stock"}
-            </label>
-          ),
-        )}
-      </div>
-
-      <br />
-
-      <label htmlFor="cart-quantity">
-        Quantity:
-      </label>
-
-      <input
+      <Box>
+        {selectedProduct.availabilities.map((availability) => (
+          <RadioGroup
+            name={'Size'}
+            onChange={(e) => handleSizeSelection(e.target.value)}
+            value={selectedSize}
+            key={availability.size}
+          >
+            <FormControlLabel
+              control={<Radio />}
+              label={`${availability.size}:
+              ${
+                availability.availability > 0
+                  ? availability.availability + 'available'
+                  : 'Out of stock'
+              }`}
+              value={availability.size}
+            />
+          </RadioGroup>
+        ))}
+      </Box>
+      <TextField
         id="cart-quantity"
-        type="number"
-        min={1}
-        max={selectedAvailability?.availability ?? 1}
         value={quantity}
         disabled={!selectedAvailability}
         onChange={handleQuantityChange}
+        label={'Quantity:'}
       />
-
-      <br />
-      <br />
-
-      <button
-        type="button"
-        disabled={
-          !selectedAvailability ||
-          addCartItemMutation.isPending
-        }
+      <Button
+        disabled={!selectedAvailability || addCartItemMutation.isPending}
         onClick={handleAddToCart}
       >
-        {addCartItemMutation.isPending
-          ? "Adding..."
-          : "Add to Cart"}
-      </button>
+        {addCartItemMutation.isPending ? 'Adding...' : 'Add to Cart'}
+      </Button>
 
       {addCartItemMutation.isSuccess && (
-        <p>
-          Item added successfully.{" "}
-          <Link to="/cart">View Cart</Link>
-        </p>
+        <Typography>
+          Item added successfully. <Link to="/cart">View Cart</Link>
+        </Typography>
       )}
 
       {addCartItemMutation.isError && (
-        <p>
-          <strong>Error:</strong>{" "}
-          {getErrorMessage(addCartItemMutation.error)}
-        </p>
+        <Typography color="error">
+          <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
+        </Typography>
       )}
-    </main>
+    </Box>
   );
 };
 

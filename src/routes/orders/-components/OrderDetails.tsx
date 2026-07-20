@@ -2,6 +2,7 @@ import { useParams } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { orderDetailsQueryOptions } from '../../../queries.ts';
 import OrderItemSummary from './OrderItemSummary.tsx';
+import { Box, Typography } from '@mui/material';
 
 const OrderDetails = () => {
   const { orderId } = useParams({ from: '/orders/$orderId/' });
@@ -9,14 +10,11 @@ const OrderDetails = () => {
   const { data: orderDetails } = useSuspenseQuery(orderDetailsQueryOptions(orderId));
 
   return (
-    <div>
-      <div>
-        <h1>Order Details</h1>
-        <div />
-        <div>Order number: {orderDetails.orderNumber}</div>
-        <OrderItemSummary orderItems={orderDetails.items} />
-      </div>
-    </div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <Typography variant={'h1'}>Order Details</Typography>
+      <Box>Order number: {orderDetails.orderNumber}</Box>
+      <OrderItemSummary orderItems={orderDetails.items} />
+    </Box>
   );
 };
 

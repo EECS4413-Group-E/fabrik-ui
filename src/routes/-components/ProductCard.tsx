@@ -1,9 +1,7 @@
-
-
-import { Link } from "@tanstack/react-router";
-import type { Listing } from "../../models/Listing";
-import WishlistButton from "./WishlistButton";
-
+import { Link } from '@tanstack/react-router';
+import type { Listing } from '../../models/Listing';
+import WishlistButton from './WishlistButton';
+import { Box, Typography } from '@mui/material';
 
 type ProductCardProps = {
   listing: Listing;
@@ -19,25 +17,23 @@ const ProductCard = ({ listing }: ProductCardProps) => {
   const colors = listing.products.map((product) => product.colorName);
 
   return (
-    <article>
+    <Box>
       <WishlistButton listingId={listing.id} />
       <Link to="/products/$listingId" params={{ listingId: listing.id }}>
-      <div>
-        {firstImage && (
-          <img src={firstImage.imageLink} alt={listing.productName} width={150} />
-        )}
+        <Box>
+          {firstImage && <img src={firstImage.imageLink} alt={listing.productName} width={150} />}
 
-        <h2>{listing.productName}</h2>
-        <p>{listing.productDescription}</p>
-        <p>Category: {listing.clothingCategory}</p>
-        <p>Department: {listing.departmentCategory}</p>
+          <Typography variant={'h2'}>{listing.productName}</Typography>
+          <Typography>{listing.productDescription}</Typography>
+          <Typography>Category: {listing.clothingCategory}</Typography>
+          <Typography>Department: {listing.departmentCategory}</Typography>
 
-        {lowestPrice !== null && <p>Starting at: ${lowestPrice.toFixed(2)}</p>}
+          {lowestPrice !== null && <Typography>Starting at: ${lowestPrice.toFixed(2)}</Typography>}
 
-        {colors.length > 0 && <p>Available colors: {colors.join(", ")}</p>}
-      </div>
-    </Link>
-    </article>
+          {colors.length > 0 && <Typography>Available colors: {colors.join(', ')}</Typography>}
+        </Box>
+      </Link>
+    </Box>
   );
 };
 

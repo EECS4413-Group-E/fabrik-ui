@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { wishlistQueryOptions } from '../../queries';
 import { useWishlistMutation } from '../../mutations.ts';
+import { Box, Button } from '@mui/material';
 
 type WishlistButtonProps = {
   listingId: string;
@@ -18,17 +19,18 @@ const WishlistButton = ({ listingId, showText = false }: WishlistButtonProps) =>
   const buttonText = isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist';
 
   return (
-    <button
-      type="button"
+    <Button
       onClick={() => mutate()}
       disabled={isLoading || isPending}
       aria-label={buttonText}
       aria-pressed={isInWishlist}
     >
-      <span aria-hidden="true">{isInWishlist ? '♥' : '♡'}</span>
+      <Box component={'span'} aria-hidden="true">
+        {isInWishlist ? '♥' : '♡'}
+      </Box>
 
-      {showText && <span>{isPending ? 'Updating...' : buttonText}</span>}
-    </button>
+      {showText && <Box component={'span'}>{isPending ? 'Updating...' : buttonText}</Box>}
+    </Button>
   );
 };
 
