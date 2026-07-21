@@ -11,6 +11,7 @@ import type { PlaceOrderRequest } from '../../models/Order';
 
 import CheckoutItemSummaryCard from './CheckoutItemSummaryCard';
 import CheckoutPaymentCard from './CheckoutPaymentCard';
+import { Box, Button, Typography } from '@mui/material';
 
 const TEMP_USER_ID = '8ecf8276-e555-41cc-b2ba-e42353dc72b4';
 
@@ -83,39 +84,31 @@ const CheckoutPage = () => {
 
   if (cartQuery.isError) {
     return (
-      <main>
-        <h1>Checkout</h1>
-
-        <p>Error loading cart: {getErrorMessage(cartQuery.error)}</p>
-      </main>
+      <Box>
+        <Typography variant={'h1'}>Checkout</Typography>
+        <Typography>Error loading cart: {getErrorMessage(cartQuery.error)}</Typography>
+      </Box>
     );
   }
 
   if (checkoutItems.length === 0) {
     return (
-      <main>
-        <h1>Checkout</h1>
-
-        <p>Your shopping cart is empty.</p>
-
+      <Box>
+        <Typography variant={'h1'}>Checkout</Typography>
+        <Typography>Your shopping cart is empty.</Typography>
         <Link to="/products">Continue Shopping</Link>
-      </main>
+      </Box>
     );
   }
 
   return (
-    <main>
-      <h1>Checkout</h1>
-
+    <Box>
+      <Typography variant={'h1'}>Checkout</Typography>
       <CheckoutItemSummaryCard checkoutItems={checkoutItems} />
-
-      <p>
+      <Typography>
         Product availability and final prices will be checked by the server when the order is
         placed.
-      </p>
-
-      <hr />
-
+      </Typography>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -124,20 +117,17 @@ const CheckoutPage = () => {
         }}
       >
         <CheckoutPaymentCard form={form} />
-
-        <br />
-
-        <button type="submit" disabled={isPending}>
+        <Button type="submit" disabled={isPending}>
           {isPending ? 'Placing Order...' : 'Place Order'}
-        </button>
+        </Button>
       </form>
 
       {isError && (
-        <p>
+        <Typography>
           <strong>Error:</strong> {getErrorMessage(error)}
-        </p>
+        </Typography>
       )}
-    </main>
+    </Box>
   );
 };
 

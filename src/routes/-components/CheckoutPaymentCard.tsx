@@ -1,4 +1,5 @@
-import { PaymentMethod, type CheckoutFormValues } from "../../models/Checkout";
+import { PaymentMethod, type CheckoutFormValues } from '../../models/Checkout';
+import { Box, FormControlLabel, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 
 interface CheckoutPaymentCardProps {
   form: any;
@@ -6,15 +7,15 @@ interface CheckoutPaymentCardProps {
 
 const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
   return (
-    <section>
-      <h2>Payment Details</h2>
+    <Box>
+      <Typography variant={'h2'}>Payment Details</Typography>
 
       <form.Field
         name="userId"
         validators={{
           onChange: ({ value }: { value: string }) => {
             if (!value) {
-              return "User ID is required";
+              return 'User ID is required';
             }
 
             return undefined;
@@ -22,21 +23,20 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
         }}
       >
         {(field: any) => (
-          <div>
-            <label htmlFor={field.name}>User ID:</label>
-            <br />
-            <input
+          <Box>
+            <TextField
               id={field.name}
               name={field.name}
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              size={45}
+              size={'medium'}
+              label={'User ID:'}
             />
             {field.state.meta.errors.map((err: string) => (
-              <div key={err}>{err}</div>
+              <Box key={err}>{err}</Box>
             ))}
-          </div>
+          </Box>
         )}
       </form.Field>
 
@@ -44,46 +44,27 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
 
       <form.Field name="paymentMethod">
         {(field: any) => (
-          <div>
-            <p>Payment Method:</p>
-
-            <label>
-              <input
-                type="radio"
-                name={field.name}
+          <Box>
+            <Typography>Payment Method:</Typography>
+            <RadioGroup
+              defaultValue={PaymentMethod.CreditCard}
+              onChange={(e) => field.handleChange(e.target.value)}
+            >
+              <FormControlLabel
+                control={<Radio />}
+                label={'Credit Card'}
                 value={PaymentMethod.CreditCard}
-                checked={field.state.value === PaymentMethod.CreditCard}
-                onBlur={field.handleBlur}
-                onChange={() => field.handleChange(PaymentMethod.CreditCard)}
               />
-              Credit Card
-            </label>
-
-            <br />
-
-            <label>
-              <input
-                type="radio"
-                name={field.name}
-                value={PaymentMethod.PayPal}
-                checked={field.state.value === PaymentMethod.PayPal}
-                onBlur={field.handleBlur}
-                onChange={() => field.handleChange(PaymentMethod.PayPal)}
-              />
-              PayPal
-            </label>
-          </div>
+              <FormControlLabel control={<Radio />} label={'PayPal'} value={PaymentMethod.PayPal} />
+            </RadioGroup>
+          </Box>
         )}
       </form.Field>
 
-      <br />
-
       <form.Subscribe
-        selector={(state: { values: CheckoutFormValues }) =>
-          state.values.paymentMethod
-        }
+        selector={(state: { values: CheckoutFormValues }) => state.values.paymentMethod}
       >
-        {(paymentMethod: CheckoutFormValues["paymentMethod"]) =>
+        {(paymentMethod: CheckoutFormValues['paymentMethod']) =>
           paymentMethod === PaymentMethod.CreditCard ? (
             <fieldset>
               <legend>Credit Card Information</legend>
@@ -93,7 +74,7 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
                 validators={{
                   onChange: ({ value }: { value: string }) => {
                     if (!value) {
-                      return "Card number is required";
+                      return 'Card number is required';
                     }
 
                     return undefined;
@@ -101,31 +82,27 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
                 }}
               >
                 {(field: any) => (
-                  <div>
-                    <label htmlFor={field.name}>Card Number:</label>
-                    <br />
-                    <input
+                  <Box>
+                    <TextField
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
+                      label={'Card Number:'}
                     />
                     {field.state.meta.errors.map((err: string) => (
-                      <div key={err}>{err}</div>
+                      <Box key={err}>{err}</Box>
                     ))}
-                  </div>
+                  </Box>
                 )}
               </form.Field>
-
-              <br />
-
               <form.Field
                 name="expiryDate"
                 validators={{
                   onChange: ({ value }: { value: string }) => {
                     if (!value) {
-                      return "Expiry date is required";
+                      return 'Expiry date is required';
                     }
 
                     return undefined;
@@ -133,32 +110,28 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
                 }}
               >
                 {(field: any) => (
-                  <div>
-                    <label htmlFor={field.name}>Expiry Date:</label>
-                    <br />
-                    <input
+                  <Box>
+                    <TextField
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       placeholder="MM/YY"
+                      label={'Expiry Date:'}
                     />
                     {field.state.meta.errors.map((err: string) => (
-                      <div key={err}>{err}</div>
+                      <Box key={err}>{err}</Box>
                     ))}
-                  </div>
+                  </Box>
                 )}
               </form.Field>
-
-              <br />
-
               <form.Field
                 name="cvv"
                 validators={{
                   onChange: ({ value }: { value: string }) => {
                     if (!value) {
-                      return "CVV is required";
+                      return 'CVV is required';
                     }
 
                     return undefined;
@@ -166,20 +139,19 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
                 }}
               >
                 {(field: any) => (
-                  <div>
-                    <label htmlFor={field.name}>CVV:</label>
-                    <br />
-                    <input
+                  <Box>
+                    <TextField
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
+                      label={'CVV:'}
                     />
                     {field.state.meta.errors.map((err: string) => (
-                      <div key={err}>{err}</div>
+                      <Box key={err}>{err}</Box>
                     ))}
-                  </div>
+                  </Box>
                 )}
               </form.Field>
             </fieldset>
@@ -192,7 +164,7 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
                 validators={{
                   onChange: ({ value }: { value: string }) => {
                     if (!value) {
-                      return "PayPal email is required";
+                      return 'PayPal email is required';
                     }
 
                     return undefined;
@@ -200,28 +172,27 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
                 }}
               >
                 {(field: any) => (
-                  <div>
-                    <label htmlFor={field.name}>PayPal Email:</label>
-                    <br />
-                    <input
+                  <Box>
+                    <TextField
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       type="email"
+                      label={'PayPal Email:'}
                     />
                     {field.state.meta.errors.map((err: string) => (
-                      <div key={err}>{err}</div>
+                      <Box key={err}>{err}</Box>
                     ))}
-                  </div>
+                  </Box>
                 )}
               </form.Field>
             </fieldset>
           )
         }
       </form.Subscribe>
-    </section>
+    </Box>
   );
 };
 

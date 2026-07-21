@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { wishlistQueryOptions } from '../../queries';
 import { useRemoveWishlistMutation } from '../../mutations.ts';
+import { Box, Button, Typography } from '@mui/material';
 
 const WishlistPage = () => {
   const { data: wishlistItems, isLoading, isError, error } = useQuery(wishlistQueryOptions());
@@ -10,34 +11,34 @@ const WishlistPage = () => {
 
   if (isLoading) {
     return (
-      <main>
-        <h1>Wishlist</h1>
-        <p>Loading wishlist...</p>
-      </main>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <Typography variant={'h1'}>Wishlist</Typography>
+        <Typography>Loading wishlist...</Typography>
+      </Box>
     );
   }
 
   if (isError) {
     return (
-      <main>
-        <h1>Wishlist</h1>
-        <p>Failed to load wishlist: {error.message}</p>
-      </main>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <Typography variant={'h1'}>Wishlist</Typography>
+        <Typography>Failed to load wishlist: {error.message}</Typography>
+      </Box>
     );
   }
 
   if (!wishlistItems || wishlistItems.length === 0) {
     return (
-      <main>
-        <h1>Wishlist</h1>
-        <p>Your wishlist is empty.</p>
-      </main>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <Typography variant={'h1'}>Wishlist</Typography>
+        <Typography>Your wishlist is empty.</Typography>
+      </Box>
     );
   }
 
   return (
-    <main>
-      <h1>Wishlist</h1>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <Typography variant={'h1'}>Wishlist</Typography>
 
       {wishlistItems.map((item) => {
         const isRemoving = isPending && variables === item.listingId;
@@ -45,28 +46,28 @@ const WishlistPage = () => {
         const hasPriceRange = item.minPrice !== item.maxPrice;
 
         return (
-          <div key={item.id}>
+          <Box key={item.id}>
             <Link to="/products/$listingId" params={{ listingId: item.listingId }} className="link">
-              <h2>{item.productName}</h2>
+              <Typography variant={'h2'}>{item.productName}</Typography>
 
               {item.imageLink && <img src={item.imageLink} alt={item.productName} width={150} />}
 
-              <p>{item.productDescription}</p>
+              <Typography>{item.productDescription}</Typography>
 
-              <p>
+              <Typography>
                 {hasPriceRange
                   ? `$${item.minPrice.toFixed(2)} – $${item.maxPrice.toFixed(2)}`
                   : `$${item.minPrice.toFixed(2)}`}
-              </p>
+              </Typography>
             </Link>
 
-            <button type="button" onClick={() => mutate(item.listingId)} disabled={isRemoving}>
+            <Button type="button" onClick={() => mutate(item.listingId)} disabled={isRemoving}>
               {isRemoving ? 'Removing...' : 'Remove from Wishlist'}
-            </button>
-          </div>
+            </Button>
+          </Box>
         );
       })}
-    </main>
+    </Box>
   );
 };
 

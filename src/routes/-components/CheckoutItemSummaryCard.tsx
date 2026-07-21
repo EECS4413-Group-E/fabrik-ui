@@ -1,77 +1,107 @@
-import type { CartItem } from "../../models/CartItem";
+import type { CartItem } from '../../models/CartItem';
+import type { GridColDef } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
+import { Box, Typography } from '@mui/material';
 
 interface CheckoutItemSummaryCardProps {
   checkoutItems: CartItem[];
 }
 
-const CheckoutItemSummaryCard = ({
-  checkoutItems,
-}: CheckoutItemSummaryCardProps) => {
-  const orderTotal = checkoutItems.reduce(
-    (total, item) =>
-      total + item.quantity * item.price,
-    0,
-  );
+const CheckoutItemSummaryCard = ({ checkoutItems }: CheckoutItemSummaryCardProps) => {
+  const orderTotal = checkoutItems.reduce((total, item) => total + item.quantity * item.price, 0);
+
+  const columns: GridColDef[] = [
+    {
+      field: 'imageLink',
+      headerName: 'Image',
+      width: 100,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) =>
+        params.row.imageLink ? (
+          <img
+            src={params.row.imageLink}
+            alt={params.row.name}
+            width={80}
+            style={{ maxHeight: '80px', objectFit: 'contain' }}
+          />
+        ) : (
+          'No image'
+        ),
+    },
+    {
+      field: 'name',
+      headerName: 'Product',
+      width: 150,
+    },
+    {
+      field: 'description',
+      headerName: 'Description',
+      width: 150,
+    },
+    {
+      field: 'colorName',
+      headerName: 'Colour',
+      width: 100,
+    },
+    {
+      field: 'size',
+      headerName: 'Size',
+      width: 80,
+    },
+    {
+      field: 'sku',
+      headerName: 'SKU',
+      width: 100,
+    },
+    {
+      field: 'quantity',
+      headerName: 'Quantity',
+      width: 100,
+      type: 'number',
+    },
+    {
+      field: 'price',
+      headerName: 'Price',
+      width: 100,
+      renderCell: (params) => `$${params.row.price.toFixed(2)}`,
+    },
+    {
+      field: 'subtotal',
+      headerName: 'Subtotal',
+      width: 100,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => `$${(params.row.quantity * params.row.price).toFixed(2)}`,
+    },
+  ];
 
   return (
-    <section>
-      <h2>Order Summary</h2>
+    <Box component="section" sx={{ p: 2 }}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
+        Order Summary
+      </Typography>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Product</th>
-            <th>Description</th>
-            <th>Colour</th>
-            <th>Size</th>
-            <th>SKU</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
+      <DataGrid
+        rows={checkoutItems}
+        columns={columns}
+        pageSizeOptions={[5, 10, 25]}
+        disableRowSelectionOnClick
+        sx={{
+          border: '1px solid #ddd',
+          '& .MuiDataGrid-cell': {
+            display: 'flex',
+            alignItems: 'center',
+          },
+        }}
+      />
 
-        <tbody>
-          {checkoutItems.map((item) => (
-            <tr key={item.id}>
-              <td>
-                {item.imageLink ? (
-                  <img
-                    src={item.imageLink}
-                    alt={item.name}
-                    width={80}
-                  />
-                ) : (
-                  "No image"
-                )}
-              </td>
-
-              <td>{item.name}</td>
-              <td>{item.description}</td>
-              <td>{item.colorName}</td>
-              <td>{item.size}</td>
-              <td>{item.sku}</td>
-              <td>{item.quantity}</td>
-              <td>${item.price.toFixed(2)}</td>
-
-              <td>
-                $
-                {(
-                  item.quantity * item.price
-                ).toFixed(2)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <p>
-        <strong>
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
           Total: ${orderTotal.toFixed(2)}
-        </strong>
-      </p>
-    </section>
+        </Typography>
+      </Box>
+    </Box>
   );
 };
 

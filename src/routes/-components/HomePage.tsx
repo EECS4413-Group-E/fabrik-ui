@@ -1,24 +1,16 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from '@tanstack/react-router';
+import { Box, Typography } from '@mui/material';
 
 const HomePage = () => {
   return (
-    <div>
-      <h1>Home Page</h1>
-
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, alignItems: 'center' }}>
+      <Typography variant={'h1'}>Home Page</Typography>
       <Link to="/user">View User</Link>
-      <div />
-
       <Link to="/login">Login</Link>
-      <div />
-
       <Link to="/products">Products</Link>
-      <div />
-
       <Link to="/wishlist">Wishlist</Link>
-      <div />
-
       <Link to="/cart">Shopping Cart</Link>
-    </div>
+    </Box>
   );
 };
 

@@ -1,31 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
-import { currentUserQueryOptions } from "../../queries";
+import { useQuery } from '@tanstack/react-query';
+import { currentUserQueryOptions } from '../../queries';
+import { Box, Typography } from '@mui/material';
 
 export const UserPage = () => {
-  const {
-    data: user,
-    isError,
-    isLoading,
-    error,
-  } = useQuery(
-    currentUserQueryOptions(),
-  );
+  const { data: user, isError, isLoading, error } = useQuery(currentUserQueryOptions());
 
   return (
-    <div>
-      <h1>User Page</h1>
+    <Box sx={{ alignSelf: 'center' }}>
+      <Typography variant={'h1'}>User Page</Typography>
       {isLoading ? (
-        <p>Loading...</p>
+        <Typography>Loading...</Typography>
       ) : isError ? (
-        <p>Error: {error.message}</p>
+        <Typography>Error: {error.message}</Typography>
       ) : (
-        <div>
-          <p>User ID: {user?.id}</p>
-          <p>User Email: {user?.email}</p>
-          <p>User Role: {user?.role}</p>
-        </div>
+        <Box>
+          <Typography>User ID: {user?.id}</Typography>
+          <Typography>User Email: {user?.email}</Typography>
+          <Typography>User Role: {user?.role}</Typography>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 
