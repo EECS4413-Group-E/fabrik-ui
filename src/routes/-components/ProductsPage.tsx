@@ -1,3 +1,9 @@
+// src/routes/-components/ProductsPage.tsx
+//
+// Extended: filters by the optional ?department= param in addition to
+// the existing keyword search, and shows a heading that reflects the
+// selected department.
+
 import { useQuery } from '@tanstack/react-query';
 import { useSearch } from '@tanstack/react-router';
 import { Box, Typography } from '@mui/material';
@@ -5,8 +11,14 @@ import { Box, Typography } from '@mui/material';
 import { listingsQueryOptions } from '../../queries';
 import ProductCard from './ProductCard';
 
+const DEPARTMENT_HEADINGS: Record<string, string> = {
+  MENS: 'Men',
+  WOMENS: 'Women',
+  OTHER: 'Other',
+};
+
 const ProductsPage = () => {
-  const { search } = useSearch({
+  const { search, department } = useSearch({
     from: '/products/',
   });
 
@@ -23,6 +35,13 @@ const ProductsPage = () => {
 
   const filteredListings = (listings ?? []).filter(
     (listing) => {
+      if (
+        department &&
+        listing.departmentCategory !== department
+      ) {
+        return false;
+      }
+
       if (!normalizedSearch) {
         return true;
       }
@@ -46,10 +65,14 @@ const ProductsPage = () => {
     },
   );
 
+  const heading = department
+    ? DEPARTMENT_HEADINGS[department]
+    : 'Products';
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h1" sx={{ mb: 2 }}>
-        Products
+        {heading}
       </Typography>
 
       {normalizedSearch && (
@@ -60,9 +83,9 @@ const ProductsPage = () => {
       )}
 
       {isLoading ? (
-        <Typography>Loading products...</Typography>
+        <Typography>Loading...</Typography>
       ) : isError ? (
-        <Typography color="error">
+        <Typography>
           Error: {error.message}
         </Typography>
       ) : filteredListings.length === 0 ? (
@@ -74,9 +97,8 @@ const ProductsPage = () => {
       ) : (
         <Box
           sx={{
-            display: 'grid',
-            gridTemplateColumns:
-              'repeat(auto-fill, minmax(260px, 1fr))',
+            display: 'flex',
+            flexWrap: 'wrap',
             gap: 3,
           }}
         >

@@ -1,7 +1,14 @@
+// src/App.tsx
+//
+// Changed: the inline blue theme is replaced by the shared Fabrik
+// theme in src/theme.ts so every page inherits the design system.
+
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { routeTree } from './routeTree.gen';
-import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box } from '@mui/material';
+
+import theme from './theme';
 
 const queryClient = new QueryClient();
 
@@ -18,14 +25,6 @@ declare module '@tanstack/react-router' {
     router: typeof router;
   }
 }
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3b93ff',
-    },
-  },
-});
 
 function App() {
   return (

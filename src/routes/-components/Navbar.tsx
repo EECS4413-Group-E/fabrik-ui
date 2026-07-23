@@ -11,16 +11,31 @@ import {
 import {
   AppBar,
   Box,
-  Button,
-  TextField,
+  IconButton,
+  InputBase,
   Toolbar,
   Typography,
 } from '@mui/material';
 
-const navigationLinkStyle = {
-  color: '#ffffff',
+import SearchIcon from '@mui/icons-material/Search';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutlined';
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+
+import { fabrikColors } from '../../theme';
+
+const DEPARTMENT_LINKS = [
+  { label: 'Men', department: 'MENS' },
+  { label: 'Women', department: 'WOMENS' },
+  { label: 'Other', department: 'OTHER' },
+] as const;
+
+const textLinkStyle = {
+  color: fabrikColors.charcoal,
   textDecoration: 'none',
-  fontWeight: 500,
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.1em',
+  fontSize: '0.8rem',
   whiteSpace: 'nowrap' as const,
 };
 
@@ -44,133 +59,123 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar
-      position="static"
-      sx={{
-        backgroundColor: '#4b78c8',
-      }}
-    >
+    <AppBar position="sticky">
       <Toolbar
         sx={{
           display: 'flex',
+          alignItems: 'center',
           gap: 3,
-          py: 1,
+          py: 1.5,
           flexWrap: 'wrap',
         }}
       >
         <Link
           to="/"
           style={{
-            color: '#ffffff',
+            color: fabrikColors.charcoal,
             textDecoration: 'none',
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              letterSpacing: 1,
-            }}
-          >
+          <Typography variant="h6" component="span">
             FABRIK
           </Typography>
         </Link>
+
+        <Box
+          component="nav"
+          aria-label="Shop departments"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2.5,
+          }}
+        >
+          {DEPARTMENT_LINKS.map(
+            ({ label, department }) => (
+              <Link
+                key={department}
+                to="/products"
+                search={{ department }}
+                style={textLinkStyle}
+              >
+                {label}
+              </Link>
+            ),
+          )}
+        </Box>
 
         <Box
           component="form"
           onSubmit={handleSearch}
           sx={{
             display: 'flex',
-            flex: '1 1 320px',
-            maxWidth: 600,
+            alignItems: 'center',
+            flex: '1 1 280px',
+            maxWidth: 480,
+            px: 1.5,
+            py: 0.5,
             gap: 1,
+            backgroundColor: '#ffffff',
+            border: `1px solid ${fabrikColors.border}`,
           }}
         >
-          <TextField
+          <SearchIcon
+            fontSize="small"
+            sx={{ color: fabrikColors.mutedCharcoal }}
+          />
+
+          <InputBase
             value={searchTerm}
             onChange={(event) =>
               setSearchTerm(event.target.value)
             }
             placeholder="Search products"
-            size="small"
             fullWidth
-            slotProps={{
-              htmlInput: {
-                'aria-label': 'Search products',
-              },
+            inputProps={{
+              'aria-label': 'Search products',
             }}
-            sx={{
-              backgroundColor: '#ffffff',
-              borderRadius: 1,
-            }}
+            sx={{ fontSize: '0.9rem' }}
           />
-
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{
-              backgroundColor: '#ffffff',
-              color: '#3564b4',
-              '&:hover': {
-                backgroundColor: '#f1f4fa',
-              },
-            }}
-          >
-            Search
-          </Button>
         </Box>
 
         <Box
-          component="nav"
-          aria-label="Main navigation"
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 2,
-            flexWrap: 'wrap',
+            gap: 1,
+            marginLeft: 'auto',
           }}
         >
-          <Link
-            to="/products"
-            style={navigationLinkStyle}
-          >
-            Products
-          </Link>
-
-          <Link
-            to="/wishlist"
-            style={navigationLinkStyle}
-          >
-            Wishlist
-          </Link>
-
-          <Link
-            to="/orders"
-            style={navigationLinkStyle}
-          >
+          <Link to="/orders" style={textLinkStyle}>
             Orders
           </Link>
 
-          <Link
-            to="/cart"
-            style={navigationLinkStyle}
+          <IconButton
+            component={Link}
+            to="/wishlist"
+            aria-label="Wishlist"
+            sx={{ color: fabrikColors.charcoal }}
           >
-            Cart
-          </Link>
+            <FavoriteBorderIcon fontSize="small" />
+          </IconButton>
 
-          <Link
+          <IconButton
+            component={Link}
             to="/user"
-            style={navigationLinkStyle}
+            aria-label="Account"
+            sx={{ color: fabrikColors.charcoal }}
           >
-            Account
-          </Link>
+            <PersonOutlineIcon fontSize="small" />
+          </IconButton>
 
-          <Link
-            to="/login"
-            style={navigationLinkStyle}
+          <IconButton
+            component={Link}
+            to="/cart"
+            aria-label="Shopping cart"
+            sx={{ color: fabrikColors.charcoal }}
           >
-            Login
-          </Link>
+            <ShoppingBagOutlinedIcon fontSize="small" />
+          </IconButton>
         </Box>
       </Toolbar>
     </AppBar>
