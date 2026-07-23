@@ -149,15 +149,7 @@ export const addCartItem = (request: AddCartItemRequest) => {
 };
 
 export const updateCartItemQuantity = async (request: UpdateCartItemQuantityRequest) => {
-  const productId = encodeURIComponent(request.productId);
-  const size = encodeURIComponent(request.size);
-
-  const response = await apiClient.patch<void>(`/user/cart/${productId}/${size}`, undefined, {
-    params: {
-      quantity: request.quantity,
-    },
-  });
-
+  const response = await apiClient.patch<void>('/user/cart', request);
   return response.data;
 };
 
