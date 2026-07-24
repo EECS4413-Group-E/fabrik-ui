@@ -11,13 +11,20 @@ export interface PaymentDetailsRequest {
   expiryDate?: string;
   cvv?: string;
   paypalEmail?: string;
+  storePoints?: number;
 }
 
 export interface CheckoutFormValues {
-  userId: string;
   paymentMethod: PaymentMethod;
   cardNumber: string;
   expiryDate: string;
   cvv: string;
   paypalEmail: string;
+  storePoints: number;
+  country: string;
+  postalCode: string;
+  province: string;
+  city: string;
+  address: string;
+  fullName: string;
 }

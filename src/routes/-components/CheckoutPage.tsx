@@ -1,6 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
+import { useQuery } from '@tanstack/react-query';
+
+import { currentUserQueryOptions } from '../../queries';
 import { useCreateOrderMutation } from '../../mutations';
+import { useCart } from '../../hooks/useCart.ts';
 
 import { PaymentMethod, type CheckoutFormValues } from '../../models/Checkout';
 
@@ -8,42 +12,68 @@ import type { PlaceOrderRequest } from '../../models/Order';
 
 import CheckoutItemSummaryCard from './CheckoutItemSummaryCard';
 import CheckoutPaymentCard from './CheckoutPaymentCard';
-import { Box, Button, Typography } from '@mui/material';
-import { useCart } from '../../hooks/useCart.ts';
+import LoanCalculator from './LoanCalculator';
 
-const TEMP_USER_ID = '8ecf8276-e555-41cc-b2ba-e42353dc72b4';
+import {
+  Alert,
+  Box,
+  Button,
+  Divider,
+  TextField,
+  Typography,
+} from '@mui/material';
 
 const getErrorMessage = (error: unknown) => {
   const possibleApiError = error as {
     response?: {
       data?: {
         error?: string;
+        message?: string;
       };
     };
   };
 
-  return possibleApiError.response?.data?.error ?? 'Unable to place order.';
+  return (
+    possibleApiError.response?.data?.message ??
+    possibleApiError.response?.data?.error ??
+    'Unable to place order.'
+  );
 };
 
 const CheckoutPage = () => {
   const cartQuery = useCart();
 
+  const userQuery = useQuery(currentUserQueryOptions());
+
   const checkoutItems = cartQuery.data ?? [];
+
+  const availablePoints = userQuery.data?.storePoints ?? 0;
+
+  const orderTotal = checkoutItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
 
   const { mutate, isPending, isError, error } = useCreateOrderMutation();
 
   const form = useForm({
     defaultValues: {
-      userId: TEMP_USER_ID,
       paymentMethod: PaymentMethod.CreditCard,
       cardNumber: '',
       expiryDate: '',
       cvv: '',
       paypalEmail: '',
+      storePoints: 0,
+      fullName: '',
+      address: '',
+      city: '',
+      province: '',
+      postalCode: '',
+      country: '',
     } as CheckoutFormValues,
 
     onSubmit: async ({ value }) => {
-      if (checkoutItems.length === 0) {
+      if (checkoutItems.length === 0 || !userQuery.data) {
         return;
       }
 
@@ -54,14 +84,16 @@ const CheckoutPage = () => {
               cardNumber: value.cardNumber,
               expiryDate: value.expiryDate,
               cvv: value.cvv,
+              storePoints: value.storePoints,
             }
           : {
               paymentMethod: value.paymentMethod,
               paypalEmail: value.paypalEmail,
+              storePoints: value.storePoints,
             };
 
       const orderRequest: PlaceOrderRequest = {
-        userId: value.userId,
+        userId: userQuery.data.id,
 
         orderItems: checkoutItems.map((item) => ({
           productId: item.productId,
@@ -70,6 +102,15 @@ const CheckoutPage = () => {
         })),
 
         paymentDetails,
+
+        shippingDetails: {
+          fullName: value.fullName,
+          address: value.address,
+          city: value.city,
+          province: value.province,
+          postalCode: value.postalCode,
+          country: value.country,
+        },
       };
 
       mutate(orderRequest);
@@ -77,36 +118,66 @@ const CheckoutPage = () => {
   });
 
   if (cartQuery.isLoading) {
-    return <p>Loading checkout...</p>;
+    return (
+      <Box sx={{ maxWidth: 800, mx: 'auto', px: 3, py: 5 }}>
+        <Typography>Loading checkout...</Typography>
+      </Box>
+    );
   }
 
   if (cartQuery.isError) {
     return (
-      <Box>
-        <Typography variant={'h1'}>Checkout</Typography>
-        <Typography>Error loading cart: {getErrorMessage(cartQuery.error)}</Typography>
+      <Box sx={{ maxWidth: 800, mx: 'auto', px: 3, py: 5 }}>
+        <Typography variant="h1" sx={{ mb: 3 }}>
+          Checkout
+        </Typography>
+
+        <Alert severity="error">
+          Error loading cart: {getErrorMessage(cartQuery.error)}
+        </Alert>
       </Box>
     );
   }
 
   if (checkoutItems.length === 0) {
     return (
-      <Box>
-        <Typography variant={'h1'}>Checkout</Typography>
-        <Typography>Your shopping cart is empty.</Typography>
-        <Link to="/products">Continue Shopping</Link>
+      <Box sx={{ maxWidth: 800, mx: 'auto', px: 3, py: 5 }}>
+        <Typography variant="h1" sx={{ mb: 2 }}>
+          Checkout
+        </Typography>
+
+        <Typography sx={{ mb: 3 }}>Your shopping cart is empty.</Typography>
+
+        <Link
+          to="/products"
+          search={{
+            keyword: '',
+            pageNumber: 0,
+            pageSize: 10,
+            department: '' as never,
+            category: '' as never,
+            deals: false,
+          }}
+          style={{ textDecoration: 'none' }}
+        >
+          <Button variant="contained">Continue Shopping</Button>
+        </Link>
       </Box>
     );
   }
 
   return (
-    <Box>
-      <Typography variant={'h1'}>Checkout</Typography>
-      <CheckoutItemSummaryCard checkoutItems={checkoutItems} />
-      <Typography>
-        Product availability and final prices will be checked by the server when the order is
-        placed.
+    <Box sx={{ maxWidth: 800, mx: 'auto', px: 3, py: 5 }}>
+      <Typography variant="h1" sx={{ mb: 3 }}>
+        Checkout
       </Typography>
+
+      <CheckoutItemSummaryCard checkoutItems={checkoutItems} />
+
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        Availability and final prices are confirmed by the server when the order is placed.
+      </Typography>
+
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -114,17 +185,148 @@ const CheckoutPage = () => {
           form.handleSubmit();
         }}
       >
+        <Divider sx={{ my: 4 }} />
+
+        <Typography variant="h3" sx={{ mb: 2 }}>
+          Shipping Details
+        </Typography>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+            gap: 2,
+          }}
+        >
+          <form.Field name="fullName">
+            {(field) => (
+              <TextField
+                label="Full Name"
+                value={field.state.value}
+                onChange={(event) => field.handleChange(event.target.value)}
+                required
+                fullWidth
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="address">
+            {(field) => (
+              <TextField
+                label="Address"
+                value={field.state.value}
+                onChange={(event) => field.handleChange(event.target.value)}
+                required
+                fullWidth
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="city">
+            {(field) => (
+              <TextField
+                label="City"
+                value={field.state.value}
+                onChange={(event) => field.handleChange(event.target.value)}
+                required
+                fullWidth
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="province">
+            {(field) => (
+              <TextField
+                label="Province"
+                value={field.state.value}
+                onChange={(event) => field.handleChange(event.target.value)}
+                required
+                fullWidth
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="postalCode">
+            {(field) => (
+              <TextField
+                label="Postal Code"
+                value={field.state.value}
+                onChange={(event) => field.handleChange(event.target.value)}
+                required
+                fullWidth
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="country">
+            {(field) => (
+              <TextField
+                label="Country"
+                value={field.state.value}
+                onChange={(event) => field.handleChange(event.target.value)}
+                required
+                fullWidth
+              />
+            )}
+          </form.Field>
+        </Box>
+
+        <Divider sx={{ my: 4 }} />
+
         <CheckoutPaymentCard form={form} />
-        <Button type="submit" disabled={isPending}>
+
+        <Divider sx={{ my: 4 }} />
+
+        <Typography variant="h3" sx={{ mb: 1 }}>
+          Store Points
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          You have {availablePoints} points available. Points are applied as a
+          discount on this order.
+        </Typography>
+
+        <form.Field name="storePoints">
+          {(field) => (
+            <TextField
+              label="Points to use"
+              type="number"
+              value={field.state.value}
+              disabled={availablePoints === 0}
+              onChange={(event) => {
+                const requested = Number(event.target.value);
+
+                if (!Number.isInteger(requested) || requested < 0) {
+                  return;
+                }
+
+                field.handleChange(Math.min(requested, availablePoints));
+              }}
+              sx={{ width: 200 }}
+            />
+          )}
+        </form.Field>
+
+        <LoanCalculator orderTotal={orderTotal} />
+
+        <Divider sx={{ my: 4 }} />
+
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          disabled={isPending}
+          sx={{ px: 5, py: 1.5 }}
+        >
           {isPending ? 'Placing Order...' : 'Place Order'}
         </Button>
-      </form>
 
-      {isError && (
-        <Typography>
-          <strong>Error:</strong> {getErrorMessage(error)}
-        </Typography>
-      )}
+        {isError && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {getErrorMessage(error)}
+          </Alert>
+        )}
+      </form>
     </Box>
   );
 };

@@ -10,38 +10,6 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
     <Box>
       <Typography variant={'h2'}>Payment Details</Typography>
 
-      <form.Field
-        name="userId"
-        validators={{
-          onChange: ({ value }: { value: string }) => {
-            if (!value) {
-              return 'User ID is required';
-            }
-
-            return undefined;
-          },
-        }}
-      >
-        {(field: any) => (
-          <Box>
-            <TextField
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              size={'medium'}
-              label={'User ID:'}
-            />
-            {field.state.meta.errors.map((err: string) => (
-              <Box key={err}>{err}</Box>
-            ))}
-          </Box>
-        )}
-      </form.Field>
-
-      <br />
-
       <form.Field name="paymentMethod">
         {(field: any) => (
           <Box>

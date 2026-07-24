@@ -19,9 +19,6 @@ import type { Filter } from './models/Filter';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Temporary direct URL until the frontend order request is fully moved
-// to the Gateway.
-const TEMP_ORDER_API_URL = 'http://localhost:4004/order';
 
 type UnauthorizedHandler = () => void;
 let onUnauthorized: UnauthorizedHandler | null = null;
@@ -128,7 +125,7 @@ export const fetchOrderDetails = (orderId: string) => {
 
 export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
   const response = await postWithConfig<PlaceOrderRequest, string | Order>(
-    TEMP_ORDER_API_URL,
+    '/order',
     orderRequest,
   );
 

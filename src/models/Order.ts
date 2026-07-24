@@ -2,6 +2,7 @@ import type { PaymentDetailsRequest } from './Checkout';
 import type { Size } from './Size.ts';
 import type { PaymentDetails } from './PaymentDetails.ts';
 import type { ShippingDetails } from './ShippingDetails.ts';
+import type { ShippingDetailsRequest } from './ShippingDetailsRequest';
 
 export const ShippingStatus = {
   Preparing: 'PREPARING',
@@ -21,6 +22,7 @@ export interface PlaceOrderRequest {
   userId: string;
   orderItems: PlaceOrderItem[];
   paymentDetails: PaymentDetailsRequest;
+  shippingDetails: ShippingDetailsRequest;
 }
 
 export interface OrderItem {
