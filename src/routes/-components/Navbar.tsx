@@ -95,7 +95,6 @@ const Navbar = () => {
               <Link
                 key={department}
                 to="/products"
-                search={{ department }}
                 style={textLinkStyle}
               >
                 {label}
