@@ -1,61 +1,65 @@
-import {
-  type FormEvent,
-  useState,
-} from 'react';
+import { type SubmitEvent, type MouseEvent, useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
 
-import {
-  Link,
-  useNavigate,
-} from '@tanstack/react-router';
-
-import {
-  AppBar,
-  Box,
-  IconButton,
-  InputBase,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { AppBar, Box, Button, IconButton, InputBase, Menu, MenuItem, Toolbar } from '@mui/material';
 
 import SearchIcon from '@mui/icons-material/Search';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 
 import { fabrikColors } from '../../theme';
 
-const DEPARTMENT_LINKS = [
-  { label: 'Men', department: 'MENS' },
-  { label: 'Women', department: 'WOMENS' },
-  { label: 'Other', department: 'OTHER' },
-] as const;
-
-const textLinkStyle = {
-  color: fabrikColors.charcoal,
-  textDecoration: 'none',
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.1em',
-  fontSize: '0.8rem',
-  whiteSpace: 'nowrap' as const,
-};
+const CATEGORIES = ['JEAN', 'PANT', 'SHORT', 'SHIRT', 'SWEATER', 'BAG', 'SHOES', 'HAT'] as const;
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [userMenuAnchor, setUserMenuAnchor] = useState<HTMLElement | null>(null);
+  const [mensMenuAnchor, setMensMenuAnchor] = useState<HTMLElement | null>(null);
+  const [womensMenuAnchor, setWomensMenuAnchor] = useState<HTMLElement | null>(null);
 
-  const handleSearch = (
-    event: FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSearch = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedSearch = searchTerm.trim();
 
     navigate({
       to: '/products',
-      search: trimmedSearch
-        ? { search: trimmedSearch }
-        : {},
+      search: trimmedSearch ? { search: trimmedSearch } : {},
     });
+  };
+
+  const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
+    setUserMenuAnchor(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setUserMenuAnchor(null);
+  };
+
+  const handleOpenMensMenu = (event: MouseEvent<HTMLElement>) => {
+    setMensMenuAnchor(event.currentTarget);
+  };
+
+  const handleCloseMensMenu = () => {
+    setMensMenuAnchor(null);
+  };
+
+  const handleOpenWomensMenu = (event: MouseEvent<HTMLElement>) => {
+    setWomensMenuAnchor(event.currentTarget);
+  };
+
+  const handleCloseWomensMenu = () => {
+    setWomensMenuAnchor(null);
+  };
+
+  const handleCategoryClick = () => {
+    //TODO: add logic for filtering products by category and gender
+    navigate({
+      to: '/products',
+    });
+    handleCloseMensMenu();
+    handleCloseWomensMenu();
   };
 
   return (
@@ -66,106 +70,195 @@ const Navbar = () => {
           alignItems: 'center',
           gap: 3,
           py: 1.5,
-          flexWrap: 'wrap',
+          justifyContent: 'center',
+          position: 'relative',
         }}
       >
-        <Link
-          to="/"
-          style={{
-            color: fabrikColors.charcoal,
-            textDecoration: 'none',
-          }}
-        >
-          <Typography variant="h6" component="span">
-            FABRIK
-          </Typography>
-        </Link>
-
         <Box
-          component="nav"
-          aria-label="Shop departments"
           sx={{
+            position: 'absolute',
+            left: 32,
             display: 'flex',
             alignItems: 'center',
             gap: 2.5,
           }}
+          component="nav"
+          aria-label="Shop departments"
         >
-          {DEPARTMENT_LINKS.map(
-            ({ label, department }) => (
-              <Link
-                key={department}
-                to="/products"
-                style={textLinkStyle}
-              >
-                {label}
-              </Link>
-            ),
-          )}
-        </Box>
-
-        <Box
-          component="form"
-          onSubmit={handleSearch}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            flex: '1 1 280px',
-            maxWidth: 480,
-            px: 1.5,
-            py: 0.5,
-            gap: 1,
-            backgroundColor: '#ffffff',
-            border: `1px solid ${fabrikColors.border}`,
-          }}
-        >
-          <SearchIcon
-            fontSize="small"
-            sx={{ color: fabrikColors.mutedCharcoal }}
-          />
-
-          <InputBase
-            value={searchTerm}
-            onChange={(event) =>
-              setSearchTerm(event.target.value)
-            }
-            placeholder="Search products"
-            fullWidth
-            inputProps={{
-              'aria-label': 'Search products',
+          <Button
+            id="mens-menu-button"
+            onClick={handleOpenMensMenu}
+            onMouseOver={handleOpenMensMenu}
+            variant="text"
+            sx={{
+              color: fabrikColors.charcoal,
+              textDecoration: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontSize: '0.8rem',
+              fontWeight: 400,
+              padding: 0,
+              '&:hover': {
+                backgroundColor: 'transparent',
+              },
             }}
-            sx={{ fontSize: '0.9rem' }}
-          />
+          >
+            Men
+          </Button>
+          <Menu
+            id="mens-menu"
+            anchorEl={mensMenuAnchor}
+            open={Boolean(mensMenuAnchor)}
+            onClose={handleCloseMensMenu}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            slotProps={{
+              paper: {
+                sx: {
+                  marginTop: '8px',
+                },
+              },
+              list: {
+                onMouseLeave: handleCloseMensMenu,
+              },
+            }}
+          >
+            {CATEGORIES.map((category) => (
+              <MenuItem key={category} onClick={() => handleCategoryClick()}>
+                {category}
+              </MenuItem>
+            ))}
+          </Menu>
+
+          <Button
+            id="womens-menu-button"
+            onClick={handleOpenWomensMenu}
+            variant="text"
+            onMouseOver={handleOpenWomensMenu}
+            sx={{
+              color: fabrikColors.charcoal,
+              textDecoration: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontSize: '0.8rem',
+              fontWeight: 400,
+              padding: 0,
+              '&:hover': {
+                backgroundColor: 'transparent',
+              },
+            }}
+          >
+            Women
+          </Button>
+          <Menu
+            id="womens-menu"
+            anchorEl={womensMenuAnchor}
+            open={Boolean(womensMenuAnchor)}
+            onClose={handleCloseWomensMenu}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            slotProps={{
+              paper: {
+                sx: {
+                  marginTop: '8px',
+                },
+              },
+              list: {
+                onMouseLeave: handleCloseWomensMenu,
+              },
+            }}
+          >
+            {CATEGORIES.map((category) => (
+              <MenuItem key={category} onClick={() => handleCategoryClick()}>
+                {category}
+              </MenuItem>
+            ))}
+          </Menu>
+          <Button
+            id="others-button"
+            component={Link}
+            to="/products"
+            variant="text"
+            sx={{
+              color: fabrikColors.charcoal,
+              textDecoration: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontSize: '0.8rem',
+              fontWeight: 400,
+              padding: 0,
+              '&:hover': {
+                backgroundColor: 'transparent',
+              },
+            }}
+          >
+            Other
+          </Button>
         </Box>
+
+        <Button
+          component={Link}
+          to="/"
+          variant="text"
+          sx={{
+            color: fabrikColors.charcoal,
+            textDecoration: 'none',
+            fontFamily: "'Italiana', serif",
+            fontSize: '2rem',
+            padding: 0,
+            '&:hover': {
+              backgroundColor: 'transparent',
+            },
+          }}
+        >
+          FABRIK
+        </Button>
 
         <Box
           sx={{
+            position: 'absolute',
+            right: 32,
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
-            marginLeft: 'auto',
+            gap: 2,
           }}
         >
-          <Link to="/orders" style={textLinkStyle}>
-            Orders
-          </Link>
-
-          <IconButton
-            component={Link}
-            to="/wishlist"
-            aria-label="Wishlist"
-            sx={{ color: fabrikColors.charcoal }}
+          <Box
+            component="form"
+            onSubmit={handleSearch}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flex: '1 1 280px',
+              width: 200,
+              px: 1.5,
+              py: 0.5,
+              gap: 1,
+              backgroundColor: '#ffffff',
+              border: `1px solid ${fabrikColors.border}`,
+            }}
           >
-            <FavoriteBorderIcon fontSize="small" />
-          </IconButton>
+            <SearchIcon fontSize="small" sx={{ color: fabrikColors.mutedCharcoal }} />
 
-          <IconButton
-            component={Link}
-            to="/user"
-            aria-label="Account"
-            sx={{ color: fabrikColors.charcoal }}
-          >
-            <PersonOutlineIcon fontSize="small" />
-          </IconButton>
+            <InputBase
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search products"
+              fullWidth
+            />
+          </Box>
 
           <IconButton
             component={Link}
@@ -175,6 +268,51 @@ const Navbar = () => {
           >
             <ShoppingBagOutlinedIcon fontSize="small" />
           </IconButton>
+
+          <IconButton
+            id="account-menu-button"
+            onClick={handleOpenUserMenu}
+            onMouseOver={handleOpenUserMenu}
+            aria-label="Account"
+            sx={{ color: fabrikColors.charcoal }}
+          >
+            <PersonOutlineIcon fontSize="small" />
+          </IconButton>
+
+          <Menu
+            id="account-menu"
+            anchorEl={userMenuAnchor}
+            open={Boolean(userMenuAnchor)}
+            onClose={handleCloseUserMenu}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            slotProps={{
+              paper: {
+                sx: {
+                  marginTop: '8px',
+                },
+              },
+              list: {
+                onMouseLeave: handleCloseUserMenu,
+              },
+            }}
+          >
+            <MenuItem component={Link} to="/user" onClick={handleCloseUserMenu}>
+              View User
+            </MenuItem>
+            <MenuItem component={Link} to="/orders" onClick={handleCloseUserMenu}>
+              Orders
+            </MenuItem>
+            <MenuItem component={Link} to="/wishlist" onClick={handleCloseUserMenu}>
+              Wishlist
+            </MenuItem>
+          </Menu>
         </Box>
       </Toolbar>
     </AppBar>
