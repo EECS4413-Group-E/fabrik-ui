@@ -13,8 +13,16 @@ export default function BasicSelect() {
     };
 
     return (
-        <Box sx={{ minWidth: 120 }}>
-            <FormControl sx={{ minWidth: 120 }}>
+        <Box>
+            <FormControl sx={{
+                minWidth: 120,
+                height: 40,
+                border: "1px solid black",
+                broderRadius: 0,
+                color: "white",
+
+            }}
+            size="small">
                 <InputLabel id="demo-simple-select-label">Sorting</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"

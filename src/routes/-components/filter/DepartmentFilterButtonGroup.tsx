@@ -1,6 +1,7 @@
 
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { styled } from '@mui/material';
+import ToggleButton, { toggleButtonClasses } from '@mui/material/ToggleButton';
+import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
 import React from 'react';
 
 export default function DepartmentFilterButtonGroup() {
@@ -8,36 +9,69 @@ export default function DepartmentFilterButtonGroup() {
 
   const handleCategorySelection = (
     event: React.MouseEvent<HTMLElement>,
-    newDepartment: string | null
-  ) => { 
-    setDepartment(newDepartment); 
+    newDepartment: string | "all"
+  ) => {
+    if (newDepartment === null) {
+      newDepartment = "all";
+    }
+    setDepartment(newDepartment);
   };
 
+  const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+    [`& .${toggleButtonGroupClasses.grouped}`]: {
+      height: 40,
+      width: 80,
+      margin: theme.spacing(0.5),
+      border: `1px solid black`,
+      borderRadius: 0,
+
+      [`&.${toggleButtonGroupClasses.selected}`]: {
+        color: "white",
+        backgroundColor: "black",
+      },
+      [`&:not(.${toggleButtonGroupClasses.selected})`]: {
+        color: "black",
+        backgroundColor: "white",
+      },
+      
+    },
+  }));
+
   return (
-    // <ToggleButtonGroup variant="contained" aria-label="Basic button group">
-    //   <Button>ALL</Button>
-    //   <Button>WOMEN</Button>
-    //   <Button>MEN</Button>
-    //   <Button>OTHER</Button>
-    // </ToggleButtonGroup>
-    <ToggleButtonGroup
-      value = {department}
+
+    <StyledToggleButtonGroup
+      sx={{
+        display: 'flex', flexDirection: 'row', gap: 1, p: 1,
+
+      }}
+      value={department}
       exclusive
       onChange={handleCategorySelection}
       aria-label="department selection"
     >
-      <ToggleButton value="all" aria-label="left aligned">
+      {/* <ToggleButton value="all">
+        ALL
+      </ToggleButton> */}
+      <ToggleButton value="all" sx={{
+        px: 5,
+      }}>
         ALL
       </ToggleButton>
-      <ToggleButton value="women" aria-label="centered">
+      <ToggleButton value="women" sx={{
+        px: 5,
+      }}>
         WOMEN
       </ToggleButton>
-      <ToggleButton value="men" aria-label="right aligned">
+      <ToggleButton value="men" sx={{
+        px: 5,
+      }}>
         MEN
       </ToggleButton>
-      <ToggleButton value="other" aria-label="other aligned">
+      <ToggleButton value="other" sx={{
+        px: 5,
+      }}>
         OTHER
       </ToggleButton>
-    </ToggleButtonGroup>
+    </StyledToggleButtonGroup >
   );
 }
