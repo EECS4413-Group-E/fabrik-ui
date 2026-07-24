@@ -19,7 +19,7 @@ export interface Product {
   availabilities: Availability[];
 }
 
-export interface Listing {
+export interface T {
   id: string;
   productName: string;
   productDescription: string;

@@ -10,11 +10,13 @@ import {
   removeCartItem,
   removeWishlistItem,
   updateCartItemQuantity,
+  fetchSearchResults,
 } from './Api';
 
 import { queryKeys } from './queries';
 import { tokenStore } from './tokenStore';
 import { useNavigate } from '@tanstack/react-router';
+import type { Filter } from './models/Filter';
 
 export const useRegisterMutation = () =>
   useMutation({
@@ -130,3 +132,12 @@ export const useCreateOrderMutation = () => {
     },
   });
 };
+
+export const useSearchMutation = (keyword: string, filter: Filter) =>{
+  return useMutation({
+    mutationFn: () => {
+      return fetchSearchResults(keyword, filter);
+    }
+  }); 
+}
+  

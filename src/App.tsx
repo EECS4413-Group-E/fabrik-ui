@@ -7,9 +7,10 @@ const queryClient = new QueryClient();
 
 const router = createRouter({
   routeTree,
-  defaultPreload: 'intent',
+  defaultPreload: false,
   scrollRestoration: true,
   context: { queryClient },
+
 });
 
 // Register things for typesafety
