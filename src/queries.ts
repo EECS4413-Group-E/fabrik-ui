@@ -19,7 +19,6 @@ export const queryKeys = {
   wishlist: () => ['wishlist'] as const,
   orders: () => ['orders'] as const,
   order: (id: string) => ['order', id] as const,
-  cart: () => ['cart'] as const,
   search: (keyword: string, filter: Filter) => ['search', keyword, filter] as const,
 };
 
@@ -57,12 +56,6 @@ export const ordersQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.orders(),
     queryFn: fetchOrders,
-  });
-
-export const cartQueryOptions = () =>
-  queryOptions({
-    queryKey: queryKeys.cart(),
-    queryFn: fetchCart,
   });
 
 export const searchQueryOptions = (keyword: string, filter: Filter, pageNumber: number, pageSize: number) =>
