@@ -81,13 +81,11 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     setSelectedProductIndex(index);
     setSelectedSize('');
     setQuantity(1);
-    addCartItemMutation.reset();
   };
 
   const handleSizeSelection = (size: string) => {
     setSelectedSize(size);
     setQuantity(1);
-    addCartItemMutation.reset();
   };
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +103,14 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     }
 
     addCartItemMutation.mutate({
+      id: selectedProduct.id,
+      price: selectedProduct.price,
+      imageLink: selectedImage.imageLink,
+      colorName: selectedProduct.colorName,
+      description: listing.productDescription,
+      name: listing.productName,
+      sku: selectedProduct.sku,
+      listingId: listingId,
       productId: selectedProduct.id,
       size: selectedSize,
       quantity,

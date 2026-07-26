@@ -1,8 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
-import { useQuery } from '@tanstack/react-query';
-
-import { cartQueryOptions } from '../../queries';
 import { useCreateOrderMutation } from '../../mutations';
 
 import { PaymentMethod, type CheckoutFormValues } from '../../models/Checkout';
@@ -12,6 +9,7 @@ import type { PlaceOrderRequest } from '../../models/Order';
 import CheckoutItemSummaryCard from './CheckoutItemSummaryCard';
 import CheckoutPaymentCard from './CheckoutPaymentCard';
 import { Box, Button, Typography } from '@mui/material';
+import { useCart } from '../../hooks/useCart.ts';
 
 const TEMP_USER_ID = '8ecf8276-e555-41cc-b2ba-e42353dc72b4';
 
@@ -28,7 +26,7 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const CheckoutPage = () => {
-  const cartQuery = useQuery(cartQueryOptions());
+  const cartQuery = useCart();
 
   const checkoutItems = cartQuery.data ?? [];
 

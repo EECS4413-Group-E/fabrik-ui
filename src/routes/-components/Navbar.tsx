@@ -1,22 +1,39 @@
 import { type SubmitEvent, type MouseEvent, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 
-import { AppBar, Box, Button, IconButton, InputBase, Menu, MenuItem, Toolbar } from '@mui/material';
+import {
+  AppBar,
+  Badge,
+  Box,
+  Button,
+  IconButton,
+  InputBase,
+  Menu,
+  MenuItem,
+  Toolbar,
+} from '@mui/material';
 
 import SearchIcon from '@mui/icons-material/Search';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutlined';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 
 import { fabrikColors } from '../../theme';
+import { useCart } from '../../hooks/useCart.ts';
+import { useAuth } from '../../hooks/useAuth.ts';
+import { useLogoutMutation } from '../../mutations.ts';
 
 const CATEGORIES = ['JEAN', 'PANT', 'SHORT', 'SHIRT', 'SWEATER', 'BAG', 'SHOES', 'HAT'] as const;
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+  const { data } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [userMenuAnchor, setUserMenuAnchor] = useState<HTMLElement | null>(null);
   const [mensMenuAnchor, setMensMenuAnchor] = useState<HTMLElement | null>(null);
   const [womensMenuAnchor, setWomensMenuAnchor] = useState<HTMLElement | null>(null);
+
+  const { mutate } = useLogoutMutation();
 
   const handleSearch = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -260,19 +277,27 @@ const Navbar = () => {
             />
           </Box>
 
-          <IconButton
-            component={Link}
-            to="/cart"
-            aria-label="Shopping cart"
-            sx={{ color: fabrikColors.charcoal }}
-          >
-            <ShoppingBagOutlinedIcon fontSize="small" />
-          </IconButton>
+          <Badge badgeContent={data?.length ?? 0} color="primary" overlap={'circular'}>
+            <IconButton
+              component={Link}
+              to="/cart"
+              aria-label="Shopping cart"
+              sx={{ color: fabrikColors.charcoal }}
+            >
+              <ShoppingBagOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Badge>
 
           <IconButton
             id="account-menu-button"
-            onClick={handleOpenUserMenu}
-            onMouseOver={handleOpenUserMenu}
+            onClick={
+              isLoggedIn
+                ? handleOpenUserMenu
+                : () => {
+                    navigate({ to: '/login' });
+                  }
+            }
+            onMouseOver={isLoggedIn ? handleOpenUserMenu : undefined}
             aria-label="Account"
             sx={{ color: fabrikColors.charcoal }}
           >
@@ -303,14 +328,24 @@ const Navbar = () => {
               },
             }}
           >
-            <MenuItem component={Link} to="/user" onClick={handleCloseUserMenu}>
+            <MenuItem component={Link} to="/user" preload={false} onClick={handleCloseUserMenu}>
               View User
             </MenuItem>
-            <MenuItem component={Link} to="/orders" onClick={handleCloseUserMenu}>
+            <MenuItem component={Link} to="/orders" preload={false} onClick={handleCloseUserMenu}>
               Orders
             </MenuItem>
-            <MenuItem component={Link} to="/wishlist" onClick={handleCloseUserMenu}>
+            <MenuItem component={Link} to="/wishlist" preload={false} onClick={handleCloseUserMenu}>
               Wishlist
+            </MenuItem>
+            <MenuItem
+              component={Link}
+              preload={false}
+              onClick={() => {
+                handleCloseUserMenu();
+                mutate();
+              }}
+            >
+              Sign Out
             </MenuItem>
           </Menu>
         </Box>

@@ -1,13 +1,12 @@
-import { queryOptions } from '@tanstack/react-query';
+import { queryOptions, skipToken } from '@tanstack/react-query';
 
 import {
-  fetchCart,
   fetchCurrentUser,
-  fetchListings,
   fetchListingById,
-  fetchWishlist,
+  fetchListings,
   fetchOrderDetails,
   fetchOrders,
+  fetchWishlist,
 } from './Api';
 
 // --- Query keys ---
@@ -39,10 +38,10 @@ export const singleListingQueryOptions = (id: string) =>
     queryFn: () => fetchListingById(id),
   });
 
-export const wishlistQueryOptions = () =>
+export const wishlistQueryOptions = (isLoggedIn: boolean) =>
   queryOptions({
     queryKey: queryKeys.wishlist(),
-    queryFn: fetchWishlist,
+    queryFn: isLoggedIn ? fetchWishlist : skipToken,
   });
 
 export const orderDetailsQueryOptions = (id: string) =>
@@ -55,10 +54,4 @@ export const ordersQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.orders(),
     queryFn: fetchOrders,
-  });
-
-export const cartQueryOptions = () =>
-  queryOptions({
-    queryKey: queryKeys.cart(),
-    queryFn: fetchCart,
   });

@@ -2,26 +2,35 @@ import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { wishlistQueryOptions } from '../../queries';
 import { useRemoveWishlistMutation } from '../../mutations.ts';
-import { Alert, Box, Button, CircularProgress, Divider, IconButton, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Typography,
+} from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-
 
 const formatPrice = (price: number) => {
   return `$${price.toFixed(2)}`;
 };
 
-
-
 const WishlistPage = () => {
-  const { data: wishlistItems, isLoading, isError, error } = useQuery(wishlistQueryOptions());
+  const { data: wishlistItems, isLoading, isError, error } = useQuery(wishlistQueryOptions(true));
 
-  const { mutate: removeWishlistItem, isPending: isRemoving , variables : removingListingId } = useRemoveWishlistMutation();
+  const {
+    mutate: removeWishlistItem,
+    isPending: isRemoving,
+    variables: removingListingId,
+  } = useRemoveWishlistMutation();
 
   const itemCount = wishlistItems?.length ?? 0;
 
   return (
-     <Box
+    <Box
       component="main"
       sx={{
         width: '100%',
@@ -116,7 +125,6 @@ const WishlistPage = () => {
           </Alert>
         )}
 
-      
         {!isLoading && !isError && itemCount === 0 && (
           <Box
             sx={{
@@ -207,40 +215,45 @@ const WishlistPage = () => {
                     }}
                   >
                     <Link
-                        to="/products/$listingId"
-                        params={{ listingId: item.listingId }}
-                        aria-label={`View ${item.productName}`}
-                        style={{ display: 'block', width: '100%', height: '100%', textDecoration: 'none' }}
-                      >
-                        {item.imageLink ? (
-                          <Box
-                            component="img"
-                            src={item.imageLink}
-                            alt={item.productName}
-                            sx={{
-                              display: 'block',
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'cover',
-                              transition: 'transform 250ms ease',
-                              '&:hover': { transform: 'scale(1.025)' },
-                            }}
-                          />
-                        ) : (
-                          <Box
-                            sx={{
-                              width: '100%',
-                              height: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              px: 2,
-                            }}
-                          >
-                            <Typography color="text.secondary">Image unavailable</Typography>
-                          </Box>
-                        )}
-                      </Link>
+                      to="/products/$listingId"
+                      params={{ listingId: item.listingId }}
+                      aria-label={`View ${item.productName}`}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      {item.imageLink ? (
+                        <Box
+                          component="img"
+                          src={item.imageLink}
+                          alt={item.productName}
+                          sx={{
+                            display: 'block',
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 250ms ease',
+                            '&:hover': { transform: 'scale(1.025)' },
+                          }}
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            px: 2,
+                          }}
+                        >
+                          <Typography color="text.secondary">Image unavailable</Typography>
+                        </Box>
+                      )}
+                    </Link>
 
                     <IconButton
                       type="button"
@@ -296,7 +309,7 @@ const WishlistPage = () => {
                         >
                           {item.productName}
                         </Typography>
-                    </Link>
+                      </Link>
 
                       <Typography
                         sx={{
