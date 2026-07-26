@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { wishlistQueryOptions } from '../../queries';
 import { useWishlistMutation } from '../../mutations.ts';
 import { Box, Button } from '@mui/material';
+import { useAuth } from '../../hooks/useAuth.ts';
 
 type WishlistButtonProps = {
   listingId: string;
@@ -10,7 +11,8 @@ type WishlistButtonProps = {
 };
 
 const WishlistButton = ({ listingId, showText = false }: WishlistButtonProps) => {
-  const { data: wishlistItems, isLoading } = useQuery(wishlistQueryOptions());
+  const { isLoggedIn } = useAuth();
+  const { data: wishlistItems, isLoading } = useQuery(wishlistQueryOptions(isLoggedIn));
 
   const isInWishlist = wishlistItems?.some((item) => item.listingId === listingId) ?? false;
 

@@ -1,25 +1,17 @@
 import { Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import {
-  Alert,
-  Box,
-  Button,
-  Divider,
-  IconButton,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, Divider, IconButton, TextField, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-
-import { cartQueryOptions } from '../../queries';
 
 import {
   useClearCartMutation,
   useRemoveCartItemMutation,
   useUpdateCartItemMutation,
 } from '../../mutations';
+import { useCart } from '../../hooks/useCart.ts';
+import { useState } from 'react';
+import ConfirmationDialog from './ConfirmationDialog.tsx';
 
 const getErrorMessage = (error: unknown) => {
   const possibleApiError = error as {
@@ -34,12 +26,12 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const ShoppingCartPage = () => {
-  const cartQuery = useQuery(cartQueryOptions());
+  const { data, isLoading, isError, error } = useCart();
+
+  const [openClearDialog, setOpenClearDialog] = useState<boolean>(false);
 
   const updateCartItemMutation = useUpdateCartItemMutation();
-
   const removeCartItemMutation = useRemoveCartItemMutation();
-
   const clearCartMutation = useClearCartMutation();
 
   const pageHeader = (
@@ -54,18 +46,13 @@ const ShoppingCartPage = () => {
     >
       <Typography variant="h1">Shopping Cart</Typography>
 
-      <Button
-        component={Link}
-        to="/products"
-        startIcon={<ArrowBackIcon />}
-        sx={{ mt: 1 }}
-      >
+      <Button component={Link} to="/products" startIcon={<ArrowBackIcon />} sx={{ mt: 1 }}>
         Continue Shopping
       </Button>
     </Box>
   );
 
-  if (cartQuery.isLoading) {
+  if (isLoading) {
     return (
       <Box sx={{ maxWidth: 1100, mx: 'auto', px: 3, py: 5 }}>
         {pageHeader}
@@ -74,29 +61,24 @@ const ShoppingCartPage = () => {
     );
   }
 
-  if (cartQuery.isError) {
+  if (isError) {
     return (
       <Box sx={{ maxWidth: 1100, mx: 'auto', px: 3, py: 5 }}>
         {pageHeader}
 
         <Alert severity="error" sx={{ mt: 4 }}>
-          Error loading cart: {getErrorMessage(cartQuery.error)}
+          Error loading cart: {getErrorMessage(error)}
         </Alert>
       </Box>
     );
   }
 
-  const cartItems = cartQuery.data ?? [];
+  const cartItems = data ?? [];
 
-  const cartTotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
+  const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const mutationError =
-    updateCartItemMutation.error ??
-    removeCartItemMutation.error ??
-    clearCartMutation.error;
+    updateCartItemMutation.error ?? removeCartItemMutation.error ?? clearCartMutation.error;
 
   if (cartItems.length === 0) {
     return (
@@ -106,9 +88,7 @@ const ShoppingCartPage = () => {
         <Divider sx={{ mt: 3 }} />
 
         <Box sx={{ textAlign: 'center', py: 10 }}>
-          <ShoppingBagOutlinedIcon
-            sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }}
-          />
+          <ShoppingBagOutlinedIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
 
           <Typography variant="h3" sx={{ mb: 1 }}>
             Your cart is empty
@@ -189,7 +169,7 @@ const ShoppingCartPage = () => {
             </Link>
 
             <Box sx={{ flexGrow: 1, minWidth: 200 }}>
-             <Link
+              <Link
                 to="/products/$listingId"
                 params={{ listingId: item.listingId }}
                 style={{ textDecoration: 'none', color: 'inherit' }}
@@ -285,13 +265,7 @@ const ShoppingCartPage = () => {
           color="inherit"
           disabled={clearCartMutation.isPending}
           onClick={() => {
-            const shouldClear = window.confirm(
-              'Are you sure you want to clear your cart?',
-            );
-
-            if (shouldClear) {
-              clearCartMutation.mutate();
-            }
+            setOpenClearDialog(true);
           }}
         >
           {clearCartMutation.isPending ? 'Clearing...' : 'Clear Cart'}
@@ -317,6 +291,15 @@ const ShoppingCartPage = () => {
           Proceed to Checkout
         </Button>
       </Box>
+      <ConfirmationDialog
+        open={openClearDialog}
+        onClose={() => setOpenClearDialog(false)}
+        onConfirm={() => {
+          clearCartMutation.mutate();
+          setOpenClearDialog(false);
+        }}
+        message="Are you sure you want to clear your cart?"
+      />
     </Box>
   );
 };
