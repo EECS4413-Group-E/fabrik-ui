@@ -133,11 +133,4 @@ export const useCreateOrderMutation = () => {
   });
 };
 
-export const useSearchMutation = (keyword: string, filter: Filter) =>{
-  return useMutation({
-    mutationFn: () => {
-      return fetchSearchResults(keyword, filter);
-    }
-  }); 
-}
   

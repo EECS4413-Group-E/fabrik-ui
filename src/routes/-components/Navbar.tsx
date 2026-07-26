@@ -9,7 +9,7 @@ import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 
 import { fabrikColors } from '../../theme';
 
-const CATEGORIES = ['JEAN', 'PANT', 'SHORT', 'SHIRT', 'SWEATER', 'BAG', 'SHOES', 'HAT'] as const;
+const CATEGORIES = ['SHOP ALL', 'JEAN', 'PANT', 'SHORT', 'SHIRT', 'SWEATER', 'BAG', 'SHOES', 'HAT'] as const;
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -24,8 +24,8 @@ const Navbar = () => {
     const trimmedSearch = searchTerm.trim();
 
     navigate({
-      to: '/products',
-      search: trimmedSearch ? { search: trimmedSearch } : {},
+      to: '/search',
+      search: trimmedSearch ? { keyword: trimmedSearch } : {},
     });
   };
 
@@ -53,10 +53,18 @@ const Navbar = () => {
     setWomensMenuAnchor(null);
   };
 
-  const handleCategoryClick = () => {
+  const handleCategoryClick = (department: 'MENS' | 'WOMENS'| 'OTHER'|'', category: string) => {
     //TODO: add logic for filtering products by category and gender
+
+    if (category === 'SHOP ALL') {
+      category = '';
+    }
     navigate({
       to: '/products',
+      search: {
+        department: department,
+        category: category
+      }
     });
     handleCloseMensMenu();
     handleCloseWomensMenu();
@@ -130,7 +138,7 @@ const Navbar = () => {
             }}
           >
             {CATEGORIES.map((category) => (
-              <MenuItem key={category} onClick={() => handleCategoryClick()}>
+              <MenuItem key={category} onClick={() => handleCategoryClick("MENS", category)}>
                 {category}
               </MenuItem>
             ))}
@@ -181,15 +189,14 @@ const Navbar = () => {
             }}
           >
             {CATEGORIES.map((category) => (
-              <MenuItem key={category} onClick={() => handleCategoryClick()}>
+              <MenuItem key={category} onClick={() => handleCategoryClick("WOMENS", category)}>
                 {category}
               </MenuItem>
             ))}
           </Menu>
           <Button
             id="others-button"
-            component={Link}
-            to="/products"
+            onClick={() => handleCategoryClick("OTHER", '')}
             variant="text"
             sx={{
               color: fabrikColors.charcoal,
@@ -205,6 +212,26 @@ const Navbar = () => {
             }}
           >
             Other
+          </Button>
+          <Button
+            id="others-button"
+            component={Link}
+            to="/products?deals=true"
+            variant="text"
+            sx={{
+              color: fabrikColors.charcoal,
+              textDecoration: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontSize: '0.8rem',
+              fontWeight: 400,
+              padding: 0,
+              '&:hover': {
+                backgroundColor: 'transparent',
+              },
+            }}
+          >
+            HOT DEALS
           </Button>
         </Box>
 

@@ -27,3 +27,16 @@ export interface Listing {
   departmentCategory: string;
   products: Product[];
 }
+
+export interface ListingItem {
+  id: string;
+  productDescription: string;
+  productName: string;
+  clothingCategory: string;
+  departmentCategory: string;
+  colors: string[];
+  imageLink: string;
+  minPrice: number;
+  maxPrice: number;
+  createdDate: string;
+}

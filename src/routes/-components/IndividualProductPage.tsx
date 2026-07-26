@@ -6,7 +6,7 @@ import { singleListingQueryOptions } from '../../queries';
 import { useAddCartItemMutation } from '../../mutations';
 import type { Product } from '../../models/Listing';
 
-import WishlistButton from './WishlistButton';
+// import WishlistButton from './WishlistButton';
 import {
   Box,
   Button,
@@ -115,7 +115,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     <Box>
       <Typography variant={'h1'}>{listing.productName}</Typography>
 
-      <WishlistButton listingId={listing.id} showText />
+      {/* <WishlistButton listingId={listing.id} showText /> */}
 
       {selectedImage && <img src={selectedImage.imageLink} alt={listing.productName} width={300} />}
 

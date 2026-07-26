@@ -1,39 +1,69 @@
-import { Box, Collapse, Pagination, ToggleButton, Typography } from "@mui/material";
-import FilterBox from "./filter/FilterBox";
-import Divider from '@mui/material/Divider';
-import { useEffect, useState } from "react";
-import SortingSelect from "./filter/SortingSelect";
-import { useSearchMutation } from "../../mutations";
+import { Box, Breadcrumbs, Button, Checkbox, CircularProgress, Collapse, Divider, IconButton, Pagination, ToggleButton, Typography, type SelectChangeEvent } from "@mui/material";
+import { useState } from "react";
+import React from "react";
+import { Link, useSearch } from '@tanstack/react-router'
+import { useQuery } from "@tanstack/react-query";
+
+import { useRemoveWishlistMutation } from "../../mutations";
+
 import type { Filter } from '../../models/Filter';
 
-import { useSearch } from '@tanstack/react-router'
-import DepartmentFilterButtonGroup from "./filter/DepartmentFilterButtonGroup";
+import { searchQueryOptions } from "../../queries";
 
+import DepartmentFilterButtonGroup from "./filter/DepartmentFilterButtonGroup";
+import PriceRangeSlider from "./filter/PriceRangeSlider";
+import CategoryFilterButtonGroup from "./filter/CategoryFilterButtonGroup";
+import ColorFilterButtonGroup from "./filter/ColorFilterButtonGroup";
+import SortingSelector from "./filter/SortingSelector";
+
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { fabrikColors } from "../../theme";
+
+const formatPrice = (price: number) => {
+    return `$${price.toFixed(2)}`;
+};
 
 const SearchPage = () => {
 
-    const { keyword } = useSearch({ from: '/search' }) as { keyword: string };
+
+    const { keyword = '' } = useSearch({ from: '/search' }) as { keyword: string };
+
+
+    const [departmentCategories, setDepartmentCategories] = useState<string>("all");
+    const [clothingCategories, setClothingCategories] = useState<string[]>(() => []);
+    const [colors, setColors] = useState<string[]>(() => []);
+
+    const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
+    const [discounted, setDiscounted] = useState<boolean>(false);
+
+    const { mutate: removeWishlistItem, isPending: isRemoving, variables: removingListingId } = useRemoveWishlistMutation();
+
 
     const [filtersOpen, setFiltersOpen] = useState(false);
 
+    const [sort, setSort] = React.useState("NEWEST");
+
+    const handleFilterClear = () => {
+        setPriceRange([0, 500]);
+        setDepartmentCategories("all");
+        setClothingCategories([]);
+        setColors([]);
+        setDiscounted(false);
+    }
+
     const filter: Filter = {
-        departmentCategory: undefined,
-        clothingCategory: undefined,
-        colorCategory: undefined,
-        minimumPrice: undefined,
-        maximumPrice: undefined,
-        sortStrategy: undefined,
-        onlyDiscounted: undefined,
+        departmentCategories: departmentCategories === "all" ? undefined : [departmentCategories],
+        clothingCategories: clothingCategories.length === 0 ? undefined : clothingCategories,
+        colorCategories: colors.length === 0 ? undefined : colors,
+        minimumPrice: priceRange[0] === 0 ? undefined : priceRange[0],
+        maximumPrice: priceRange[1] === 500 ? undefined : priceRange[1],
+        sortStrategy: sort,
+        onlyDiscounted: discounted,
         startRange: undefined,
         endRange: undefined
     }
-
-    const { data: pageable, mutate } = useSearchMutation(keyword, filter);
-
-    useEffect(() => {
-        mutate();
-    }, [mutate, filter]);
-
+    const { data: pageable, isLoading, isError, error } = useQuery(searchQueryOptions(keyword, filter));
     return (
         <div>
             {/* Search results header */}
@@ -53,13 +83,10 @@ const SearchPage = () => {
                 </Typography>
             </Box>
 
-
             <Divider />
-
             {/* Main content */}
             <Box sx={{
                 mx: 20,
-
             }}>
                 {/* Filter and sorting options */}
                 <Box
@@ -70,7 +97,7 @@ const SearchPage = () => {
                         justifyContent: "space-between",
                     }}
                 >
-                    <DepartmentFilterButtonGroup />
+                    <DepartmentFilterButtonGroup department={departmentCategories} setDepartment={(department) => { setDepartmentCategories(department); }} />
                     {/* Sorting + Filter button  -- grouped */}
                     <Box
                         style={{
@@ -78,7 +105,8 @@ const SearchPage = () => {
                             alignItems: "center",
                         }}
                     >
-                        <SortingSelect />
+                        <SortingSelector sort={sort} setSort={(sort) => { setSort(sort); }} />
+
                         <ToggleButton
                             value="filters"
                             onChange={() => setFiltersOpen(!filtersOpen)}
@@ -98,39 +126,333 @@ const SearchPage = () => {
                             }}
                             selected={filtersOpen}
                         >
+                            <FilterListIcon sx={{ mr: 1 }} />
                             Filters
                         </ToggleButton>
                     </Box>
                 </Box>
 
-
+                {/* Filter options collapse */}
                 <Collapse in={filtersOpen} timeout="auto" unmountOnExit>
-                    <FilterBox />
-                </Collapse>
-                <Divider />
-                {pageable?.content?.length === 0 ? (
                     <Box sx={{
                         display: "flex",
-                        justifyContent: "center",
+                        flexDirection: "column",
+                        gap: 2,
+                        backgroundColor: fabrikColors.linen,
+                        border: `1px solid ${fabrikColors.border}`,
+                        px: 2,
+                        py: 2,
                     }}>
-                        <Typography variant="body1" gutterBottom sx={{
-                            fontSize: 50,
-                            py: 20
-                        }}>
-                            We all out of "{keyword}"
-                        </Typography>
-                    </Box>
-                ) : (<Box sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                }}>
-                    <Typography variant="body1" gutterBottom sx={{
-                        fontSize: 50,
-                    }}>
-                        We got the good stuff for "{keyword}"
-                    </Typography>
+                        {/* Price Range Option */}
+                        <Box>
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                            }}>
+                                <Typography>PRICE RANGE</Typography>
+                                <Box sx={{
+                                    display: "flex",
+                                    gap: 0,
+                                }}>
+                                    <Typography
+                                        sx={{
+                                            fontFamily: "'Times New Roman', serif",
+                                        }}
+                                    >${priceRange[0]} - ${priceRange[1]}</Typography>
+                                    {priceRange[1] === 500 && (
+                                        <Typography sx={{
+                                            fontFamily: "'Times New Roman', serif",
+                                        }}>
+                                            +
+                                        </Typography>
+                                    )
+                                    }
+                                </Box>
+                            </Box>
+                            <Box sx={{
+                                px: 2,
+                                py: 1,
+                            }}>
 
-                </Box>)}
+                                <PriceRangeSlider value={priceRange} setValue={setPriceRange} />
+                            </Box>
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+                        { /* Category Options */}
+                        <Box>
+                            <Typography>
+                                CATEGORY
+                            </Typography>
+                            <CategoryFilterButtonGroup categories={clothingCategories} setCategories={setClothingCategories} />
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+                        {/* Color Options */}
+                        <Box>
+                            <Typography>
+                                COLOR
+                            </Typography>
+                            <ColorFilterButtonGroup colors={colors} setColors={setColors} />
+
+                        </Box>
+                        <Divider sx={{ my: 2 }} />
+                        {/* Discounted Options and clear&apply buttons */}
+                        <Box sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}>
+                            <Box sx={{
+                                display: "flex",
+                                alignItems: "center",
+
+                            }}>
+                                <Typography>
+                                    DISCOUNTED ONLY
+                                </Typography>
+                                <Checkbox
+                                    checked={discounted}
+                                    onChange={discounted => { setDiscounted(discounted.target.checked); }}
+                                    slotProps={{
+                                        input: { 'aria-label': 'controlled' },
+                                    }}
+                                    sx={{
+                                        color: "black",
+                                        "&.Mui-checked": {
+                                            color: "black",
+
+                                        },
+                                    }}
+                                />
+                            </Box>
+                            <Box sx={{
+                                display: "flex",
+                                gap: 1,
+                            }}>
+
+                                <Button
+                                    onClick={handleFilterClear}
+                                    sx={{
+                                        height: 40,
+                                        width: 80,
+                                        border: `1px solid black`,
+                                        borderRadius: 0,
+                                        color: "black",
+                                        "&:hover": {
+                                            backgroundColor: "darkred",
+                                            color: "white",
+                                        },
+                                    }}
+                                >
+                                    CLEAR
+                                </Button>
+                                {/* <Button
+                                    onClick={handleSearch}
+                                    sx={{
+                                        height: 40,
+                                        width: 80,
+                                        border: `1px solid black`,
+                                        borderRadius: 0,
+                                        color: "black",
+                                        "&:hover": {
+                                            backgroundColor: "black",
+                                            color: "white",
+                                        },
+                                    }}
+                                >
+                                    APPLY
+                                </Button> */}
+                            </Box>
+                        </Box>
+
+                    </Box>
+                </Collapse>
+                <Divider sx={{ my: 2 }} />
+
+                {/* Search results */}
+                <Box>
+                    {isLoading && (
+                        <Box>loading</Box>
+                    )}
+                    {!isLoading && !isError && pageable?.content?.length === 0 ? (
+                        <Box sx={{
+                            display: "flex-column",
+                            justifyContent: "center",
+                            alignItems: "center",
+
+                            py: 20,
+                        }}>
+                            <Typography variant="body1" gutterBottom sx={{
+
+                                fontSize: 50,
+                                justifyContent: "center",
+                                alignItems: "center",
+
+                            }}>
+                                We don't have any results for "{keyword}"
+                            </Typography>
+                            <Typography variant="body1" gutterBottom sx={{
+                                fontSize: 30,
+
+                            }}>
+                                Try a different keyword, or change your filters to find what you're looking for.
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <Box
+                            sx={{
+                                display: 'grid',
+                                gridTemplateColumns: {
+                                    xs: '1fr',
+                                    sm: 'repeat(2, minmax(0, 1fr))',
+                                    md: 'repeat(3, minmax(0, 1fr))',
+                                    lg: 'repeat(4, minmax(0, 1fr))',
+                                    xl: 'repeat(5, minmax(0, 1fr))',
+                                },
+                                gap: { xs: 4, sm: 2.5 },
+                                alignItems: 'start',
+                            }}
+                        >
+                            {pageable?.content?.map((item) => {
+
+                                const itemIsRemoving = isRemoving && removingListingId === item.id;
+                                const hasPriceRange = item.minPrice !== item.maxPrice;
+
+                                return (
+                                    <Box component="article" key={item.id} sx={{ minWidth: 0 }}>
+                                        <Box
+                                            sx={{
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                                backgroundColor: '#eeeae3',
+                                                aspectRatio: '3 / 4',
+                                            }}
+                                        >
+                                            <Link
+                                                to="/products/$listingId"
+                                                params={{ listingId: item.id }}
+                                                aria-label={`View ${item.productName}`}
+                                                style={{ display: 'block', width: '100%', height: '100%', textDecoration: 'none' }}
+                                            >
+                                                {item.imageLink ? (
+                                                    <Box
+                                                        component="img"
+                                                        src={item.imageLink}
+                                                        alt={item.productName}
+                                                        sx={{
+                                                            display: 'block',
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            objectFit: 'cover',
+                                                            transition: 'transform 250ms ease',
+                                                            '&:hover': { transform: 'scale(1.025)' },
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Box
+                                                        sx={{
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            px: 2,
+                                                        }}
+                                                    >
+                                                        <Typography color="text.secondary">Image unavailable</Typography>
+                                                    </Box>
+                                                )}
+                                            </Link>
+                                            {/*                                             
+                                            <IconButton
+                                                type="button"
+                                                aria-label={`Remove ${item.productName} from wishlist`}
+                                                title="Remove from wishlist"
+                                                onClick={() => removeWishlistItem(item.id)}
+                                                disabled={itemIsRemoving}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 10,
+                                                    right: 10,
+                                                    width: 38,
+                                                    height: 38,
+                                                    borderRadius: 10,
+                                                    backgroundColor: 'hsla(38, 40%, 96%, 0.67)',
+                                                    color: '#bd7a4a',
+                                                    '&:hover': { backgroundColor: '#ffffff' },
+                                                    '&.Mui-disabled': { backgroundColor: 'rgba(248, 245, 239, 0.8)' },
+                                                }}
+                                            >
+                                                {itemIsRemoving ? (
+                                                    <CircularProgress size={18} color="inherit" />
+                                                ) : (
+                                                    <FavoriteIcon sx={{ fontSize: 20 }} />
+                                                )}
+                                            </IconButton> */}
+
+                                        </Box>
+
+                                        <Box sx={{ pt: 1.5 }}>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'flex-start',
+                                                    gap: 2,
+                                                }}
+                                            >
+                                                <Link
+                                                    to="/products/$listingId"
+                                                    params={{ listingId: item.id }}
+                                                    style={{ minWidth: 0, color: 'inherit', textDecoration: 'none' }}
+                                                >
+                                                    <Typography
+                                                        sx={{
+                                                            color: 'text.primary',
+                                                            fontSize: '0.95rem',
+                                                            lineHeight: 1.4,
+                                                            '&:hover': {
+                                                                textDecoration: 'underline',
+                                                                textUnderlineOffset: '3px',
+                                                            },
+                                                        }}
+                                                    >
+                                                        {item.productName}
+                                                    </Typography>
+                                                </Link>
+
+                                                <Typography
+                                                    sx={{
+                                                        flexShrink: 0,
+                                                        fontSize: '0.95rem',
+                                                        fontWeight: 600,
+                                                        lineHeight: 1.4,
+                                                    }}
+                                                >
+                                                    {hasPriceRange
+                                                        ? `${formatPrice(item.minPrice)} – ${formatPrice(item.maxPrice)}`
+                                                        : formatPrice(item.minPrice)}
+                                                </Typography>
+                                            </Box>
+                                            <Breadcrumbs sx={{ py: 2 }} separator=">">
+                                                <Typography color="text.secondary">
+                                                    {item.departmentCategory}
+                                                </Typography>
+                                                <Typography color="text.secondary">
+                                                    {item.clothingCategory}
+                                                </Typography>
+                                            </Breadcrumbs>
+
+
+
+                                        </Box>
+                                    </Box>
+                                );
+                            })}
+                        </Box>
+                    )}
+                </Box>
 
                 <Box sx={{
                     display: "flex",

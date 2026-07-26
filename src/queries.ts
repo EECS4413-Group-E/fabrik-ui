@@ -8,7 +8,9 @@ import {
   fetchWishlist,
   fetchOrderDetails,
   fetchOrders,
+  fetchSearchResults,
 } from './Api';
+import type { Filter } from './models/Filter';
 
 // --- Query keys ---
 export const queryKeys = {
@@ -19,6 +21,7 @@ export const queryKeys = {
   orders: () => ['orders'] as const,
   order: (id: string) => ['order', id] as const,
   cart: () => ['cart'] as const,
+  search: (keyword: string, filter: Filter) => ['search', keyword, filter] as const,
 };
 
 export const currentUserQueryOptions = () =>
@@ -62,3 +65,9 @@ export const cartQueryOptions = () =>
     queryKey: queryKeys.cart(),
     queryFn: fetchCart,
   });
+
+export const searchQueryOptions = (keyword: string, filter: Filter) =>
+  queryOptions({
+    queryKey: ['search', keyword, filter],
+    queryFn: () => fetchSearchResults(keyword, filter),
+  }); 
