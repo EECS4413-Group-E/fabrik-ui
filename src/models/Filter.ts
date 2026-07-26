@@ -6,9 +6,6 @@ export interface Filter {
     maximumPrice: number | undefined;
     sortStrategy: string | undefined;
     onlyDiscounted: boolean | undefined;
-
-    startRange: number | undefined; // inclusive
-    endRange: number | undefined; // exclusive
 } 
 
 export const ClothingCategory = {

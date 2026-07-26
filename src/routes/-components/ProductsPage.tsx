@@ -26,21 +26,27 @@ const formatPrice = (price: number) => {
 
 const ProductsPage = () => {
   const { keyword = '' } = useSearch({ from: '/products' }) as { keyword: string };
+  const { pageNumber = 0 } = useSearch({ from: '/products' }) as { pageNumber: number };
+  const { pageSize = 10 } = useSearch({ from: '/products' }) as { pageSize: number };
+  
+  
   const { department = '' } = useSearch({ from: '/products' }) as { department: string };
   const { category = '' } = useSearch({ from: '/products' }) as { category: string };
   const { deals = false } = useSearch({ from: '/products' }) as { deals: boolean };
 
   const [departmentCategories, setDepartmentCategories] = useState<string>("all");
   const [clothingCategories, setClothingCategories] = useState<string[]>(() => []);
+  const [colors, setColors] = useState<string[]>(() => []);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
+  const [discounted, setDiscounted] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(pageNumber);
 
+  // const { mutate: removeWishlistItem, isPending: isRemoving, variables: removingListingId } = useRemoveWishlistMutation();
 
   const [hideDepartmentFilter, setHideDepartmentFilter] = useState<boolean>(department !== '');
   const [hideCategoryFilter, setHideCategoryFilter] = useState<boolean>(category !== '');
-  
-  const [colors, setColors] = useState<string[]>(() => []);
 
-  const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
-  const [discounted, setDiscounted] = useState<boolean>(false);
+
 
   useEffect(() => {
     if (department !== '') {
@@ -60,13 +66,12 @@ const ProductsPage = () => {
     if (deals === true) {
       setDiscounted(true);
     }
-    else
-    {
+    else {
       setDiscounted(false);
     }
   }, [deals]);
 
- 
+
 
   const { mutate: removeWishlistItem, isPending: isRemoving, variables: removingListingId } = useRemoveWishlistMutation();
 
@@ -81,6 +86,7 @@ const ProductsPage = () => {
     setClothingCategories([]);
     setColors([]);
     setDiscounted(false);
+    setCurrentPage(0);
   }
 
   const filter: Filter = {
@@ -91,10 +97,10 @@ const ProductsPage = () => {
     maximumPrice: priceRange[1] === 500 ? undefined : priceRange[1],
     sortStrategy: sort,
     onlyDiscounted: discounted,
-    startRange: undefined,
-    endRange: undefined
   }
-  const { data: pageable, isLoading, isError, error } = useQuery(searchQueryOptions(keyword, filter));
+
+  const { data: pageable, isLoading, isError, error } = useQuery(searchQueryOptions(keyword, filter, currentPage, pageSize));
+  
   return (
     <div>
       {/* Search results header */}
@@ -143,9 +149,9 @@ const ProductsPage = () => {
           }}
         >
           {
-            !hideDepartmentFilter ?(
+            !hideDepartmentFilter ? (
               <DepartmentFilterButtonGroup department={departmentCategories} setDepartment={(department) => { setDepartmentCategories(department); }} />
-            ):(<Box></Box>)
+            ) : (<Box></Box>)
           }
           {/* Sorting + Filter button  -- grouped */}
           <Box
@@ -225,7 +231,7 @@ const ProductsPage = () => {
 
                 <PriceRangeSlider value={priceRange} setValue={setPriceRange} />
               </Box>
-            <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2 }} />
             </Box>
 
             { /* Category Options */}
@@ -246,7 +252,7 @@ const ProductsPage = () => {
                 COLOR
               </Typography>
               <ColorFilterButtonGroup colors={colors} setColors={setColors} />
-            <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2 }} />
             </Box>
             {/* Discounted Options and clear&apply buttons */}
             <Box sx={{
@@ -416,31 +422,31 @@ const ProductsPage = () => {
                         )}
                       </Link>
                       {/*                                             
-                                            <IconButton
-                                                type="button"
-                                                aria-label={`Remove ${item.productName} from wishlist`}
-                                                title="Remove from wishlist"
-                                                onClick={() => removeWishlistItem(item.id)}
-                                                disabled={itemIsRemoving}
-                                                sx={{
-                                                    position: 'absolute',
-                                                    top: 10,
-                                                    right: 10,
-                                                    width: 38,
-                                                    height: 38,
-                                                    borderRadius: 10,
-                                                    backgroundColor: 'hsla(38, 40%, 96%, 0.67)',
-                                                    color: '#bd7a4a',
-                                                    '&:hover': { backgroundColor: '#ffffff' },
-                                                    '&.Mui-disabled': { backgroundColor: 'rgba(248, 245, 239, 0.8)' },
-                                                }}
-                                            >
-                                                {itemIsRemoving ? (
-                                                    <CircularProgress size={18} color="inherit" />
-                                                ) : (
-                                                    <FavoriteIcon sx={{ fontSize: 20 }} />
-                                                )}
-                                            </IconButton> */}
+                                                    <IconButton
+                                                        type="button"
+                                                        aria-label={`Remove ${item.productName} from wishlist`}
+                                                        title="Remove from wishlist"
+                                                        onClick={() => removeWishlistItem(item.id)}
+                                                        disabled={itemIsRemoving}
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            top: 10,
+                                                            right: 10,
+                                                            width: 38,
+                                                            height: 38,
+                                                            borderRadius: 10,
+                                                            backgroundColor: 'hsla(38, 40%, 96%, 0.67)',
+                                                            color: '#bd7a4a',
+                                                            '&:hover': { backgroundColor: '#ffffff' },
+                                                            '&.Mui-disabled': { backgroundColor: 'rgba(248, 245, 239, 0.8)' },
+                                                        }}
+                                                    >
+                                                        {itemIsRemoving ? (
+                                                            <CircularProgress size={18} color="inherit" />
+                                                        ) : (
+                                                            <FavoriteIcon sx={{ fontSize: 20 }} />
+                                                        )}
+                                                    </IconButton> */}
 
                     </Box>
 
@@ -512,7 +518,14 @@ const ProductsPage = () => {
           {pageable?.content?.length === 0 ? (
             <Box></Box>
           ) : (
-            <Pagination count={pageable?.totalPages} defaultPage={1} siblingCount={0} boundaryCount={2} />
+            <Pagination
+              count={pageable?.totalPages}
+              page={currentPage + 1}
+              onChange={(event, page) => setCurrentPage(page - 1)}
+              defaultPage={1}
+              siblingCount={0}
+              boundaryCount={2}
+            />
           )}
         </Box>
       </Box>

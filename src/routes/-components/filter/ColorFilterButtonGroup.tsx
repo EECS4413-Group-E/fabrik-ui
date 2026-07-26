@@ -87,7 +87,8 @@ export default function ColorFilterButtonGroup({ colors, setColors }: { colors: 
                 </ToggleButton>
             </Tooltip>
             <Tooltip title="Other">
-                <ToggleButton value="OTHER" sx={colorSx("orange")}>
+                <ToggleButton value="OTHER" sx={colorSx("white")}>
+                    ?
                 </ToggleButton>
             </Tooltip>
         </StyledToggleButtonGroup >

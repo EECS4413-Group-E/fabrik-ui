@@ -25,17 +25,18 @@ const formatPrice = (price: number) => {
 };
 
 const SearchPage = () => {
-
-
     const { keyword = '' } = useSearch({ from: '/search' }) as { keyword: string };
+    const { pageNumber = 0 } = useSearch({ from: '/search' }) as { pageNumber: number };
+    const { pageSize = 10 } = useSearch({ from: '/search' }) as { pageSize: number };
 
+    
 
     const [departmentCategories, setDepartmentCategories] = useState<string>("all");
     const [clothingCategories, setClothingCategories] = useState<string[]>(() => []);
     const [colors, setColors] = useState<string[]>(() => []);
-
     const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
     const [discounted, setDiscounted] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(pageNumber);
 
     const { mutate: removeWishlistItem, isPending: isRemoving, variables: removingListingId } = useRemoveWishlistMutation();
 
@@ -50,6 +51,7 @@ const SearchPage = () => {
         setClothingCategories([]);
         setColors([]);
         setDiscounted(false);
+        setCurrentPage(0);
     }
 
     const filter: Filter = {
@@ -60,10 +62,10 @@ const SearchPage = () => {
         maximumPrice: priceRange[1] === 500 ? undefined : priceRange[1],
         sortStrategy: sort,
         onlyDiscounted: discounted,
-        startRange: undefined,
-        endRange: undefined
     }
-    const { data: pageable, isLoading, isError, error } = useQuery(searchQueryOptions(keyword, filter));
+
+    const { data: pageable, isLoading, isError, error } = useQuery(searchQueryOptions(keyword, filter, currentPage, pageSize));
+
     return (
         <div>
             {/* Search results header */}
@@ -461,7 +463,14 @@ const SearchPage = () => {
                     {pageable?.content?.length === 0 ? (
                         <Box></Box>
                     ) : (
-                        <Pagination count={pageable?.totalPages} defaultPage={1} siblingCount={0} boundaryCount={2} />
+                        <Pagination 
+                        count={pageable?.totalPages} 
+                        page={currentPage+1} 
+                        onChange={(event, page) => setCurrentPage(page-1)} 
+                        defaultPage={1} 
+                        siblingCount={0} 
+                        boundaryCount={2} 
+                        />
                     )}
                 </Box>
             </Box>

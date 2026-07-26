@@ -46,6 +46,7 @@ export default function CategoryFilterButtonGroup({ categories, setCategories }:
         gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
         flexDirection: 'row', 
         gap: 0, p: 1,
+        py: 1,
       }}
       value={categories}
       onChange={handleCategorySelection}

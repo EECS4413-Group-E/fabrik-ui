@@ -66,8 +66,8 @@ export const cartQueryOptions = () =>
     queryFn: fetchCart,
   });
 
-export const searchQueryOptions = (keyword: string, filter: Filter) =>
+export const searchQueryOptions = (keyword: string, filter: Filter, pageNumber: number, pageSize: number) =>
   queryOptions({
-    queryKey: ['search', keyword, filter],
-    queryFn: () => fetchSearchResults(keyword, filter),
+    queryKey: ['search', keyword, filter, pageNumber, pageSize],
+    queryFn: () => fetchSearchResults(keyword, filter, pageNumber, pageSize),
   }); 

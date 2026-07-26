@@ -124,8 +124,8 @@ export const fetchListingById = (listingid: string) => {
   return getWithConfig<Listing>(`/catalogue/listing/${listingid}`);
 };
 
-export const fetchSearchResults = (keyword: string, filter: Filter) => {
-  return postWithConfig<Filter, PageableResponse<ListingItem>>(`/catalogue/listings/search?keyword=${encodeURIComponent(keyword)}`, filter);
+export const fetchSearchResults = (keyword: string, filter: Filter, pageNumber: number, pageSize: number) => {
+  return postWithConfig<Filter, PageableResponse<ListingItem>>(`/catalogue/listings/search?keyword=${encodeURIComponent(keyword)}&pageNumber=${pageNumber}&pageSize=${pageSize}`, filter);
 };
 
 export const fetchWishlist = () => {
