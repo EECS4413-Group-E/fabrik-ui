@@ -189,18 +189,6 @@ export const useCreateOrderMutation = () => {
   });
 };
 
-export const useAddReviewMutation = (listingId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: addReview,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.reviews(listingId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.listing(listingId) });
-    },
-  });
-};
-
 export const useChangePasswordMutation = () => {
   return useMutation<void, Error, ChangePasswordRequest>({
     mutationFn: changePassword,
@@ -216,6 +204,19 @@ export const useChangeEmailMutation = () => {
       await queryClient.invalidateQueries({
         queryKey: queryKeys.currentUser(),
       });
+    },
+  });
+};
+
+
+export const useAddReviewMutation = (listingId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: addReview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.reviews(listingId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.listing(listingId) });
     },
   });
 };
