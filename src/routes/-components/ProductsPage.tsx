@@ -28,8 +28,8 @@ const ProductsPage = () => {
   const { keyword = '' } = useSearch({ from: '/products' }) as { keyword: string };
   const { pageNumber = 0 } = useSearch({ from: '/products' }) as { pageNumber: number };
   const { pageSize = 10 } = useSearch({ from: '/products' }) as { pageSize: number };
-  
-  
+
+
   const { department = '' } = useSearch({ from: '/products' }) as { department: string };
   const { category = '' } = useSearch({ from: '/products' }) as { category: string };
   const { deals = false } = useSearch({ from: '/products' }) as { deals: boolean };
@@ -98,7 +98,7 @@ const ProductsPage = () => {
   }
 
   const { data: pageable, isLoading, isError, error } = useQuery(searchQueryOptions(keyword, filter, currentPage, pageSize));
-  
+
   return (
     <div>
       {/* Search results header */}
@@ -328,7 +328,12 @@ const ProductsPage = () => {
         {/* Search results */}
         <Box>
           {isLoading && (
-            <Box>loading</Box>
+            <Box sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}>
+              <CircularProgress sx={{ margin: 'auto' }} />
+            </Box>
           )}
           {!isLoading && !isError && pageable?.content?.length === 0 ? (
             <Box sx={{

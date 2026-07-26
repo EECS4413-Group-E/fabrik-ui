@@ -29,7 +29,7 @@ const SearchPage = () => {
     const { pageNumber = 0 } = useSearch({ from: '/search' }) as { pageNumber: number };
     const { pageSize = 10 } = useSearch({ from: '/search' }) as { pageSize: number };
 
-    
+
 
     const [departmentCategories, setDepartmentCategories] = useState<string>("all");
     const [clothingCategories, setClothingCategories] = useState<string[]>(() => []);
@@ -275,7 +275,12 @@ const SearchPage = () => {
                 {/* Search results */}
                 <Box>
                     {isLoading && (
-                        <Box>loading</Box>
+                        <Box sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                        }}>
+                            <CircularProgress sx={{ margin: 'auto' }} />
+                        </Box>
                     )}
                     {!isLoading && !isError && pageable?.content?.length === 0 ? (
                         <Box sx={{
@@ -463,13 +468,13 @@ const SearchPage = () => {
                     {pageable?.content?.length === 0 ? (
                         <Box></Box>
                     ) : (
-                        <Pagination 
-                        count={pageable?.totalPages} 
-                        page={currentPage+1} 
-                        onChange={(event, page) => setCurrentPage(page-1)} 
-                        defaultPage={1} 
-                        siblingCount={0} 
-                        boundaryCount={2} 
+                        <Pagination
+                            count={pageable?.totalPages}
+                            page={currentPage + 1}
+                            onChange={(event, page) => setCurrentPage(page - 1)}
+                            defaultPage={1}
+                            siblingCount={0}
+                            boundaryCount={2}
                         />
                     )}
                 </Box>
