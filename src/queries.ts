@@ -19,6 +19,7 @@ export const queryKeys = {
   wishlist: () => ['wishlist'] as const,
   orders: () => ['orders'] as const,
   order: (id: string) => ['order', id] as const,
+  cart: () => ['cart'] as const,
   search: (keyword: string, filter: Filter) => ['search', keyword, filter] as const,
 };
 

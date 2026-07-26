@@ -1,6 +1,6 @@
 
 import { styled } from '@mui/material';
-import ToggleButton, { toggleButtonClasses } from '@mui/material/ToggleButton';
+import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
 import React from 'react';
 
