@@ -11,7 +11,6 @@ import type { WishListItem } from './models/WishList';
 import type {
   AddCartItemRequest,
   CartItem,
-  CartItemReference,
   RemoveCartItemRequest,
   UpdateCartItemQuantityRequest,
 } from './models/CartItem';
@@ -22,13 +21,20 @@ const API_BASE_URL = 'http://localhost:5000/api';
 // to the Gateway.
 const TEMP_ORDER_API_URL = 'http://localhost:4004/order';
 
+type UnauthorizedHandler = () => void;
+let onUnauthorized: UnauthorizedHandler | null = null;
+
+export const registerUnauthorizedHandler = (handler: UnauthorizedHandler) => {
+  onUnauthorized = handler;
+};
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = tokenStore.get();
+  const token = tokenStore.peek();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -54,7 +60,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         tokenStore.set(null);
-        window.location.href = '/login';
+        onUnauthorized?.();
         return Promise.reject(refreshError);
       }
     }
@@ -65,6 +71,11 @@ apiClient.interceptors.response.use(
 
 const getWithConfig = async <Response>(url: string): Promise<Response> => {
   const response = await apiClient.get<Response>(url);
+  return response.data;
+};
+
+const putWithConfig = async <Request, Response>(url: string, data?: Request): Promise<Response> => {
+  const response = await apiClient.put<Response>(url, data);
   return response.data;
 };
 
@@ -87,6 +98,14 @@ export const registerUser = (data: LoginRegisterRequest) => {
 
 export const loginUser = (data: LoginRegisterRequest) => {
   return postWithConfig<LoginRegisterRequest, AccessTokenResponse>('/auth/login', data);
+};
+
+export const refreshUser = () => {
+  return postWithConfig<undefined, AccessTokenResponse>('/auth/refresh');
+};
+
+export const logoutUser = () => {
+  return postWithConfig<undefined, AccessTokenResponse>('/auth/logout');
 };
 
 export const fetchCurrentUser = () => {
@@ -145,12 +164,16 @@ export const fetchCart = () => {
 };
 
 export const addCartItem = (request: AddCartItemRequest) => {
-  return postWithConfig<AddCartItemRequest, CartItemReference>('/user/cart', request);
+  return postWithConfig<AddCartItemRequest, void>('/user/cart', request);
 };
 
 export const updateCartItemQuantity = async (request: UpdateCartItemQuantityRequest) => {
   const response = await apiClient.patch<void>('/user/cart', request);
   return response.data;
+};
+
+export const replaceCart = (request: AddCartItemRequest[]) => {
+  return putWithConfig<AddCartItemRequest[], void>('/user/cart', request);
 };
 
 export const removeCartItem = (request: RemoveCartItemRequest) => {
