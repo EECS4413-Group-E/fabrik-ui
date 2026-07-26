@@ -71,8 +71,6 @@ const ProductsPage = () => {
     }
   }, [deals]);
 
-
-
   const { mutate: removeWishlistItem, isPending: isRemoving, variables: removingListingId } = useRemoveWishlistMutation();
 
 
