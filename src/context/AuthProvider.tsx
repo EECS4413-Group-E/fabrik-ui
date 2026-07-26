@@ -4,11 +4,12 @@ import { refreshUser, registerUnauthorizedHandler } from '../Api.ts';
 import { parseJWT } from '../utils.ts';
 import { tokenStore } from '../tokenStore.ts';
 import { router } from '../router.ts';
+import type { UserRole } from '../models/User.ts';
 
 interface TokenPayload {
   sub: string;
   email: string;
-  role: string;
+  role: UserRole;
   iat: number;
   exp: number;
 }
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, role: parsedToken?.role || '', isLoggedIn, loading, setAccessToken }}
+      value={{ accessToken, role: parsedToken?.role || null, isLoggedIn, loading, setAccessToken }}
     >
       {children}
     </AuthContext.Provider>
