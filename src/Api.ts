@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { LoginRegisterRequest, User } from './models/User';
-import type { Listing } from './models/Listing';
+import type { Listing, ListingItem } from './models/Listing';
 import type { Order, PlaceOrderRequest } from './models/Order';
 
 import { tokenStore } from './tokenStore';
@@ -14,6 +14,8 @@ import type {
   RemoveCartItemRequest,
   UpdateCartItemQuantityRequest,
 } from './models/CartItem';
+import type { PageableResponse } from './models/PageableResponse';
+import type { Filter } from './models/Filter';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -139,6 +141,10 @@ export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
 
 export const fetchListingById = (listingid: string) => {
   return getWithConfig<Listing>(`/catalogue/listing/${listingid}`);
+};
+
+export const fetchSearchResults = (keyword: string, filter: Filter, pageNumber: number, pageSize: number) => {
+  return postWithConfig<Filter, PageableResponse<ListingItem>>(`/catalogue/listings/search?keyword=${encodeURIComponent(keyword)}&pageNumber=${pageNumber}&pageSize=${pageSize}`, filter);
 };
 
 export const fetchWishlist = () => {
