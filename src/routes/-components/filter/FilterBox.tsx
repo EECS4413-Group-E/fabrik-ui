@@ -36,7 +36,7 @@ const FilterBox = ({
                 <Box sx={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: 2,
+                    gap: 0,
                     backgroundColor: fabrikColors.linen,
                     border: `1px solid ${fabrikColors.border}`,
                     px: 2,
@@ -48,7 +48,9 @@ const FilterBox = ({
                             display: "flex",
                             justifyContent: "space-between",
                         }}>
-                            <Typography>PRICE RANGE</Typography>
+                            <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary', my: 2 }}>
+                                PRICE RANGE
+                            </Typography>
                             <Box sx={{
                                 display: "flex",
                                 gap: 0,
@@ -75,14 +77,15 @@ const FilterBox = ({
 
                             <PriceRangeSlider priceRange={priceRange} setPriceRange={setPriceRange} />
                         </Box>
+                        <Divider sx={{ my: 2 }} />
                     </Box>
 
-                    <Divider sx={{ my: 2 }} />
+
                     { /* Category Options */}
                     {!hideCategoryFilter && (
                         <Box>
                             <Box>
-                                <Typography>
+                                <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary', my: 2 }}>
                                     CATEGORY
                                 </Typography>
                                 <CategoryFilterButtonGroup categories={clothingCategories} setCategories={setClothingCategories} />
@@ -93,7 +96,8 @@ const FilterBox = ({
 
                     {/* Color Options */}
                     <Box>
-                        <Typography>
+                        <Typography
+                            sx={{ letterSpacing: '0.25em', color: 'text.secondary', my: 2 }}>
                             COLOR
                         </Typography>
                         <ColorFilterButtonGroup colors={colors} setColors={setColors} />
@@ -110,7 +114,7 @@ const FilterBox = ({
                             alignItems: "center",
 
                         }}>
-                            <Typography>
+                            <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary', mr: 1 }}>
                                 DISCOUNTED ONLY
                             </Typography>
                             <Checkbox

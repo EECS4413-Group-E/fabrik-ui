@@ -105,6 +105,8 @@ const ProductsPage = () => {
 
         <Breadcrumbs aria-label="breadcrumb" sx={{
           mb: 2,
+          letterSpacing: '0.25em',
+          color: 'text.secondary',
         }}>
           {department !== '' && (
             <Box>
@@ -122,8 +124,8 @@ const ProductsPage = () => {
             </Box>
           )}
         </Breadcrumbs>
-        <Typography variant="body1" gutterBottom>
-          {pageable?.totalElements} results found
+        <Typography variant="body1" gutterBottom sx={{ letterSpacing: '0.05em', color: 'text.secondary' }}>
+          {pageable?.totalElements} items found
         </Typography>
       </Box>
       <Divider sx={{ my: 2 }} />

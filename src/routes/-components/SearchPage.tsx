@@ -67,14 +67,14 @@ const SearchPage = () => {
                 my: 5,
             }}
             >
-                <Typography>
+                <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary' }}  gutterBottom>
                     SEARCH RESULTS FOR
                 </Typography>
-                <Typography variant="h4" gutterBottom>
+                <Typography variant="h2" gutterBottom>
                     "{keyword}"
                 </Typography>
-                <Typography variant="body1" gutterBottom>
-                    {pageable?.totalElements} results found
+                <Typography variant="body1" gutterBottom sx={{ letterSpacing: '0.05em', color: 'text.secondary' }}>
+                    {pageable?.totalElements} items found
                 </Typography>
             </Box>
 

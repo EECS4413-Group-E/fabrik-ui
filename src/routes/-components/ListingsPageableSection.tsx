@@ -1,4 +1,4 @@
-import { Box, Breadcrumbs, CircularProgress,  IconButton, Pagination,  Typography } from "@mui/material";
+import { Box, Breadcrumbs, CircularProgress, IconButton, Pagination, Tooltip, Typography } from "@mui/material";
 import type { ListingItem } from "../../models/Listing";
 import type { PageableResponse } from "../../models/PageableResponse";
 import { useRemoveWishlistMutation } from "../../mutations";
@@ -25,7 +25,7 @@ const ListingsPageableSection = ({
     setCurrentPage: (page: number) => void;
 }) => {
     const { mutate: removeWishlistItem, isPending: isRemoving, variables: removingListingId } = useRemoveWishlistMutation();
-    
+
     return (
         <Box>
             {/* Search results */}
@@ -127,32 +127,34 @@ const ListingsPageableSection = ({
                                                 </Box>
                                             )}
                                         </Link>
+                                        <Tooltip title={"Add to wishlist"} placement="right">
+                                            <IconButton
+                                                type="button"
+                                                aria-label={`Remove ${item.productName} from wishlist`}
+                                                title="Remove from wishlist"
+                                                onClick={() => removeWishlistItem(item.id)}
+                                                disabled={itemIsRemoving}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 10,
+                                                    right: 10,
+                                                    width: 38,
+                                                    height: 38,
+                                                    borderRadius: 10,
+                                                    backgroundColor: 'hsla(38, 40%, 96%, 0.67)',
+                                                    color: '#bd7a4a',
+                                                    '&:hover': { backgroundColor: '#ffffff' },
+                                                    '&.Mui-disabled': { backgroundColor: 'rgba(248, 245, 239, 0.8)' },
+                                                }}
+                                            >
+                                                {itemIsRemoving ? (
+                                                    <CircularProgress size={18} color="inherit" />
+                                                ) : (
+                                                    <FavoriteIcon sx={{ fontSize: 20 }} />
+                                                )}
+                                            </IconButton>
 
-                                        <IconButton
-                                            type="button"
-                                            aria-label={`Remove ${item.productName} from wishlist`}
-                                            title="Remove from wishlist"
-                                            onClick={() => removeWishlistItem(item.id)}
-                                            disabled={itemIsRemoving}
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 10,
-                                                right: 10,
-                                                width: 38,
-                                                height: 38,
-                                                borderRadius: 10,
-                                                backgroundColor: 'hsla(38, 40%, 96%, 0.67)',
-                                                color: '#bd7a4a',
-                                                '&:hover': { backgroundColor: '#ffffff' },
-                                                '&.Mui-disabled': { backgroundColor: 'rgba(248, 245, 239, 0.8)' },
-                                            }}
-                                        >
-                                            {itemIsRemoving ? (
-                                                <CircularProgress size={18} color="inherit" />
-                                            ) : (
-                                                <FavoriteIcon sx={{ fontSize: 20 }} />
-                                            )}
-                                        </IconButton>
+                                        </Tooltip>
 
                                     </Box>
 

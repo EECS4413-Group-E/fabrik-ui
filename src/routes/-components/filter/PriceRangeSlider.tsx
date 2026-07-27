@@ -52,6 +52,11 @@ export default function PriceRangeSlider({ priceRange, setPriceRange }: { priceR
                 max={500}
                 step={100}
                 sx={{
+                    "& .MuiSlider-markLabel": {
+                        color: "text.secondary",
+                    },
+                    
+                    
                     
                     "& .MuiSlider-thumb": {
                         backgroundColor: "black",
