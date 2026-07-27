@@ -175,7 +175,26 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
           {/* Color Selection */}
           <Box sx={{ mb: 2 }}>
             <Typography variant={'body1'} sx={{ color: 'text.secondary' }}> COLOR - </Typography>
+            
+            <Box>
+              {listing.products.map((product, index) => (
+                <Button
+                  key={product.id}
+                  onClick={() => handleProductSelection(index)}
+                  disabled={index === selectedProductIndex}
+                >
+                  {product.colorName}
+                </Button>
+              ))}
+            </Box>
           </Box>
+
+
+
+
+
+
+
           {/* Size Selection */}
           <Box sx={{ mb: 2 }}>
             <Typography variant={'body1'} sx={{ color: 'text.secondary', my:3 }}> SIZE</Typography>
@@ -194,7 +213,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
 
           </Box>
 
-          <Typography>{listing.productDescription}</Typography>
+            {listing.productDescription}
           <Typography>Category: {listing.clothingCategory}</Typography>
 
           <Typography variant={'h2'}>Selected Color: {selectedProduct.colorName}</Typography>
@@ -203,18 +222,9 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
 
           <WishlistButton listingId={listing.id} showText />
           <Typography variant={'h3'}>Available Colors</Typography>
+          <Typography variant={'body1'} sx={{ mb: 2, color: 'text.secondary' }}></Typography>
 
-          <Box>
-            {listing.products.map((product, index) => (
-              <Button
-                key={product.id}
-                onClick={() => handleProductSelection(index)}
-                disabled={index === selectedProductIndex}
-              >
-                {product.colorName}
-              </Button>
-            ))}
-          </Box>
+
 
           <Typography variant={'h3'}>Select a Size</Typography>
 
