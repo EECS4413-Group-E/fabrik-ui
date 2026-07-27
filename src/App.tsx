@@ -10,8 +10,7 @@ import { ThemeProvider, CssBaseline, Box, CircularProgress } from '@mui/material
 import theme from './theme';
 import { AuthProvider } from './context/AuthProvider.tsx';
 import { queryClient, router } from './router.ts';
-import { AuthContext } from './context/AuthContext.tsx';
-import { useContext } from 'react';
+import { useAuth } from './hooks/useAuth.ts';
 
 // Register things for typesafety
 declare module '@tanstack/react-router' {
@@ -21,7 +20,7 @@ declare module '@tanstack/react-router' {
 }
 
 function AppRouter() {
-  const auth = useContext(AuthContext);
+  const auth = useAuth();
   if (auth?.loading) {
     return (
       <Box sx={{ display: 'flex' }}>
@@ -47,7 +46,6 @@ function App() {
           }}
         >
           <QueryClientProvider client={queryClient}>
-            {/* <RouterProvider router={router} /> */}
             <AppRouter />
           </QueryClientProvider>
         </Box>

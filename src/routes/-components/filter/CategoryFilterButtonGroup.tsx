@@ -6,11 +6,7 @@ import React from 'react';
 import type { ClothingCategory } from '../../../models/Filter';
 
 export default function CategoryFilterButtonGroup({ categories, setCategories }: { categories: ClothingCategory[]; setCategories: (categories: ClothingCategory[]) => void }) {
-
-  // const handleCategorySelection = (
-
-  //   newCategories: string[]
-  // ) => {
+  
   const handleCategorySelection = (...args: [React.MouseEvent<HTMLElement>, ClothingCategory[]]) => {
     setCategories(args[1]);
   };
