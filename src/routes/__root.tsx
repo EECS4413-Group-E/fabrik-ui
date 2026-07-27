@@ -4,6 +4,7 @@ import RootComponent from './-components/RootComponent.tsx';
 
 type RouterContext = {
   queryClient: QueryClient;
+  isLoggedIn: boolean;
 };
 
 export const Route = createRootRouteWithContext<RouterContext>()({
