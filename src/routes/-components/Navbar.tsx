@@ -231,7 +231,7 @@ const Navbar = () => {
             Other
           </Button>
           <Button
-            id="others-button"
+            id="deals-button"
             component={Link}
             to="/products?deals=true"
             variant="text"

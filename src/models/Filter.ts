@@ -1,10 +1,10 @@
 export interface Filter {
-    departmentCategories: string[] | undefined;
-    clothingCategories: string[]| undefined;
-    colorCategories: string[] | undefined;
+    departmentCategories: DepartmentCategory[] | undefined;
+    clothingCategories: ClothingCategory[]| undefined;
+    colorCategories: ColorCategory[] | undefined;
     minimumPrice: number | undefined;
     maximumPrice: number | undefined;
-    sortStrategy: string | undefined;
+    sortStrategy: SortStrategy | undefined;
     onlyDiscounted: boolean | undefined;
 } 
 

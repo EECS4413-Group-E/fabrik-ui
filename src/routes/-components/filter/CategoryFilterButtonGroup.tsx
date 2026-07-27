@@ -3,14 +3,15 @@ import { styled } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
 import React from 'react';
+import type { ClothingCategory } from '../../../models/Filter';
 
-export default function CategoryFilterButtonGroup({ categories, setCategories }: { categories: string[]; setCategories: (categories: string[]) => void }) {
+export default function CategoryFilterButtonGroup({ categories, setCategories }: { categories: ClothingCategory[]; setCategories: (categories: ClothingCategory[]) => void }) {
 
   // const handleCategorySelection = (
 
   //   newCategories: string[]
   // ) => {
-  const handleCategorySelection = (...args: [React.MouseEvent<HTMLElement>, string[]]) => {
+  const handleCategorySelection = (...args: [React.MouseEvent<HTMLElement>, ClothingCategory[]]) => {
     setCategories(args[1]);
   };
 

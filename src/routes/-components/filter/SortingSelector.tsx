@@ -1,9 +1,10 @@
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import type { SortStrategy } from "../../../models/Filter";
 
-const SortingSelector = ({ sort, setSort }: { sort: string; setSort: (sort: string) => void }) => {
+const SortingSelector = ({ sort, setSort }: { sort: SortStrategy; setSort: (sort: SortStrategy) => void }) => {
 
     const handleChange = (event: any) => {
-        setSort(event.target.value as string);
+        setSort(event.target.value as SortStrategy);
         
     };
     return (

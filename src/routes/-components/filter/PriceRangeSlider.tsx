@@ -33,9 +33,9 @@ function valuetext(value: number) {
     return `${value}`;
 }
 
-export default function PriceRangeSlider({ value, setValue }: { value: number[]; setValue: (value: number[]) => void }) {
+export default function PriceRangeSlider({ priceRange, setPriceRange }: { priceRange: number[]; setPriceRange: (value: number[]) => void }) {
     const handleChange = (event: Event, newValue: number[]) => {
-        setValue(newValue);
+        setPriceRange(newValue);
     };
 
 
@@ -43,7 +43,7 @@ export default function PriceRangeSlider({ value, setValue }: { value: number[];
         <Box sx={{ width: 300 }}>
             <Slider
                 getAriaLabel={() => 'Price range'}
-                value={value}
+                value={priceRange}
                 onChange={handleChange}
                 valueLabelDisplay="auto"
                 getAriaValueText={valuetext}

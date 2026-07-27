@@ -2,10 +2,11 @@ import { styled, Tooltip } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
 import React from 'react';
+import type { ColorCategory } from '../../../models/Filter';
 
-export default function ColorFilterButtonGroup({ colors, setColors }: { colors: string[]; setColors: (colors: string[]) => void }) {
+export default function ColorFilterButtonGroup({ colors, setColors }: { colors: ColorCategory[]; setColors: (colors: ColorCategory[]) => void }) {
 
-    const handleColorSelection = (...args: [React.MouseEvent<HTMLElement>, string[]]) => {
+    const handleColorSelection = (...args: [React.MouseEvent<HTMLElement>, ColorCategory[]]) => {
         setColors(args[1]);
     };
 

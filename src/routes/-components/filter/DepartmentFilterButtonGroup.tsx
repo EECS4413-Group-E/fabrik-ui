@@ -2,17 +2,19 @@ import { styled } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
 import React from 'react';
+import type { DepartmentCategory } from '../../../models/Filter';
 
-export default function DepartmentFilterButtonGroup({ department, setDepartment }: { department: string; setDepartment: (department: string) => void }) {
+export default function DepartmentFilterButtonGroup({ department, setDepartment }: { department: DepartmentCategory | undefined; setDepartment: (department: DepartmentCategory | undefined) => void }) {
 
-  const handleCategorySelection = (
-    event: React.MouseEvent<HTMLElement>,
-    newDepartment: string | "all"
-  ) => {
-    if (newDepartment === null) {
-      newDepartment = "all";
+
+  const handleCategorySelection = (...args: [React.MouseEvent<HTMLElement>, DepartmentCategory | ""]) => {
+    const value = args[1];
+    if (value=== null|| value ==="") {
+      setDepartment(undefined);
     }
-    setDepartment(newDepartment);
+    else{
+      setDepartment(value);
+    }
   };
 
   const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
@@ -43,12 +45,12 @@ export default function DepartmentFilterButtonGroup({ department, setDepartment 
         flexDirection: 'row', gap: 1, p: 1,
 
       }}
-      value={department}
+      value={department ?? ""}
       exclusive
       onChange={handleCategorySelection}
       aria-label="department selection"
     >
-      <ToggleButton value="all" sx={{
+      <ToggleButton value="" sx={{
         px: 5,
       }}>
         ALL
