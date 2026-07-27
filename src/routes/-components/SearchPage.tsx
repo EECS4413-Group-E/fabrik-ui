@@ -1,4 +1,4 @@
-import { Box, Breadcrumbs, Button, Checkbox, CircularProgress, Collapse, Divider, Pagination, ToggleButton, Typography } from "@mui/material";
+import { Box, Breadcrumbs, Button, Checkbox, CircularProgress, Collapse, Divider, IconButton, Pagination, ToggleButton, Typography } from "@mui/material";
 import { useState } from "react";
 import React from "react";
 import { Link, useSearch } from '@tanstack/react-router'
@@ -249,25 +249,8 @@ const SearchPage = () => {
                                 >
                                     CLEAR
                                 </Button>
-                                {/* <Button
-                                    onClick={handleSearch}
-                                    sx={{
-                                        height: 40,
-                                        width: 80,
-                                        border: `1px solid black`,
-                                        borderRadius: 0,
-                                        color: "black",
-                                        "&:hover": {
-                                            backgroundColor: "black",
-                                            color: "white",
-                                        },
-                                    }}
-                                >
-                                    APPLY
-                                </Button> */}
                             </Box>
                         </Box>
-
                     </Box>
                 </Collapse>
                 <Divider sx={{ my: 2 }} />
@@ -371,7 +354,7 @@ const SearchPage = () => {
                                                     </Box>
                                                 )}
                                             </Link>
-                                            {/*                                             
+                                                                                        
                                             <IconButton
                                                 type="button"
                                                 aria-label={`Remove ${item.productName} from wishlist`}
@@ -396,7 +379,7 @@ const SearchPage = () => {
                                                 ) : (
                                                     <FavoriteIcon sx={{ fontSize: 20 }} />
                                                 )}
-                                            </IconButton> */}
+                                            </IconButton>
 
                                         </Box>
 

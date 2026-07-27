@@ -6,21 +6,21 @@ import React from 'react';
 
 export default function CategoryFilterButtonGroup({ categories, setCategories }: { categories: string[]; setCategories: (categories: string[]) => void }) {
 
-  const handleCategorySelection = (
-    event: React.MouseEvent<HTMLElement>,
-    newCategories: string[]
-  ) => {
-    setCategories(newCategories);
+  // const handleCategorySelection = (
+
+  //   newCategories: string[]
+  // ) => {
+  const handleCategorySelection = (...args: [React.MouseEvent<HTMLElement>, string[]]) => {
+    setCategories(args[1]);
   };
 
-  const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  const StyledToggleButtonGroup = styled(ToggleButtonGroup)( {
     [`& .${toggleButtonGroupClasses.grouped}`]: {
       height: 40,
       width: 90,
       margin: 0, 
       border: `1px solid black`,
       borderRadius: 0,
-      
 
       [`&.${toggleButtonGroupClasses.selected}`]: {
         color: "white",
@@ -36,25 +36,21 @@ export default function CategoryFilterButtonGroup({ categories, setCategories }:
         },
       
     },
-  }));
+  });
 
   return (
 
     <StyledToggleButtonGroup
       sx={{
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-        flexDirection: 'row', 
-        gap: 0, p: 1,
-        py: 1,
+        gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
+        rowGap: 2,
+        columnGap: 2,
       }}
       value={categories}
       onChange={handleCategorySelection}
       aria-label="department selection"
     >
-      {/* <ToggleButton value="all">
-        ALL
-      </ToggleButton> */}
       <ToggleButton value="JEAN" sx={{
         px: 5,
       }}>

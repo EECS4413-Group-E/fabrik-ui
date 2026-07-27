@@ -40,50 +40,38 @@ export default function ColorFilterButtonGroup({ colors, setColors }: { colors: 
 
         <StyledToggleButtonGroup
             sx={{
-                display: 'flex',
-                flexDirection: 'row', gap: 1, p: 1,
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(35px, 1fr))',
+                rowGap: 2,
+                columnGap: 2,
             }}
             value={colors}
             onChange={handleColorSelection}
             aria-label="color selection"
         >
             <Tooltip title="Black">
-                <ToggleButton value="BLACK" sx={colorSx("black")}>
-                </ToggleButton>
+                <ToggleButton value="BLACK" sx={colorSx("black")}/>
             </Tooltip>
             <Tooltip title="Gray">
-                <ToggleButton value="GRAY" sx={colorSx("gray")}>
-                </ToggleButton>
+                <ToggleButton value="GRAY" sx={colorSx("gray")}/>
             </Tooltip>
             <Tooltip title="White">
-                <ToggleButton value="WHITE" sx={colorSx("white")}>
-
-                </ToggleButton>
+                <ToggleButton value="WHITE" sx={colorSx("white")}/>
             </Tooltip>
             <Tooltip title="Red">
-                <ToggleButton value="RED" sx={colorSx("red")}>
-
-                </ToggleButton>
+                <ToggleButton value="RED" sx={colorSx("red")}/>
             </Tooltip>
             <Tooltip title="Blue">
-                <ToggleButton value="BLUE" sx={colorSx("blue")}>
-
-                </ToggleButton>
+                <ToggleButton value="BLUE" sx={colorSx("blue")}/>
             </Tooltip>
             <Tooltip title="Yellow">
-                <ToggleButton value="YELLOW" sx={colorSx("yellow")}>
-
-                </ToggleButton>
+                <ToggleButton value="YELLOW" sx={colorSx("yellow")}/>
             </Tooltip>
             <Tooltip title="Green">
-                <ToggleButton value="GREEN" sx={colorSx("green")}>
-
-                </ToggleButton>
+                <ToggleButton value="GREEN" sx={colorSx("green")}/>
             </Tooltip>
             <Tooltip title="Purple">
-                <ToggleButton value="PURPLE" sx={colorSx("purple")}>
-
-                </ToggleButton>
+                <ToggleButton value="PURPLE" sx={colorSx("purple")}/>
             </Tooltip>
             <Tooltip title="Other">
                 <ToggleButton value="OTHER" sx={colorSx("white")}>

@@ -48,9 +48,6 @@ export default function DepartmentFilterButtonGroup({ department, setDepartment 
       onChange={handleCategorySelection}
       aria-label="department selection"
     >
-      {/* <ToggleButton value="all">
-        ALL
-      </ToggleButton> */}
       <ToggleButton value="all" sx={{
         px: 5,
       }}>
