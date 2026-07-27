@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import type { T } from '../../models/Listing';
+import type { Listing } from '../../models/Listing';
 import WishlistButton from './WishlistButton';
 import { Box, Typography } from '@mui/material';
 
 type ProductCardProps = {
-  listing: T;
+  listing: Listing;
 };
 
 const ProductCard = ({ listing }: ProductCardProps) => {

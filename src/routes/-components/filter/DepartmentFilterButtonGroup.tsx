@@ -1,20 +1,20 @@
-
 import { styled } from '@mui/material';
-import ToggleButton, { toggleButtonClasses } from '@mui/material/ToggleButton';
+import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
 import React from 'react';
+import type { DepartmentCategory } from '../../../models/Filter';
 
-export default function DepartmentFilterButtonGroup() {
-  const [department, setDepartment] = React.useState<string | null>('all');
+export default function DepartmentFilterButtonGroup({ department, setDepartment }: { department: DepartmentCategory | undefined; setDepartment: (department: DepartmentCategory | undefined) => void }) {
 
-  const handleCategorySelection = (
-    event: React.MouseEvent<HTMLElement>,
-    newDepartment: string | "all"
-  ) => {
-    if (newDepartment === null) {
-      newDepartment = "all";
+
+  const handleCategorySelection = (...args: [React.MouseEvent<HTMLElement>, DepartmentCategory | ""]) => {
+    const value = args[1];
+    if (value=== null|| value ==="") {
+      setDepartment(undefined);
     }
-    setDepartment(newDepartment);
+    else{
+      setDepartment(value);
+    }
   };
 
   const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
@@ -41,33 +41,31 @@ export default function DepartmentFilterButtonGroup() {
 
     <StyledToggleButtonGroup
       sx={{
-        display: 'flex', flexDirection: 'row', gap: 1, p: 1,
+        display: 'flex', 
+        flexDirection: 'row', gap: 1, p: 1,
 
       }}
-      value={department}
+      value={department ?? ""}
       exclusive
       onChange={handleCategorySelection}
       aria-label="department selection"
     >
-      {/* <ToggleButton value="all">
-        ALL
-      </ToggleButton> */}
-      <ToggleButton value="all" sx={{
+      <ToggleButton value="" sx={{
         px: 5,
       }}>
         ALL
       </ToggleButton>
-      <ToggleButton value="women" sx={{
+      <ToggleButton value="WOMENS" sx={{
         px: 5,
       }}>
         WOMEN
       </ToggleButton>
-      <ToggleButton value="men" sx={{
+      <ToggleButton value="MENS" sx={{
         px: 5,
       }}>
         MEN
       </ToggleButton>
-      <ToggleButton value="other" sx={{
+      <ToggleButton value="OTHER" sx={{
         px: 5,
       }}>
         OTHER

@@ -12,12 +12,10 @@ import {
   removeWishlistItem,
   replaceCart,
   updateCartItemQuantity,
-  fetchSearchResults,
 } from './Api';
 
 import { queryKeys } from './queries';
 import { useNavigate } from '@tanstack/react-router';
-import type { Filter } from './models/Filter';
 import { useAuth } from './hooks/useAuth.ts';
 import { cartStorage } from './cartStorage.ts';
 import { tokenStore } from './tokenStore.ts';
@@ -183,12 +181,3 @@ export const useCreateOrderMutation = () => {
     },
   });
 };
-
-export const useSearchMutation = (keyword: string, filter: Filter) =>{
-  return useMutation({
-    mutationFn: () => {
-      return fetchSearchResults(keyword, filter);
-    }
-  }); 
-}
-  

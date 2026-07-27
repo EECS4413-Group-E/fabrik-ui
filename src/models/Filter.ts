@@ -1,20 +1,12 @@
 export interface Filter {
-    departmentCategory: string[] | undefined;
-    clothingCategory: string[]| undefined;
-    colorCategory: string[] | undefined;
-
+    departmentCategories: DepartmentCategory[] | undefined;
+    clothingCategories: ClothingCategory[]| undefined;
+    colorCategories: ColorCategory[] | undefined;
     minimumPrice: number | undefined;
     maximumPrice: number | undefined;
-
-    sortStrategy: string | undefined;
-
+    sortStrategy: SortStrategy | undefined;
     onlyDiscounted: boolean | undefined;
-
-    startRange: number | undefined; // inclusive
-    endRange: number | undefined; // exclusive
 } 
-
-
 
 export const ClothingCategory = {
     Jean: "JEAN",

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { LoginRegisterRequest, User } from './models/User';
-import type { T } from './models/Listing';
+import type { Listing, ListingItem } from './models/Listing';
 import type { Order, PlaceOrderRequest } from './models/Order';
 
 import { tokenStore } from './tokenStore';
@@ -115,7 +115,7 @@ export const fetchCurrentUser = () => {
 };
 
 export const fetchListings = () => {
-  return getWithConfig<T[]>('/catalogue/listings');
+  return getWithConfig<Listing[]>('/catalogue/listings');
 };
 
 export const fetchOrders = () => {
@@ -140,11 +140,11 @@ export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
 };
 
 export const fetchListingById = (listingid: string) => {
-  return getWithConfig<T>(`/catalogue/listing/${listingid}`);
+  return getWithConfig<Listing>(`/catalogue/listing/${listingid}`);
 };
 
-export const fetchSearchResults = (keyword: string, filter: Filter) => {
-  return postWithConfig<Filter, PageableResponse<T>>(`/catalogue/listings/search?keyword=${encodeURIComponent(keyword)}`, filter);
+export const fetchSearchResults = (keyword: string, filter: Filter, pageNumber: number, pageSize: number) => {
+  return postWithConfig<Filter, PageableResponse<ListingItem>>(`/catalogue/listings/search?keyword=${encodeURIComponent(keyword)}&pageNumber=${pageNumber}&pageSize=${pageSize}`, filter);
 };
 
 export const fetchWishlist = () => {

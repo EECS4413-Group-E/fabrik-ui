@@ -1,55 +1,162 @@
-import { Box, ToggleButton, Typography } from "@mui/material";
-import { useState } from "react";
-import ColorButton from "./ColorButton";
+import { Box, Button, Checkbox, Collapse, Divider, Typography } from "@mui/material";
+import { fabrikColors } from "../../../theme";
+import PriceRangeSlider from "./PriceRangeSlider";
+import CategoryFilterButtonGroup from "./CategoryFilterButtonGroup";
+import ColorFilterButtonGroup from "./ColorFilterButtonGroup";
+import type { ClothingCategory, ColorCategory } from "../../../models/Filter";
 
-const COLOR_OPTIONS = ["red", "blue", "green", "yellow", "black", "white"];
-
-export default function FilterBox() {
-
-    const [colorsSelected, setColorsSelected] = useState<string[]>([]);
-
-    const toggleColor = (color: string) => {
-        +        setColorsSelected((prev) =>
-            prev.includes(color)
-                ? prev.filter((c) => c !== color)
-                : [...prev, color]
-        );
-    };
-
+const FilterBox = ({
+    filtersOpen,
+    priceRange,
+    setPriceRange,
+    clothingCategories,
+    setClothingCategories,
+    colors,
+    setColors,
+    discounted,
+    setDiscounted,
+    handleFilterClear,
+    hideCategoryFilter,
+}: {
+    filtersOpen: boolean;
+    priceRange: number[];
+    setPriceRange: (priceRange: number[]) => void;
+    clothingCategories: ClothingCategory[];
+    setClothingCategories: (categories: ClothingCategory[]) => void;
+    colors: ColorCategory[];
+    setColors: (colors: ColorCategory[]) => void;
+    discounted: boolean;
+    setDiscounted: (discounted: boolean) => void;
+    handleFilterClear: () => void;
+    hideCategoryFilter: boolean;
+}) => {
     return (
-        <Box sx={{ maxWidth: 400 }}>
-            <Box
-                sx={{
-                    mt: 1,
-                    p: 3,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                    bgcolor: 'background.paper',
-                }}
-            >
-                <Typography variant="body1" gutterBottom>
-                    Price Range
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                    Color filters
-                </Typography>
+        <Box>
+            <Collapse in={filtersOpen} timeout="auto" unmountOnExit>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0,
+                    backgroundColor: fabrikColors.linen,
+                    border: `1px solid ${fabrikColors.border}`,
+                    px: 2,
+                    py: 2,
+                }}>
+                    {/* Price Range Option */}
+                    <Box>
+                        <Box sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                        }}>
+                            <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary', my: 2 }}>
+                                PRICE RANGE
+                            </Typography>
+                            <Box sx={{
+                                display: "flex",
+                                gap: 0,
+                            }}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: "'Times New Roman', serif",
+                                    }}
+                                >${priceRange[0]} - ${priceRange[1]}</Typography>
+                                {priceRange[1] === 500 && (
+                                    <Typography sx={{
+                                        fontFamily: "'Times New Roman', serif",
+                                    }}>
+                                        +
+                                    </Typography>
+                                )
+                                }
+                            </Box>
+                        </Box>
+                        <Box sx={{
+                            px: 2,
+                            py: 1,
+                        }}>
 
-                <div>
-                    {COLOR_OPTIONS.map((color) => (
-                    <ToggleButton
-                        key={color}
-                        value={color}
-                        selected={colorsSelected.includes(color)}
-                        onChange={() => toggleColor(color)}                       >
-                        {color.charAt(0).toUpperCase() + color.slice(1)}
-                    </ToggleButton>
-                    ))}
-                </div>
-                <Typography variant="body1" gutterBottom>
-                    Category filters
-                </Typography>
-            </Box>
-        </Box>
-    );
+                            <PriceRangeSlider priceRange={priceRange} setPriceRange={setPriceRange} />
+                        </Box>
+                        <Divider sx={{ my: 2 }} />
+                    </Box>
+
+
+                    { /* Category Options */}
+                    {!hideCategoryFilter && (
+                        <Box>
+                            <Box>
+                                <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary', my: 2 }}>
+                                    CATEGORY
+                                </Typography>
+                                <CategoryFilterButtonGroup categories={clothingCategories} setCategories={setClothingCategories} />
+                            </Box>
+                            <Divider sx={{ my: 2 }} />
+                        </Box>
+                    )}
+
+                    {/* Color Options */}
+                    <Box>
+                        <Typography
+                            sx={{ letterSpacing: '0.25em', color: 'text.secondary', my: 2 }}>
+                            COLOR
+                        </Typography>
+                        <ColorFilterButtonGroup colors={colors} setColors={setColors} />
+                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                    {/* Discounted Options and clear&apply buttons */}
+                    <Box sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}>
+                        <Box sx={{
+                            display: "flex",
+                            alignItems: "center",
+
+                        }}>
+                            <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary', mr: 1 }}>
+                                DISCOUNTED ONLY
+                            </Typography>
+                            <Checkbox
+                                checked={discounted}
+                                onChange={discounted => { setDiscounted(discounted.target.checked); }}
+                                slotProps={{
+                                    input: { 'aria-label': 'controlled' },
+                                }}
+                                sx={{
+                                    color: "black",
+                                    "&.Mui-checked": {
+                                        color: "black",
+
+                                    },
+                                }}
+                            />
+                        </Box>
+                        <Box sx={{
+                            display: "flex",
+                            gap: 1,
+                        }}>
+                            <Button
+                                onClick={handleFilterClear}
+                                sx={{
+                                    height: 40,
+                                    width: 80,
+                                    border: `1px solid black`,
+                                    borderRadius: 0,
+                                    color: "black",
+                                    "&:hover": {
+                                        backgroundColor: "darkred",
+                                        color: "white",
+                                    },
+                                }}
+                            >
+                                CLEAR
+                            </Button>
+                        </Box>
+                    </Box>
+                </Box>
+            </Collapse>
+        </Box>)
 }
+
+export default FilterBox;

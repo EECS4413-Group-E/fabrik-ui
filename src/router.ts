@@ -8,5 +8,8 @@ export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   scrollRestoration: true,
-  context: { queryClient },
+  context: {
+    queryClient,
+    isLoggedIn: false,
+  },
 });

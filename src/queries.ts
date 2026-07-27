@@ -1,4 +1,5 @@
 import { queryOptions, skipToken } from '@tanstack/react-query';
+import type { Filter } from './models/Filter';
 
 import {
   fetchCurrentUser,
@@ -7,6 +8,7 @@ import {
   fetchOrderDetails,
   fetchOrders,
   fetchWishlist,
+  fetchSearchResults,
 } from './Api';
 
 // --- Query keys ---
@@ -18,6 +20,7 @@ export const queryKeys = {
   orders: () => ['orders'] as const,
   order: (id: string) => ['order', id] as const,
   cart: () => ['cart'] as const,
+  search: (keyword: string, filter: Filter) => ['search', keyword, filter] as const,
 };
 
 export const currentUserQueryOptions = () =>
@@ -55,3 +58,9 @@ export const ordersQueryOptions = () =>
     queryKey: queryKeys.orders(),
     queryFn: fetchOrders,
   });
+
+export const searchQueryOptions = (keyword: string, filter: Filter, pageNumber: number, pageSize: number) =>
+  queryOptions({
+    queryKey: ['search', keyword, filter, pageNumber, pageSize],
+    queryFn: () => fetchSearchResults(keyword, filter, pageNumber, pageSize),
+  }); 

@@ -19,11 +19,24 @@ export interface Product {
   availabilities: Availability[];
 }
 
-export interface T {
+export interface Listing {
   id: string;
   productName: string;
   productDescription: string;
   clothingCategory: string;
   departmentCategory: string;
   products: Product[];
+}
+
+export interface ListingItem {
+  id: string;
+  productDescription: string;
+  productName: string;
+  clothingCategory: string;
+  departmentCategory: string;
+  colors: string[];
+  imageLink: string;
+  minPrice: number;
+  maxPrice: number;
+  createdDate: string;
 }

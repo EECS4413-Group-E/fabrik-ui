@@ -1,38 +1,63 @@
-import { Box, Collapse, Pagination, ToggleButton, Typography } from "@mui/material";
-import FilterBox from "./filter/FilterBox";
-import Divider from '@mui/material/Divider';
-import { useEffect, useState } from "react";
-import SortingSelect from "./filter/SortingSelect";
-import { useSearchMutation } from "../../mutations";
-import type { Filter } from '../../models/Filter';
+import { Box, Divider, ToggleButton, Typography } from "@mui/material";
+import { useState } from "react";
 
 import { useSearch } from '@tanstack/react-router'
-import DepartmentFilterButtonGroup from "./filter/DepartmentFilterButtonGroup";
+import { useQuery } from "@tanstack/react-query";
 
+
+import type { ClothingCategory, ColorCategory, DepartmentCategory, Filter, SortStrategy } from '../../models/Filter';
+
+import { searchQueryOptions } from "../../queries";
+import DepartmentFilterButtonGroup from "./filter/DepartmentFilterButtonGroup";
+import SortingSelector from "./filter/SortingSelector";
+
+
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ListingsPageableSection from "./ListingsPageableSection.tsx";
+import FilterBox from "./filter/FilterBox.tsx";
 
 const SearchPage = () => {
+    const { keyword = '', pageNumber = 0, pageSize = 10 } = useSearch({ from: '/search' }) as {
+        keyword: string;
+        pageNumber: number;
+        pageSize: number;
+    };
 
-    const { keyword } = useSearch({ from: '/search' }) as { keyword: string };
+    const [departmentCategories, setDepartmentCategories] = useState<DepartmentCategory | undefined>(() => undefined);
+    const [clothingCategories, setClothingCategories] = useState<ClothingCategory[]>(() => []);
+    const [colors, setColors] = useState<ColorCategory[]>(() => []);
+    const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
+    const [discounted, setDiscounted] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(pageNumber);
+
 
     const [filtersOpen, setFiltersOpen] = useState(false);
 
-    const filter: Filter = {
-        departmentCategory: undefined,
-        clothingCategory: undefined,
-        colorCategory: undefined,
-        minimumPrice: undefined,
-        maximumPrice: undefined,
-        sortStrategy: undefined,
-        onlyDiscounted: undefined,
-        startRange: undefined,
-        endRange: undefined
+    const [sort, setSort] = useState("NEWEST" as SortStrategy);
+
+    const handleFilterClear = () => {
+        setPriceRange([0, 500]);
+        setDepartmentCategories(undefined);
+        setClothingCategories([]);
+        setColors([]);
+        setDiscounted(false);
+        setCurrentPage(0);
     }
 
-    const { data: pageable, mutate } = useSearchMutation(keyword, filter);
 
-    useEffect(() => {
-        mutate();
-    }, [mutate, filter]);
+    const filter: Filter = {
+        departmentCategories: (departmentCategories === undefined || departmentCategories === null)
+            ? undefined
+            : [departmentCategories],
+        clothingCategories: clothingCategories.length === 0 ? undefined : clothingCategories,
+        colorCategories: colors.length === 0 ? undefined : colors,
+        minimumPrice: priceRange[0] === 0 ? undefined : priceRange[0],
+        maximumPrice: priceRange[1] === 500 ? undefined : priceRange[1],
+        sortStrategy: sort,
+        onlyDiscounted: discounted,
+    }
+
+    const { data: pageable, isLoading, isError, error } = useQuery(searchQueryOptions(keyword, filter, currentPage, pageSize));
 
     return (
         <div>
@@ -42,24 +67,21 @@ const SearchPage = () => {
                 my: 5,
             }}
             >
-                <Typography>
+                <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary' }}  gutterBottom>
                     SEARCH RESULTS FOR
                 </Typography>
-                <Typography variant="h4" gutterBottom>
+                <Typography variant="h2" gutterBottom>
                     "{keyword}"
                 </Typography>
-                <Typography variant="body1" gutterBottom>
-                    {pageable?.totalElements} results found
+                <Typography variant="body1" gutterBottom sx={{ letterSpacing: '0.05em', color: 'text.secondary' }}>
+                    {pageable?.totalElements} items found
                 </Typography>
             </Box>
 
-
             <Divider />
-
             {/* Main content */}
             <Box sx={{
                 mx: 20,
-
             }}>
                 {/* Filter and sorting options */}
                 <Box
@@ -70,7 +92,7 @@ const SearchPage = () => {
                         justifyContent: "space-between",
                     }}
                 >
-                    <DepartmentFilterButtonGroup />
+                    <DepartmentFilterButtonGroup department={departmentCategories} setDepartment={(department) => { setDepartmentCategories(department); }} />
                     {/* Sorting + Filter button  -- grouped */}
                     <Box
                         style={{
@@ -78,7 +100,8 @@ const SearchPage = () => {
                             alignItems: "center",
                         }}
                     >
-                        <SortingSelect />
+                        <SortingSelector sort={sort} setSort={(sort) => { setSort(sort); }} />
+
                         <ToggleButton
                             value="filters"
                             onChange={() => setFiltersOpen(!filtersOpen)}
@@ -98,50 +121,41 @@ const SearchPage = () => {
                             }}
                             selected={filtersOpen}
                         >
+                            <FilterListIcon sx={{ mr: 1 }} />
                             Filters
                         </ToggleButton>
                     </Box>
                 </Box>
 
-
-                <Collapse in={filtersOpen} timeout="auto" unmountOnExit>
-                    <FilterBox />
-                </Collapse>
-                <Divider />
-                {pageable?.content?.length === 0 ? (
-                    <Box sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                    }}>
-                        <Typography variant="body1" gutterBottom sx={{
-                            fontSize: 50,
-                            py: 20
-                        }}>
-                            We all out of "{keyword}"
-                        </Typography>
-                    </Box>
-                ) : (<Box sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                }}>
-                    <Typography variant="body1" gutterBottom sx={{
-                        fontSize: 50,
-                    }}>
-                        We got the good stuff for "{keyword}"
-                    </Typography>
-
-                </Box>)}
-
-                <Box sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                }}>
-                    {pageable?.content?.length === 0 ? (
-                        <Box></Box>
-                    ) : (
-                        <Pagination count={pageable?.totalPages} defaultPage={1} siblingCount={0} boundaryCount={2} />
-                    )}
-                </Box>
+                {/* Filter options collapse */}
+                <FilterBox
+                    filtersOpen={filtersOpen}
+                    priceRange={priceRange}
+                    setPriceRange={(priceRange) => { setPriceRange(priceRange); }}
+                    clothingCategories={clothingCategories}
+                    setClothingCategories={(categories) => { setClothingCategories(categories); }}
+                    colors={colors}
+                    setColors={(colors) => { setColors(colors); }}
+                    discounted={discounted}
+                    setDiscounted={(discounted) => { setDiscounted(discounted); }}
+                    handleFilterClear={handleFilterClear}
+                    hideCategoryFilter={false}
+                />
+                <Divider sx={{ my: 2 }} />
+            </Box>
+            {/* Listings Section */}
+            <Box sx={{
+                mx: 20,
+                my: 5,
+            }}>
+                <ListingsPageableSection
+                    pageable={pageable}
+                    isLoading={isLoading}
+                    isError={isError}
+                    keyword={keyword}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                />
             </Box>
         </div>
     )
