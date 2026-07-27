@@ -35,7 +35,6 @@ const ProductsPage = () => {
   const [discounted, setDiscounted] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(pageNumber);
 
-  // const { mutate: removeWishlistItem, isPending: isRemoving, variables: removingListingId } = useRemoveWishlistMutation();
 
   const [hideDepartmentFilter, setHideDepartmentFilter] = useState<boolean>(department !== '');
   const [hideCategoryFilter, setHideCategoryFilter] = useState<boolean>(category !== '');

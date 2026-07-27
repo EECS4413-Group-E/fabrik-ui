@@ -1,4 +1,5 @@
 import { queryOptions, skipToken } from '@tanstack/react-query';
+import type { Filter } from './models/Filter';
 
 import {
   fetchCurrentUser,
@@ -9,7 +10,6 @@ import {
   fetchWishlist,
   fetchSearchResults,
 } from './Api';
-import type { Filter } from './models/Filter';
 
 // --- Query keys ---
 export const queryKeys = {
