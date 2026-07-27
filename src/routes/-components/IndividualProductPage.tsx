@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
 import { singleListingQueryOptions } from '../../queries';
@@ -9,13 +9,19 @@ import type { Product } from '../../models/Listing';
 import WishlistButton from './WishlistButton';
 import {
   Box,
+  Breadcrumbs,
   Button,
+  Divider,
   FormControlLabel,
   Radio,
   RadioGroup,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  toggleButtonGroupClasses,
   Typography,
 } from '@mui/material';
+import SizeSelectionButtonGroup from './individualProductPage/SizeSelectionButtonGroup';
 
 type IndividualProductPageProps = {
   listingId: string;
@@ -117,85 +123,133 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     });
   };
 
+  const navigate = useNavigate();
+
+
   return (
-    <Box>
-      <Typography variant={'h1'}>{listing.productName}</Typography>
-
-      <WishlistButton listingId={listing.id} showText />
-
-      {selectedImage && <img src={selectedImage.imageLink} alt={listing.productName} width={300} />}
-
-      <Typography>{listing.productDescription}</Typography>
-      <Typography>Category: {listing.clothingCategory}</Typography>
-      <Typography>Department: {listing.departmentCategory}</Typography>
-
-      <Typography variant={'h2'}>Selected Color: {selectedProduct.colorName}</Typography>
-      <Typography>Color Category: {selectedProduct.colorCategory}</Typography>
-      <Typography>Price: ${selectedProduct.price.toFixed(2)}</Typography>
-      <Typography>SKU: {selectedProduct.sku}</Typography>
-
-      <Typography variant={'h3'}>Available Colors</Typography>
-
+    <Box sx={{ mx: 10, my: 5 }}>
+      {/* Breadcrumbs Menu Selection*/}
       <Box>
-        {listing.products.map((product, index) => (
-          <Button
-            key={product.id}
-            onClick={() => handleProductSelection(index)}
-            disabled={index === selectedProductIndex}
-          >
-            {product.colorName}
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, color: 'text.secondary' }}>
+          <Button onClick={() => navigate({ to: '/' })} sx={{ color: 'text.secondary' }}>
+            <Typography color="text.secondary">HOME</Typography>
           </Button>
-        ))}
+          <Button onClick={() => navigate({ to: '/products' })} sx={{ color: 'text.secondary' }}>
+            <Typography color="text.secondary">
+
+              {listing.departmentCategory}
+            </Typography>
+          </Button>
+          <Button onClick={() => navigate({ to: '/products' })} sx={{ color: 'text.secondary' }}>
+            <Typography color="text.secondary">
+
+              {listing.clothingCategory}
+            </Typography>
+          </Button>
+          <Typography color="text.primary">{listing.productName.toUpperCase()}</Typography>
+        </Breadcrumbs>
       </Box>
+      {/* Main Content */}
+      <Box sx={{ display: 'Grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+        {/* Images section */}
+        <Box>
 
-      <Typography variant={'h3'}>Select a Size</Typography>
+          {selectedImage && <img src={selectedImage.imageLink} alt={listing.productName} width={300} />}
+        </Box>
 
-      <Box>
-        {selectedProduct.availabilities.map((availability) => (
-          <RadioGroup
-            name={'Size'}
-            onChange={(e) => handleSizeSelection(e.target.value)}
-            value={selectedSize}
-            key={availability.size}
-          >
-            <FormControlLabel
-              control={<Radio />}
-              label={`${availability.size}:
-              ${
-                availability.availability > 0
-                  ? availability.availability + 'available'
-                  : 'Out of stock'
-              }`}
-              value={availability.size}
+        {/* Info section */}
+        <Box>
+          {/* Product info + Price */}
+          <Box>
+            <Typography variant={'h1'}>{listing.productName}</Typography>
+            <Typography variant={'body1'} sx={{ mb: 2, color: 'text.secondary' }}>
+              {listing.departmentCategory}
+            </Typography>
+            <Typography variant={'h5'} sx={{ my: 5 }}>${selectedProduct.price.toFixed(2)}</Typography>
+          </Box>
+          <Divider sx={{ my: 2 }} />
+
+
+
+
+          {/* Color Selection */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant={'body1'} sx={{ color: 'text.secondary' }}> COLOR - </Typography>
+          </Box>
+          {/* Size Selection */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant={'body1'} sx={{ color: 'text.secondary', my:3 }}> SIZE</Typography>
+            <SizeSelectionButtonGroup
+              availabilities={selectedProduct.availabilities}
+              selectedSize={selectedSize}
+              handleSizeSelection={handleSizeSelection}
             />
-          </RadioGroup>
-        ))}
+          </Box>
+
+
+
+
+          {/* Add To Bag +Wishlist */}
+          <Box>
+
+          </Box>
+
+          <Typography>{listing.productDescription}</Typography>
+          <Typography>Category: {listing.clothingCategory}</Typography>
+
+          <Typography variant={'h2'}>Selected Color: {selectedProduct.colorName}</Typography>
+          <Typography>Color Category: {selectedProduct.colorCategory}</Typography>
+          <Typography>SKU: {selectedProduct.sku}</Typography>
+
+          <WishlistButton listingId={listing.id} showText />
+          <Typography variant={'h3'}>Available Colors</Typography>
+
+          <Box>
+            {listing.products.map((product, index) => (
+              <Button
+                key={product.id}
+                onClick={() => handleProductSelection(index)}
+                disabled={index === selectedProductIndex}
+              >
+                {product.colorName}
+              </Button>
+            ))}
+          </Box>
+
+          <Typography variant={'h3'}>Select a Size</Typography>
+
+
+          <TextField
+            id="cart-quantity"
+            value={quantity}
+            disabled={!selectedAvailability}
+            onChange={handleQuantityChange}
+            label={'Quantity:'}
+          />
+          <Button
+            disabled={!selectedAvailability || addCartItemMutation.isPending}
+            onClick={handleAddToCart}
+          >
+            {addCartItemMutation.isPending ? 'Adding...' : 'Add to Cart'}
+          </Button>
+
+          {addCartItemMutation.isSuccess && (
+            <Typography>
+              Item added successfully. <Link to="/cart">View Cart</Link>
+            </Typography>
+          )}
+
+          {addCartItemMutation.isError && (
+            <Typography color="error">
+              <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
+            </Typography>
+          )}
+        </Box>
       </Box>
-      <TextField
-        id="cart-quantity"
-        value={quantity}
-        disabled={!selectedAvailability}
-        onChange={handleQuantityChange}
-        label={'Quantity:'}
-      />
-      <Button
-        disabled={!selectedAvailability || addCartItemMutation.isPending}
-        onClick={handleAddToCart}
-      >
-        {addCartItemMutation.isPending ? 'Adding...' : 'Add to Cart'}
-      </Button>
 
-      {addCartItemMutation.isSuccess && (
-        <Typography>
-          Item added successfully. <Link to="/cart">View Cart</Link>
-        </Typography>
-      )}
-
-      {addCartItemMutation.isError && (
-        <Typography color="error">
-          <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
-        </Typography>
-      )}
+      {/* Reviews */}
+      <Divider sx={{ my: 2 }} />
+      <Typography variant={'h3'}>Product Reviews</Typography>
     </Box>
   );
 };
