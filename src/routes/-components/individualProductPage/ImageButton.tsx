@@ -1,4 +1,4 @@
-import { ToggleButton } from '@mui/material';
+import { Box, ToggleButton } from '@mui/material';
 import type { ProductImage } from '../../../models/Listing';
 
 export default function ImageButton({
@@ -21,6 +21,7 @@ export default function ImageButton({
           padding: 0,
           borderRadius: 0,
           overflow: 'hidden',
+          border: '1px solid black',
         }}
       >
         {imageSet[imageIndex]?.imageLink && (
@@ -35,7 +36,7 @@ export default function ImageButton({
               height: '100%',
               objectFit: 'cover',
             }}
-          />
+            />
         )}
       </ToggleButton>
 

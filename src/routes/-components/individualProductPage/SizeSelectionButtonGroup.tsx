@@ -14,11 +14,11 @@ export default function SizeSelectionButtonGroup({
   selectedSize,
   handleSizeSelection,
 }: {
-  availabilities: { size: string; availability: number }[];
+  availabilities: { size: Size; availability: number }[];
   selectedSize: Size;
   handleSizeSelection: (size: Size) => void;
 }) {
-  const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({
+    const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -36,14 +36,15 @@ export default function SizeSelectionButtonGroup({
       },
       '&:not(:first-of-type)': {},
     },
-  }));
-
+  }));      
   const sortedAvailabilities = [...availabilities].sort(
     (a, b) => SIZE_ORDER.indexOf(a.size as Size) - SIZE_ORDER.indexOf(b.size as Size),
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, flexWrap: 'wrap', my: 2 }}>
+    <Box
+      sx={{ display: 'flex', flexDirection: 'row', gap: 2, flexWrap: 'wrap', maxWidth: 400, my: 2 }}
+    >
       <StyledToggleButtonGroup
         sx={{
           gap: 2,
@@ -58,15 +59,15 @@ export default function SizeSelectionButtonGroup({
           return (
             <ToggleButton
               sx={{
-                width: 50,
+                    width: 50,
                 height: 50,
                 px: 0,
                 mx: 0,
               }}
               key={availability.size}
               value={availability.size}
+              onChange={() => handleSizeSelection(availability.size)}
               disabled={availability.availability === 0}
-            onChange={() => handleSizeSelection(selectedSize)}
             >
               {availability.size}
             </ToggleButton>

@@ -1,6 +1,6 @@
-import { Box, IconButton, ToggleButtonGroup } from '@mui/material';
+import { Box, IconButton, styled, ToggleButtonGroup, toggleButtonGroupClasses } from '@mui/material';
 import type { ProductImage } from '../../../models/Listing';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ImageButton from './ImageButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -24,9 +24,48 @@ export default function ImageSelectionList({
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 0,
+    margin: 0,
+    [`& .${toggleButtonGroupClasses.grouped}`]: {
+      border: `100px solid black`,
+      [`&.${toggleButtonGroupClasses.selected}`]: {
+        color: 'white',
+        backgroundColor: 'black',
+        border: `4px solid black`,
+
+      },
+      [`&:not(.${toggleButtonGroupClasses.selected})`]: {
+        color: 'black',
+        border: `0px solid black`,
+
+      },
+    },
+  }));      
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const selectedEl = container.querySelector<HTMLElement>('.Mui-selected');
+    if (!selectedEl) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const elRect = selectedEl.getBoundingClientRect();
+
+    const offset =
+      elRect.left -
+      containerRect.left +
+      container.scrollLeft -
+      container.clientWidth / 2 +
+      elRect.width / 2;
+
+    container.scrollTo({ left: offset, behavior: 'smooth' });
+  }, [selectedImage]);
+
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (!scrollRef.current) return;
-    // If the wheel movement is mostly vertical, redirect it horizontally
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
       e.preventDefault();
       scrollRef.current.scrollLeft += e.deltaY;
@@ -70,8 +109,8 @@ export default function ImageSelectionList({
           },
         }}
       >
-        <ToggleButtonGroup
-          value={selectedIndex}
+        <StyledToggleButtonGroup
+          value={selectedImage}
           exclusive
           sx={{
             display: 'flex',
@@ -87,7 +126,7 @@ export default function ImageSelectionList({
               setSelectedIndex={handleImageSelection}
             />
           ))}
-        </ToggleButtonGroup>
+        </StyledToggleButtonGroup>
       </Box>
       <IconButton
         onClick={() => {
