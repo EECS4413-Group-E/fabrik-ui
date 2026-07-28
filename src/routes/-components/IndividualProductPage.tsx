@@ -88,13 +88,22 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     setQuantity(1);
   };
 
-  const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextQuantity = Number(event.target.value);
+const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = event.target.value;
     const maximumQuantity = selectedAvailability?.availability ?? 1;
 
-    if (Number.isInteger(nextQuantity) && nextQuantity >= 1 && nextQuantity <= maximumQuantity) {
-      setQuantity(nextQuantity);
+    if (rawValue === '') {
+      setQuantity(1);
+      return;
     }
+
+    const nextQuantity = Number(rawValue);
+
+    if (!Number.isInteger(nextQuantity) || nextQuantity < 1) {
+      return;
+    }
+
+    setQuantity(Math.min(nextQuantity, maximumQuantity));
   };
 
   const handleAddToCart = () => {
@@ -173,6 +182,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
       </Box>
       <TextField
         id="cart-quantity"
+        type="number"
         value={quantity}
         disabled={!selectedAvailability}
         onChange={handleQuantityChange}

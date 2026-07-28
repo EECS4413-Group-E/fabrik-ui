@@ -197,8 +197,9 @@ const ShoppingCartPage = () => {
               }}
             >
               <TextField
+                key={`${item.productId}-${item.size}-${item.quantity}`}
+                type="number"
                 defaultValue={item.quantity}
-                disabled={updateCartItemMutation.isPending}
                 label="Qty"
                 sx={{ width: 90 }}
                 onBlur={(event) => {
@@ -207,7 +208,6 @@ const ShoppingCartPage = () => {
 
                   if (!Number.isInteger(nextQuantity) || nextQuantity < 1) {
                     input.value = String(item.quantity);
-
                     return;
                   }
 
@@ -215,18 +215,11 @@ const ShoppingCartPage = () => {
                     return;
                   }
 
-                  updateCartItemMutation.mutate(
-                    {
-                      productId: item.productId,
-                      size: item.size,
-                      quantity: nextQuantity,
-                    },
-                    {
-                      onError: () => {
-                        input.value = String(item.quantity);
-                      },
-                    },
-                  );
+                  updateCartItemMutation.mutate({
+                    productId: item.productId,
+                    size: item.size,
+                    quantity: nextQuantity,
+                  });
                 }}
               />
 
