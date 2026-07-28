@@ -17,6 +17,8 @@ import type {
 import type { PageableResponse } from './models/PageableResponse';
 import type { Filter } from './models/Filter';
 
+import type { AddReviewRequest, ReviewPage } from './models/Review';
+
 const API_BASE_URL = 'http://localhost:5000/api';
 
 // Temporary direct URL until the frontend order request is fully moved
@@ -29,6 +31,9 @@ let onUnauthorized: UnauthorizedHandler | null = null;
 export const registerUnauthorizedHandler = (handler: UnauthorizedHandler) => {
   onUnauthorized = handler;
 };
+
+// Temporary direct URL until review routes are added to the Gateway.
+const TEMP_REVIEW_API_URL = 'http://localhost:4002/listing';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -191,4 +196,24 @@ export const removeCartItem = (request: RemoveCartItemRequest) => {
 
 export const clearCart = () => {
   return deleteWithConfig<void>('/user/cart');
+};
+
+export const fetchReviews = async (listingId: string) => {
+  const response = await axios.get<ReviewPage>(
+    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
+    { params: { page: 0, size: 20 } },
+  );
+
+  return response.data;
+};
+
+export const addReview = async (request: AddReviewRequest) => {
+  const { listingId, ...body } = request;
+
+  const response = await axios.post(
+    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
+    body,
+  );
+
+  return response.data;
 };

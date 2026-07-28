@@ -12,6 +12,7 @@ import {
   removeWishlistItem,
   replaceCart,
   updateCartItemQuantity,
+  addReview,
 } from './Api';
 
 import { queryKeys } from './queries';
@@ -178,6 +179,18 @@ export const useCreateOrderMutation = () => {
       } finally {
         navigate({ to: '/orders/$orderId/confirm', params: { orderId: createdOrderId } });
       }
+    },
+  });
+};
+
+export const useAddReviewMutation = (listingId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: addReview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.reviews(listingId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.listing(listingId) });
     },
   });
 };

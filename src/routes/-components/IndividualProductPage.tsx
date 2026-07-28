@@ -7,6 +7,8 @@ import { useAddCartItemMutation } from '../../mutations';
 import type { Product } from '../../models/Listing';
 import type { Size } from '../../models/Size';
 
+import ReviewsSection from './ReviewsSection';
+
 import WishlistButton from './WishlistButton';
 import {
   Box,
@@ -419,20 +421,12 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                 </Typography>
               )}
 
-              {addCartItemMutation.isError && (
-                <Typography color="error">
-                  <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
-                </Typography>
-              )}
-            </Box>
-          </Box>
-          {/* Reviews */}
-          <Box sx={{ mx: { md: 10, lg: 20, xl: 30 } }}>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant={'h3'}>Product Reviews</Typography>
-          </Box>
-        </Box>
+      {addCartItemMutation.isError && (
+        <Typography color="error">
+          <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
+        </Typography>
       )}
+      <ReviewsSection listingId={listing.id} />
     </Box>
   );
 };
