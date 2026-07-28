@@ -129,7 +129,7 @@ const CheckoutPage = () => {
     },
   });
 
-  if (cartQuery.isLoading) {
+if (cartQuery.isLoading || userQuery.isLoading) {
     return (
       <Box sx={{ maxWidth: 800, mx: 'auto', px: 3, py: 5 }}>
         <Typography>Loading checkout...</Typography>
@@ -146,6 +146,20 @@ const CheckoutPage = () => {
 
         <Alert severity="error">
           Error loading cart: {getErrorMessage(cartQuery.error)}
+        </Alert>
+      </Box>
+    );
+  }
+
+  if (userQuery.isError) {
+    return (
+      <Box sx={{ maxWidth: 800, mx: 'auto', px: 3, py: 5 }}>
+        <Typography variant="h1" sx={{ mb: 3 }}>
+          Checkout
+        </Typography>
+
+        <Alert severity="error">
+          Error loading your account: {getErrorMessage(userQuery.error)}
         </Alert>
       </Box>
     );
