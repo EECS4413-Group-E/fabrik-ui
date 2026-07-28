@@ -40,4 +40,5 @@ export interface ListingItem {
   minPrice: number;
   maxPrice: number;
   createdDate: string;
+  discountPercentage?: number;
 }

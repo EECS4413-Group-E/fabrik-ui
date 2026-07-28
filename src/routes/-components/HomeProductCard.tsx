@@ -1,26 +1,20 @@
 import { Link } from '@tanstack/react-router';
 import { Box, Chip, Typography } from '@mui/material';
 
-import type { Listing } from '../../models/Listing';
+import type { ListingItem } from '../../models/Listing';
 import { fabrikColors } from '../../theme';
 
 type HomeProductCardProps = {
-  listing: Listing;
+  listing: ListingItem;
 };
 
 const HomeProductCard = ({ listing }: HomeProductCardProps) => {
-  const firstProduct = listing.products[0];
-  const firstImage = firstProduct?.images[0];
-
-  const prices = listing.products.map((product) => product.price);
-  const lowestPrice = prices.length > 0 ? Math.min(...prices) : null;
-
   const discount = listing.discountPercentage ?? 0;
 
+  const lowestPrice = listing.minPrice;
+
   const discountedPrice =
-    lowestPrice !== null && discount > 0
-      ? lowestPrice * (1 - discount / 100)
-      : null;
+    discount > 0 ? lowestPrice * (1 - discount / 100) : null;
 
   return (
     <Link
@@ -54,42 +48,54 @@ const HomeProductCard = ({ listing }: HomeProductCardProps) => {
             overflow: 'hidden',
           }}
         >
-          {firstImage && (
+          {listing.imageLink && (
             <Box
               component="img"
-              src={firstImage.imageLink}
+              src={listing.imageLink}
               alt={listing.productName}
-              sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+              }}
             />
           )}
         </Box>
 
         <Box sx={{ p: 2 }}>
-          <Typography sx={{ fontWeight: 500 }}>{listing.productName}</Typography>
+          <Typography sx={{ fontWeight: 500 }}>
+            {listing.productName}
+          </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {listing.departmentCategory}
           </Typography>
 
-          {lowestPrice !== null && (
-            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-              {discountedPrice !== null ? (
-                <>
-                  <Typography sx={{ color: fabrikColors.terracotta, fontWeight: 500 }}>
-                    ${discountedPrice.toFixed(2)}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: 'text.secondary', textDecoration: 'line-through' }}
-                  >
-                    ${lowestPrice.toFixed(2)}
-                  </Typography>
-                </>
-              ) : (
-                <Typography sx={{ fontWeight: 500 }}>${lowestPrice.toFixed(2)}</Typography>
-              )}
-            </Box>
-          )}
+          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+            {discountedPrice !== null ? (
+              <>
+                <Typography
+                  sx={{ color: fabrikColors.terracotta, fontWeight: 500 }}
+                >
+                  ${discountedPrice.toFixed(2)}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                    textDecoration: 'line-through',
+                  }}
+                >
+                  ${lowestPrice.toFixed(2)}
+                </Typography>
+              </>
+            ) : (
+              <Typography sx={{ fontWeight: 500 }}>
+                ${lowestPrice.toFixed(2)}
+              </Typography>
+            )}
+          </Box>
         </Box>
       </Box>
     </Link>

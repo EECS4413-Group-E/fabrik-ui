@@ -17,9 +17,9 @@ const PRODUCTS_SEARCH_DEFAULTS = {
 };
 
 const DEPARTMENTS = [
-  { label: 'Men', seed: 'men-fashion' },
-  { label: 'Women', seed: 'women-fashion' },
-  { label: 'Other', seed: 'accessories' },
+  { label: 'Men', image: '/category-men.jpg' },
+  { label: 'Women', image: '/category-women.jpg' },
+  { label: 'Other', image: '/category-other.jpg' },
 ] as const;
 
 const productGridSx = {
@@ -56,7 +56,7 @@ const HomePage = () => {
           textAlign: 'center',
           color: '#fff',
           backgroundImage:
-            'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(https://picsum.photos/seed/fabrik-hero/1600/900)',
+            'linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(/hero.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -110,7 +110,7 @@ const HomePage = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#fff',
-                  backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(https://picsum.photos/seed/${department.seed}/600/400)`,
+                  backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${department.image})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   transition: 'transform 0.2s ease',
