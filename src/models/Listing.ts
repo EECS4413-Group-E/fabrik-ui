@@ -1,6 +1,9 @@
+import type { ClothingCategory, ColorCategory, DepartmentCategory } from "./Filter";
+import type { Size } from "./Size";
+
 export interface Availability {
   id: string;
-  size: string;
+  size: Size;
   availability: number;
 }
 
@@ -11,7 +14,7 @@ export interface ProductImage {
 
 export interface Product {
   id: string;
-  colorCategory: string;
+  colorCategory: ColorCategory;
   colorName: string;
   price: number;
   sku: string;
@@ -23,20 +26,26 @@ export interface Listing {
   id: string;
   productName: string;
   productDescription: string;
-  clothingCategory: string;
-  departmentCategory: string;
+  clothingCategory: ClothingCategory;
+  departmentCategory: DepartmentCategory;
   products: Product[];
+  discountPercentage: number;
+  averageRating: number;
+  reviewCount: number;
+
 }
 
 export interface ListingItem {
   id: string;
   productDescription: string;
   productName: string;
-  clothingCategory: string;
-  departmentCategory: string;
+  clothingCategory: ClothingCategory;
+  departmentCategory: DepartmentCategory;
   colors: string[];
   imageLink: string;
   minPrice: number;
   maxPrice: number;
   createdDate: string;
+  averageRating: number;
+  reviewCount: number;
 }

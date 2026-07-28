@@ -21,6 +21,7 @@ import { fabrikColors } from '../../theme';
 import { useCart } from '../../hooks/useCart.ts';
 import { useAuth } from '../../hooks/useAuth.ts';
 import { useLogoutMutation } from '../../mutations.ts';
+import type { ClothingCategory, DepartmentCategory } from '../../models/Filter.ts';
 
 const CATEGORIES = ['SHOP ALL', 'JEAN', 'PANT', 'SHORT', 'SHIRT', 'SWEATER', 'BAG', 'SHOES', 'HAT'] as const;
 
@@ -42,7 +43,11 @@ const Navbar = () => {
 
     navigate({
       to: '/search',
-      search: trimmedSearch ? { keyword: trimmedSearch } : {},
+      search: {
+        keyword: trimmedSearch,
+        pageNumber: 0,
+        pageSize: 10,
+      },
     });
   };
 
@@ -79,9 +84,13 @@ const Navbar = () => {
     navigate({
       to: '/products',
       search: {
-        department: department,
-        category: category
-      }
+        keyword: '',
+        pageNumber: 0,
+        pageSize: 10,
+        department: department as DepartmentCategory,
+        category: category as ClothingCategory,
+        deals: false,
+      },
     });
     handleCloseMensMenu();
     handleCloseWomensMenu();

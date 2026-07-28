@@ -74,7 +74,7 @@ const SearchPage = () => {
                     "{keyword}"
                 </Typography>
                 <Typography variant="body1" gutterBottom sx={{ letterSpacing: '0.05em', color: 'text.secondary' }}>
-                    {pageable?.totalElements} items found
+                    {pageable?.totalElements} item{pageable?.totalElements !== 1 ? 's' : ''} found
                 </Typography>
             </Box>
 
