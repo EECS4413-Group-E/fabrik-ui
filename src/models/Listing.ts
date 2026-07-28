@@ -26,6 +26,7 @@ export interface Listing {
   clothingCategory: string;
   departmentCategory: string;
   products: Product[];
+  discountPercentage?: number;
 }
 
 export interface ListingItem {
