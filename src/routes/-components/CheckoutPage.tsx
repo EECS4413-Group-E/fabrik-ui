@@ -23,6 +23,15 @@ import {
   Typography,
 } from '@mui/material';
 
+const PRODUCTS_SEARCH_DEFAULTS = {
+  keyword: '',
+  pageNumber: 0,
+  pageSize: 10,
+  department: '' as never,
+  category: '' as never,
+  deals: false,
+};
+
 const getErrorMessage = (error: unknown) => {
   const possibleApiError = error as {
     response?: {
@@ -64,6 +73,7 @@ const CheckoutPage = () => {
       cvv: '',
       paypalEmail: '',
       storePoints: 0,
+      installments: 0,
       fullName: '',
       address: '',
       city: '',
@@ -85,11 +95,13 @@ const CheckoutPage = () => {
               expiryDate: value.expiryDate,
               cvv: value.cvv,
               storePoints: value.storePoints,
+              installments: value.installments || undefined,
             }
           : {
               paymentMethod: value.paymentMethod,
               paypalEmail: value.paypalEmail,
               storePoints: value.storePoints,
+              installments: value.installments || undefined,
             };
 
       const orderRequest: PlaceOrderRequest = {
@@ -150,14 +162,7 @@ const CheckoutPage = () => {
 
         <Link
           to="/products"
-          search={{
-            keyword: '',
-            pageNumber: 0,
-            pageSize: 10,
-            department: '' as never,
-            category: '' as never,
-            deals: false,
-          }}
+          search={PRODUCTS_SEARCH_DEFAULTS}
           style={{ textDecoration: 'none' }}
         >
           <Button variant="contained">Continue Shopping</Button>
@@ -307,7 +312,14 @@ const CheckoutPage = () => {
           )}
         </form.Field>
 
-        <LoanCalculator orderTotal={orderTotal} />
+        <form.Field name="installments">
+          {(field) => (
+            <LoanCalculator
+              orderTotal={orderTotal}
+              onChange={(installments) => field.handleChange(installments)}
+            />
+          )}
+        </form.Field>
 
         <Divider sx={{ my: 4 }} />
 

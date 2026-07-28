@@ -11,13 +11,14 @@ import {
 
 type LoanCalculatorProps = {
   orderTotal: number;
+  onChange: (installments: number) => void;
 };
 
 const TERM_OPTIONS = [3, 6, 12, 24];
 
 const ANNUAL_INTEREST_RATE = 0.12;
 
-const LoanCalculator = ({ orderTotal }: LoanCalculatorProps) => {
+const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
   const [payInInstallments, setPayInInstallments] = useState(false);
   const [termMonths, setTermMonths] = useState(6);
 
@@ -29,6 +30,16 @@ const LoanCalculator = ({ orderTotal }: LoanCalculatorProps) => {
   const totalRepaid = monthlyPayment * termMonths;
 
   const totalInterest = totalRepaid - orderTotal;
+
+  const handleToggle = (checked: boolean) => {
+    setPayInInstallments(checked);
+    onChange(checked ? termMonths : 0);
+  };
+
+  const handleTermChange = (months: number) => {
+    setTermMonths(months);
+    onChange(months);
+  };
 
   return (
     <Box>
@@ -47,7 +58,7 @@ const LoanCalculator = ({ orderTotal }: LoanCalculatorProps) => {
         control={
           <Checkbox
             checked={payInInstallments}
-            onChange={(event) => setPayInInstallments(event.target.checked)}
+            onChange={(event) => handleToggle(event.target.checked)}
           />
         }
         label="I'd like to pay in installments"
@@ -59,7 +70,7 @@ const LoanCalculator = ({ orderTotal }: LoanCalculatorProps) => {
             select
             label="Term"
             value={termMonths}
-            onChange={(event) => setTermMonths(Number(event.target.value))}
+            onChange={(event) => handleTermChange(Number(event.target.value))}
             sx={{ width: 200 }}
           >
             {TERM_OPTIONS.map((months) => (

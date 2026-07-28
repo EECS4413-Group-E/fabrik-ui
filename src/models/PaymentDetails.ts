@@ -9,4 +9,5 @@ export type PaymentDetails = {
   status: 'APPROVED' | 'DECLINED';
   paymentReference: string;
   message: string;
+  installments?: number;
 };

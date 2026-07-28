@@ -12,6 +12,7 @@ export interface PaymentDetailsRequest {
   cvv?: string;
   paypalEmail?: string;
   storePoints?: number;
+  installments?: number;
 }
 
 export interface CheckoutFormValues {
@@ -27,4 +28,5 @@ export interface CheckoutFormValues {
   city: string;
   address: string;
   fullName: string;
+  installments: number;
 }
