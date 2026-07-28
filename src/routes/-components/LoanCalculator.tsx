@@ -3,9 +3,11 @@ import {
   Box,
   Checkbox,
   Divider,
+  FormControl,
   FormControlLabel,
+  InputLabel,
   MenuItem,
-  TextField,
+  Select,
   Typography,
 } from '@mui/material';
 
@@ -14,31 +16,29 @@ type LoanCalculatorProps = {
   onChange: (installments: number) => void;
 };
 
-const TERM_OPTIONS = [3, 6, 12, 24];
+const TERM_OPTIONS = [2, 3, 4, 5, 6];
 
-const ANNUAL_INTEREST_RATE = 0.12;
+const INTEREST_RATE_PER_INSTALLMENT = 0.03;
 
 const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
   const [payInInstallments, setPayInInstallments] = useState(false);
-  const [termMonths, setTermMonths] = useState(6);
+  const [installments, setInstallments] = useState(2);
 
-  const monthlyRate = ANNUAL_INTEREST_RATE / 12;
+  const totalRepaid =
+    orderTotal * (1 + INTEREST_RATE_PER_INSTALLMENT * installments);
 
-  const monthlyPayment =
-    (orderTotal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -termMonths));
-
-  const totalRepaid = monthlyPayment * termMonths;
+  const monthlyPayment = totalRepaid / installments;
 
   const totalInterest = totalRepaid - orderTotal;
 
   const handleToggle = (checked: boolean) => {
     setPayInInstallments(checked);
-    onChange(checked ? termMonths : 0);
+    onChange(checked ? installments : 0);
   };
 
-  const handleTermChange = (months: number) => {
-    setTermMonths(months);
-    onChange(months);
+  const handleInstallmentsChange = (value: number) => {
+    setInstallments(value);
+    onChange(value);
   };
 
   return (
@@ -51,7 +51,7 @@ const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
         Optional. Spread the cost over monthly payments instead of paying the
-        full amount today.
+        full amount today. Store points cannot be used with installments.
       </Typography>
 
       <FormControlLabel
@@ -66,19 +66,24 @@ const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
 
       {payInInstallments && (
         <Box sx={{ mt: 2 }}>
-          <TextField
-            select
-            label="Term"
-            value={termMonths}
-            onChange={(event) => handleTermChange(Number(event.target.value))}
-            sx={{ width: 200 }}
-          >
-            {TERM_OPTIONS.map((months) => (
-              <MenuItem key={months} value={months}>
-                {months} months
-              </MenuItem>
-            ))}
-          </TextField>
+          <FormControl sx={{ width: 200 }}>
+            <InputLabel id="installments-label">Installments</InputLabel>
+
+            <Select
+              labelId="installments-label"
+              label="Installments"
+              value={installments}
+              onChange={(event) =>
+                handleInstallmentsChange(Number(event.target.value))
+              }
+            >
+              {TERM_OPTIONS.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option} payments
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           <Box sx={{ mt: 2 }}>
             <Typography>
@@ -86,15 +91,16 @@ const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
-              Total repaid ${totalRepaid.toFixed(2)} · Interest $
-              {totalInterest.toFixed(2)} at{' '}
-              {(ANNUAL_INTEREST_RATE * 100).toFixed(0)}% APR
+              Total ${totalRepaid.toFixed(2)} · Interest $
+              {totalInterest.toFixed(2)} (
+              {(INTEREST_RATE_PER_INSTALLMENT * 100).toFixed(0)}% per
+              installment)
             </Typography>
           </Box>
 
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Each monthly payment will be charged to the card or PayPal account
-            entered above.
+            The first payment is charged today, the rest monthly to the card or
+            PayPal account entered above.
           </Typography>
         </Box>
       )}

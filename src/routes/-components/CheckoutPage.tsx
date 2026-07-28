@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { useQuery } from '@tanstack/react-query';
@@ -64,6 +65,7 @@ const CheckoutPage = () => {
   );
 
   const { mutate, isPending, isError, error } = useCreateOrderMutation();
+  const [installmentCount, setInstallmentCount] = useState(0);
 
   const form = useForm({
     defaultValues: {
@@ -311,7 +313,12 @@ if (cartQuery.isLoading || userQuery.isLoading) {
               label="Points to use"
               type="number"
               value={field.state.value}
-              disabled={availablePoints === 0}
+              disabled={availablePoints === 0 || installmentCount > 0}
+              helperText={
+                installmentCount > 0
+                  ? 'Points cannot be used with installments'
+                  : undefined
+              }
               onChange={(event) => {
                 const requested = Number(event.target.value);
 
@@ -330,11 +337,18 @@ if (cartQuery.isLoading || userQuery.isLoading) {
           {(field) => (
             <LoanCalculator
               orderTotal={orderTotal}
-              onChange={(installments) => field.handleChange(installments)}
+              onChange={(installments) => {
+                field.handleChange(installments);
+                setInstallmentCount(installments);
+
+                if (installments > 0) {
+                  form.setFieldValue('storePoints', 0);
+                }
+              }}
             />
           )}
         </form.Field>
-
+        
         <Divider sx={{ my: 4 }} />
 
         <Button
