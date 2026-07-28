@@ -59,10 +59,13 @@ const CheckoutPage = () => {
 
   const availablePoints = userQuery.data?.storePoints ?? 0;
 
-  const orderTotal = checkoutItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
+  const orderTotal = checkoutItems.reduce((total, item) => {
+    const discount = item.discountPercentage ?? 0;
+
+    const unitPrice = discount > 0 ? item.price * (1 - discount / 100) : item.price;
+
+    return total + unitPrice * item.quantity;
+  }, 0);
 
   const { mutate, isPending, isError, error } = useCreateOrderMutation();
   const [installmentCount, setInstallmentCount] = useState(0);
