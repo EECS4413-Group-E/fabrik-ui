@@ -19,7 +19,19 @@ const ListingsPageableSection = ({
   keyword,
   currentPage,
   setCurrentPage,
+  pageable,
+  isLoading,
+  isError,
+  keyword,
+  currentPage,
+  setCurrentPage,
 }: {
+  pageable: PageableResponse<ListingItem> | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  keyword: string;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
   pageable: PageableResponse<ListingItem> | undefined;
   isLoading: boolean;
   isError: boolean;

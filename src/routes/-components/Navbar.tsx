@@ -23,7 +23,17 @@ import { useAuth } from '../../hooks/useAuth.ts';
 import { useLogoutMutation } from '../../mutations.ts';
 import type { ClothingCategory, DepartmentCategory } from '../../models/Filter.ts';
 
-const CATEGORIES = ['SHOP ALL', 'JEAN', 'PANT', 'SHORT', 'SHIRT', 'SWEATER', 'BAG', 'SHOES', 'HAT'] as const;
+const CATEGORIES = [
+  'SHOP ALL',
+  'JEAN',
+  'PANT',
+  'SHORT',
+  'SHIRT',
+  'SWEATER',
+  'BAG',
+  'SHOES',
+  'HAT',
+] as const;
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -75,21 +85,17 @@ const Navbar = () => {
     setWomensMenuAnchor(null);
   };
 
-  const handleCategoryClick = (department: 'MENS' | 'WOMENS'| 'OTHER'|'', category: string) => {
+  const handleCategoryClick = (
+    department: 'MENS' | 'WOMENS' | 'OTHER' | '',
+    category: ClothingCategory | 'SHOP ALL',
+  ) => {
     //TODO: add logic for filtering products by category and gender
 
-    if (category === 'SHOP ALL') {
-      category = '';
-    }
     navigate({
       to: '/products',
       search: {
-        keyword: '',
-        pageNumber: 0,
-        pageSize: 10,
-        department: department as DepartmentCategory,
-        category: category as ClothingCategory,
-        deals: false,
+        department: department === '' ? undefined : department,
+        category: category === 'SHOP ALL' ? undefined : category,
       },
     });
     handleCloseMensMenu();
@@ -164,7 +170,7 @@ const Navbar = () => {
             }}
           >
             {CATEGORIES.map((category) => (
-              <MenuItem key={category} onClick={() => handleCategoryClick("MENS", category)}>
+              <MenuItem key={category} onClick={() => handleCategoryClick('MENS', category)}>
                 {category}
               </MenuItem>
             ))}
@@ -215,14 +221,14 @@ const Navbar = () => {
             }}
           >
             {CATEGORIES.map((category) => (
-              <MenuItem key={category} onClick={() => handleCategoryClick("WOMENS", category)}>
+              <MenuItem key={category} onClick={() => handleCategoryClick('WOMENS', category)}>
                 {category}
               </MenuItem>
             ))}
           </Menu>
           <Button
             id="others-button"
-            onClick={() => handleCategoryClick("OTHER", '')}
+            onClick={() => handleCategoryClick('OTHER', 'SHOP ALL')}
             variant="text"
             sx={{
               color: fabrikColors.charcoal,
