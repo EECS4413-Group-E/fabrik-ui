@@ -167,11 +167,6 @@ export const removeWishlistItem = (listingId: string) => {
 };
 
 
-export const logoutUser = async (): Promise<void> => {
-  await apiClient.post('auth/logout');
-};
-
-
 export const changePassword = async (
   request: ChangePasswordRequest,
 ): Promise<void> => {
