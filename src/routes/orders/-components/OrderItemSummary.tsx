@@ -1,14 +1,23 @@
-import type { OrderItem } from '../../../models/Order.ts';
+import type { Order } from '../../../models/Order.ts';
 import type { GridColDef } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
-import { Box, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
+import PriceRow from '../../-components/PriceRow.tsx';
 
 type OrderItemSummaryProps = {
-  orderItems: OrderItem[];
+  order: Order;
 };
 
-const OrderItemSummary = ({ orderItems }: OrderItemSummaryProps) => {
-  const orderTotal = orderItems.reduce((total, item) => total + item.quantity * item.price, 0);
+const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
+  const { items, paymentDetails } = order;
+  const orderTotal =
+    paymentDetails.completedPayments.reduce((total, payment) => total + payment.amount, 0) +
+    paymentDetails.scheduledPayments.reduce((total, payment) => total + payment.amount, 0);
+  const pointsAmount = paymentDetails.completedPayments.reduce(
+    (total, payment) => total + payment.usedStorePoints,
+    0,
+  ) * 0.05;
+  const amountPayed = orderTotal - pointsAmount;
 
   const columns: GridColDef[] = [
     {
@@ -57,7 +66,7 @@ const OrderItemSummary = ({ orderItems }: OrderItemSummaryProps) => {
 
       <Box sx={{ width: '100%', maxWidth: '900px' }}>
         <DataGrid
-          rows={orderItems}
+          rows={items}
           columns={columns}
           pageSizeOptions={[5, 10, 25]}
           disableRowSelectionOnClick
@@ -67,9 +76,26 @@ const OrderItemSummary = ({ orderItems }: OrderItemSummaryProps) => {
         />
       </Box>
 
-      <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-        Total: ${orderTotal.toFixed(2)}
-      </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1 }}>
+        {paymentDetails.completedPayments[0].totalInstallments > 1 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1 }}>
+            <Typography>Completed Payment</Typography>
+            <PriceRow
+              label={'Installment 1:'}
+              value={paymentDetails.completedPayments[0]?.amount || 0}
+            />
+            <Divider />
+            <Typography>Scheduled Payments</Typography>
+            {paymentDetails.scheduledPayments.map((payment, index) => (
+              <PriceRow key={index} label={`Installment ${index + 2}:`} value={payment.amount} />
+            ))}
+            <Divider />
+          </Box>
+        )}
+        <PriceRow label="Total:" value={orderTotal} />
+        {pointsAmount > 0 && <PriceRow label="Points Amount:" value={pointsAmount} />}
+        {pointsAmount > 0 && <PriceRow label="Amount Payed:" value={amountPayed} />}
+      </Box>
     </Box>
   );
 };

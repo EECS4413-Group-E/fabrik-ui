@@ -8,6 +8,8 @@ import type { AccessTokenResponse } from './models/AccessTokenResponse';
 
 import type { WishListItem } from './models/WishList';
 
+import type {ChangePasswordRequest, UpdateEmailRequest} from './models/UserRequests';
+
 import type {
   AddCartItemRequest,
   CartItem,
@@ -23,9 +25,6 @@ import type { ChatResponse } from './models/ChatResponse';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Temporary direct URL until the frontend order request is fully moved
-// to the Gateway.
-const TEMP_ORDER_API_URL = 'http://localhost:4004/order';
 
 type UnauthorizedHandler = () => void;
 let onUnauthorized: UnauthorizedHandler | null = null;
@@ -33,9 +32,6 @@ let onUnauthorized: UnauthorizedHandler | null = null;
 export const registerUnauthorizedHandler = (handler: UnauthorizedHandler) => {
   onUnauthorized = handler;
 };
-
-// Temporary direct URL until review routes are added to the Gateway.
-const TEMP_REVIEW_API_URL = 'http://localhost:4002/listing';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -123,7 +119,7 @@ export const fetchCurrentUser = () => {
 };
 
 export const fetchListings = () => {
-  return getWithConfig<Listing[]>('/catalogue/listings');
+  return getWithConfig<ListingItem[]>('/catalogue/listings');
 };
 
 export const fetchOrders = () => {
@@ -136,7 +132,7 @@ export const fetchOrderDetails = (orderId: string) => {
 
 export const placeOrder = async (orderRequest: PlaceOrderRequest) => {
   const response = await postWithConfig<PlaceOrderRequest, string | Order>(
-    TEMP_ORDER_API_URL,
+    '/order',
     orderRequest,
   );
 
@@ -165,6 +161,21 @@ export const addWishlistItem = (listingId: string) => {
 
 export const removeWishlistItem = (listingId: string) => {
   return deleteWithConfig<void>(`/user/wishlist/${listingId}`);
+};
+
+
+export const changePassword = async (
+  request: ChangePasswordRequest,
+): Promise<void> => {
+  await apiClient.patch('/auth/change-password', request);
+};
+
+export const changeEmail = async ({newEmail}: UpdateEmailRequest): Promise<void> => {
+    await apiClient.patch('/user/change-email', null, {
+    params: {
+       newEmail,
+    },
+  });
 };
 
 /*
@@ -202,21 +213,9 @@ export const clearCart = () => {
 };
 
 export const fetchReviews = async (listingId: string) => {
-  const response = await axios.get<ReviewPage>(
-    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
-    { params: { page: 0, size: 20 } },
-  );
-
-  return response.data;
+  return getWithConfig<ReviewPage>(`/catalogue/listing/${listingId}/review`);
 };
 
-export const addReview = async (request: AddReviewRequest) => {
-  const { listingId, ...body } = request;
-
-  const response = await axios.post(
-    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
-    body,
-  );
-
-  return response.data;
+export const addReview = async (listingId: string, data: AddReviewRequest) => {
+  return postWithConfig<AddReviewRequest, void>(`/catalogue/listing/${listingId}/review`, data); 
 };

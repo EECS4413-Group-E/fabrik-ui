@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 
-const ColorSwatch = () => {
+const ColorSwatch = (colorName: string) => {
   return (
     <Box
       sx={{

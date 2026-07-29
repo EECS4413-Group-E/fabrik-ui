@@ -1,11 +1,11 @@
 export interface Filter {
-  departmentCategories: DepartmentCategory[] | undefined;
-  clothingCategories: ClothingCategory[] | undefined;
-  colorCategories: ColorCategory[] | undefined;
-  minimumPrice: number | undefined;
-  maximumPrice: number | undefined;
-  sortStrategy: SortStrategy | undefined;
-  onlyDiscounted: boolean | undefined;
+  departmentCategories?: DepartmentCategory[] | undefined;
+  clothingCategories?: ClothingCategory[] | undefined;
+  colorCategories?: ColorCategory[] | undefined;
+  minimumPrice?: number | undefined;
+  maximumPrice?: number | undefined;
+  sortStrategy?: SortStrategy | undefined;
+  onlyDiscounted?: boolean | undefined;
 }
 
 export const ClothingCategory = {
