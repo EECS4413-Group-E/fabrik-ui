@@ -46,22 +46,22 @@ const theme = createTheme({
     fontFamily: "'Jost', sans-serif",
 
     h1: {
-      fontFamily: "'Italiana', serif",
+      fontFamily: "'Cormorant Garamond', serif",
       fontSize: '2.75rem',
       letterSpacing: '0.04em',
     },
     h2: {
-      fontFamily: "'Italiana', serif",
+      fontFamily: "'Cormorant Garamond', serif",
       fontSize: '2.125rem',
       letterSpacing: '0.04em',
     },
     h3: {
-      fontFamily: "'Italiana', serif",
+      fontFamily: "'Cormorant Garamond', serif",
       fontSize: '1.625rem',
       letterSpacing: '0.03em',
     },
     h6: {
-      fontFamily: "'Italiana', serif",
+      fontFamily: "'Cormorant Garamond', serif",
       letterSpacing: '0.12em',
     },
     button: {

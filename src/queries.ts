@@ -9,6 +9,7 @@ import {
   fetchOrders,
   fetchSearchResults,
   fetchWishlist,
+  fetchReviews,
 } from './Api';
 
 // --- Query keys ---
@@ -21,6 +22,7 @@ export const queryKeys = {
   order: (id: string) => ['order', id] as const,
   cart: () => ['cart'] as const,
   search: (keyword: string, filter: Filter) => ['search', keyword, filter] as const,
+  reviews: (listingId: string) => ['reviews', listingId] as const,
 };
 
 export const optionalCurrentUserQueryOptions = (isLoggedIn: boolean) =>
@@ -74,4 +76,10 @@ export const searchQueryOptions = (
   queryOptions({
     queryKey: ['search', keyword, filter, pageNumber, pageSize],
     queryFn: () => fetchSearchResults(keyword, filter, pageNumber, pageSize),
+  });
+
+export const reviewsQueryOptions = (listingId: string) =>
+  queryOptions({
+    queryKey: queryKeys.reviews(listingId),
+    queryFn: () => fetchReviews(listingId),
   });

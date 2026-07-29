@@ -8,6 +8,8 @@ import type { AccessTokenResponse } from './models/AccessTokenResponse';
 
 import type { WishListItem } from './models/WishList';
 
+import type {ChangePasswordRequest, UpdateEmailRequest} from './models/UserRequests';
+
 import type {
   AddCartItemRequest,
   CartItem,
@@ -16,6 +18,8 @@ import type {
 } from './models/CartItem';
 import type { PageableResponse } from './models/PageableResponse';
 import type { Filter } from './models/Filter';
+
+import type { AddReviewRequest, ReviewPage } from './models/Review';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -26,6 +30,9 @@ let onUnauthorized: UnauthorizedHandler | null = null;
 export const registerUnauthorizedHandler = (handler: UnauthorizedHandler) => {
   onUnauthorized = handler;
 };
+
+// Temporary direct URL until review routes are added to the Gateway.
+const TEMP_REVIEW_API_URL = 'http://localhost:4002/listing';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -156,6 +163,21 @@ export const removeWishlistItem = (listingId: string) => {
   return deleteWithConfig<void>(`/user/wishlist/${listingId}`);
 };
 
+
+export const changePassword = async (
+  request: ChangePasswordRequest,
+): Promise<void> => {
+  await apiClient.patch('/auth/change-password', request);
+};
+
+export const changeEmail = async ({newEmail}: UpdateEmailRequest): Promise<void> => {
+    await apiClient.patch('/user/change-email', null, {
+    params: {
+       newEmail,
+    },
+  });
+};
+
 /*
  * These cart URLs are based on Farhad's completed User Service contract
  * and the existing Gateway /api/user pattern. Change only this section
@@ -188,4 +210,24 @@ export const removeCartItem = (request: RemoveCartItemRequest) => {
 
 export const clearCart = () => {
   return deleteWithConfig<void>('/user/cart');
+};
+
+export const fetchReviews = async (listingId: string) => {
+  const response = await axios.get<ReviewPage>(
+    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
+    { params: { page: 0, size: 20 } },
+  );
+
+  return response.data;
+};
+
+export const addReview = async (request: AddReviewRequest) => {
+  const { listingId, ...body } = request;
+
+  const response = await axios.post(
+    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
+    body,
+  );
+
+  return response.data;
 };
