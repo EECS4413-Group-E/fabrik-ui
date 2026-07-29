@@ -1,12 +1,12 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
-import { listingsQueryOptions } from '../../queries';
+import { listingsQueryOptions, searchQueryOptions } from '../../queries';
 import { fabrikColors } from '../../theme';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeProductCard from './HomeProductCard';
-import type { DepartmentCategory } from '../../models/Filter';
+import type { ClothingCategory, DepartmentCategory, Filter, SortStrategy } from '../../models/Filter';
 
 const PRODUCTS_SEARCH_DEFAULTS = {
   keyword: '',
@@ -35,15 +35,27 @@ const productGridSx = {
 } as const;
 
 const HomePage = () => {
-  const { data: listings, isLoading } = useQuery(listingsQueryOptions());
+  const discountedFilter: Filter = {
+    sortStrategy: "NEWEST" as SortStrategy,
+    onlyDiscounted: true,
+  };
+  const featuredFilter: Filter = {
+    sortStrategy: "NEWEST" as SortStrategy,
+    onlyDiscounted: false,
+  };
 
-  const allListings = listings ?? [];
+  
+  const {
+    data: hotDeals,
+    isLoading: discountedIsLoading,
+    isError: discountedIsError,
+  } = useQuery(searchQueryOptions('', discountedFilter, 0, 4));
 
-  const hotDeals = allListings.filter(
-    (listing) => (listing.discountPercentage ?? 0) > 0,
-  );
-
-  const featured = allListings.slice(0, 8);
+  const {
+    data: featured,
+    isLoading: featuredIsLoading,
+    isError: featuredIsError,
+  } = useQuery(searchQueryOptions('', featuredFilter, 0, 12));
 
   return (
     <Box>
@@ -119,7 +131,6 @@ const HomePage = () => {
                   ,
                 }}
               >
-
                 <Typography variant="h1" sx={{ color: 'white', mb: 2, ml: 3 }}>
                   {department.label}
                 </Typography>
@@ -128,7 +139,7 @@ const HomePage = () => {
           ))}
         </Box>
 
-        {hotDeals.length > 0 && (
+        
           <Box sx={{ mb: 8 }}>
             <Box
               sx={{
@@ -153,26 +164,35 @@ const HomePage = () => {
                 </Button>
               </Link>
             </Box>
-
-            <Box sx={productGridSx}>
-              {hotDeals.map((listing) => (
+            {discountedIsLoading ? (
+              <CircularProgress sx={{ mx: 'auto' }} />
+            ) : discountedIsError ? (
+              <Typography>Error loading collection.</Typography>
+            ) : (
+              
+              <Box sx={productGridSx}>
+              {hotDeals?.content.map((listing) => (
                 <HomeProductCard key={listing.id} listing={listing} />
               ))}
             </Box>
+            )}
+
           </Box>
-        )}
+    
 
         <Typography variant="h2" sx={{ mb: 3 }}>
           New Arrivals
         </Typography>
 
-        {isLoading ? (
-          <Typography>Loading collection...</Typography>
-        ) : featured.length === 0 ? (
+        {featuredIsLoading ? (
+          <CircularProgress sx={{ mx: 'auto' }} />
+        ) : featuredIsError ? (
+          <Typography>Error loading collection.</Typography>
+        ) : featured?.totalElements === 0 ? (
           <Typography>No products available yet.</Typography>
         ) : (
           <Box sx={productGridSx}>
-            {featured.map((listing) => (
+            {featured?.content.map((listing) => (
               <HomeProductCard key={listing.id} listing={listing} />
             ))}
           </Box>
