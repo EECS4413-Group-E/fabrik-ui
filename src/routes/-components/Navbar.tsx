@@ -103,7 +103,7 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="sticky">
+    <AppBar sx={{ height: '10vh' }} position="sticky">
       <Toolbar
         sx={{
           display: 'flex',

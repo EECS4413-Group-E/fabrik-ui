@@ -9,6 +9,8 @@ export interface User {
     id: string;
     email: string;
     role: UserRole;
+    storePoints: number;
+    createdDate: string;
 }
 
 export interface LoginRegisterRequest {

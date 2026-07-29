@@ -8,6 +8,8 @@ import type { AccessTokenResponse } from './models/AccessTokenResponse';
 
 import type { WishListItem } from './models/WishList';
 
+import type {ChangePasswordRequest, UpdateEmailRequest} from './models/UserRequests';
+
 import type {
   AddCartItemRequest,
   CartItem,
@@ -159,6 +161,21 @@ export const addWishlistItem = (listingId: string) => {
 
 export const removeWishlistItem = (listingId: string) => {
   return deleteWithConfig<void>(`/user/wishlist/${listingId}`);
+};
+
+
+export const changePassword = async (
+  request: ChangePasswordRequest,
+): Promise<void> => {
+  await apiClient.patch('/auth/change-password', request);
+};
+
+export const changeEmail = async ({newEmail}: UpdateEmailRequest): Promise<void> => {
+    await apiClient.patch('/user/change-email', null, {
+    params: {
+       newEmail,
+    },
+  });
 };
 
 /*
