@@ -75,7 +75,17 @@ const ShoppingCartPage = () => {
 
   const cartItems = data ?? [];
 
-  const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getDiscountedPrice = (price: number, discountPercentage?: number) => {
+    const discount = discountPercentage ?? 0;
+
+    return discount > 0 ? price * (1 - discount / 100) : price;
+  };
+
+  const cartTotal = cartItems.reduce(
+    (total, item) =>
+      total + getDiscountedPrice(item.price, item.discountPercentage) * item.quantity,
+    0,
+  );
 
   const mutationError =
     updateCartItemMutation.error ?? removeCartItemMutation.error ?? clearCartMutation.error;
@@ -185,7 +195,26 @@ const ShoppingCartPage = () => {
                 SKU {item.sku}
               </Typography>
 
-              <Typography sx={{ mt: 1 }}>${item.price.toFixed(2)}</Typography>
+              {(item.discountPercentage ?? 0) > 0 ? (
+                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mt: 1 }}>
+                  <Typography sx={{ color: 'primary.main', fontWeight: 500 }}>
+                    ${getDiscountedPrice(item.price, item.discountPercentage).toFixed(2)}
+                  </Typography>
+
+                  <Typography
+                    variant="body2"
+                    sx={{ color: 'text.secondary', textDecoration: 'line-through' }}
+                  >
+                    ${item.price.toFixed(2)}
+                  </Typography>
+
+                  <Typography variant="body2" sx={{ color: 'primary.main' }}>
+                    -{item.discountPercentage}%
+                  </Typography>
+                </Box>
+              ) : (
+                <Typography sx={{ mt: 1 }}>${item.price.toFixed(2)}</Typography>
+              )}
             </Box>
 
             <Box
