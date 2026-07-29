@@ -7,8 +7,8 @@ import {
   fetchListings,
   fetchOrderDetails,
   fetchOrders,
-  fetchWishlist,
   fetchSearchResults,
+  fetchWishlist,
   fetchReviews,
 } from './Api';
 
@@ -24,6 +24,12 @@ export const queryKeys = {
   search: (keyword: string, filter: Filter) => ['search', keyword, filter] as const,
   reviews: (listingId: string) => ['reviews', listingId] as const,
 };
+
+export const optionalCurrentUserQueryOptions = (isLoggedIn: boolean) =>
+  queryOptions({
+    queryKey: queryKeys.currentUser(),
+    queryFn: isLoggedIn ? fetchCurrentUser : skipToken,
+  });
 
 export const currentUserQueryOptions = () =>
   queryOptions({
@@ -61,7 +67,12 @@ export const ordersQueryOptions = () =>
     queryFn: fetchOrders,
   });
 
-export const searchQueryOptions = (keyword: string, filter: Filter, pageNumber: number, pageSize: number) =>
+export const searchQueryOptions = (
+  keyword: string,
+  filter: Filter,
+  pageNumber: number,
+  pageSize: number,
+) =>
   queryOptions({
     queryKey: ['search', keyword, filter, pageNumber, pageSize],
     queryFn: () => fetchSearchResults(keyword, filter, pageNumber, pageSize),
