@@ -1,3 +1,5 @@
+import type { ClothingCategory, DepartmentCategory } from "./Filter";
+
 export interface Availability {
   id: string;
   size: string;
@@ -33,8 +35,8 @@ export interface ListingItem {
   id: string;
   productDescription: string;
   productName: string;
-  clothingCategory: string;
-  departmentCategory: string;
+  clothingCategory: ClothingCategory;
+  departmentCategory: DepartmentCategory;
   colors: string[];
   imageLink: string;
   minPrice: number;

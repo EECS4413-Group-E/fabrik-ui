@@ -4,8 +4,9 @@ import { Box, Button, Typography } from '@mui/material';
 
 import { listingsQueryOptions } from '../../queries';
 import { fabrikColors } from '../../theme';
-
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeProductCard from './HomeProductCard';
+import type { DepartmentCategory } from '../../models/Filter';
 
 const PRODUCTS_SEARCH_DEFAULTS = {
   keyword: '',
@@ -17,8 +18,8 @@ const PRODUCTS_SEARCH_DEFAULTS = {
 };
 
 const DEPARTMENTS = [
-  { label: 'Men', image: '/category-men.jpg' },
-  { label: 'Women', image: '/category-women.jpg' },
+  { label: 'Mens', image: '/category-men.jpg' },
+  { label: 'Womens', image: '/category-women.jpg' },
   { label: 'Other', image: '/category-other.jpg' },
 ] as const;
 
@@ -81,7 +82,7 @@ const HomePage = () => {
           </Link>
         </Box>
       </Box>
-
+      {/* Categories */}
       <Box sx={{ maxWidth: 1200, mx: 'auto', px: 3, py: 6 }}>
         <Typography variant="h2" sx={{ mb: 3 }}>
           Shop by Category
@@ -99,25 +100,27 @@ const HomePage = () => {
             <Link
               key={department.label}
               to="/products"
-              search={PRODUCTS_SEARCH_DEFAULTS}
+              search={{ ...PRODUCTS_SEARCH_DEFAULTS, department: department.label.toUpperCase() as DepartmentCategory }}
               style={{ textDecoration: 'none' }}
             >
               <Box
                 sx={{
                   position: 'relative',
-                  height: 240,
+                  height: 600,
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${department.image})`,
+                  alignItems: 'end',
+                  justifyContent: 'left',
+                  backgroundImage: `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7)), url(${department.image})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   transition: 'transform 0.2s ease',
-                  '&:hover': { transform: 'scale(1.02)' },
+                  '&:hover': { transform: 'scale(1.02)' 
+                  }
+                  ,
                 }}
               >
-                <Typography variant="h3" sx={{ color: '#fff' }}>
+
+                <Typography variant="h1" sx={{ color: 'white', mb: 2, ml: 3 }}>
                   {department.label}
                 </Typography>
               </Box>
@@ -144,7 +147,10 @@ const HomePage = () => {
                 search={{ ...PRODUCTS_SEARCH_DEFAULTS, deals: true }}
                 style={{ textDecoration: 'none' }}
               >
-                <Button>View all</Button>
+                <Button>
+                  View all 
+                  <NavigateNextIcon />
+                </Button>
               </Link>
             </Box>
 
