@@ -117,7 +117,7 @@ export const fetchCurrentUser = () => {
 };
 
 export const fetchListings = () => {
-  return getWithConfig<Listing[]>('/catalogue/listings');
+  return getWithConfig<ListingItem[]>('/catalogue/listings');
 };
 
 export const fetchOrders = () => {

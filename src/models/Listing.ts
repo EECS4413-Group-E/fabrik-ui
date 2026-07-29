@@ -41,6 +41,8 @@ export interface ListingItem {
   productName: string;
   clothingCategory: ClothingCategory;
   departmentCategory: DepartmentCategory;
+  clothingCategory: ClothingCategory;
+  departmentCategory: DepartmentCategory;
   colors: string[];
   imageLink: string;
   minPrice: number;
