@@ -268,7 +268,10 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   </Box>
 
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Rating name="half-rating-read" defaultValue={listing.averageRating} precision={0.5} readOnly />
+                    <Rating name="product rating" defaultValue={listing.averageRating} precision={0.5} readOnly />
+                    <Typography variant={'body1'} sx={{ my: 0, alignItems: 'center' }} >  
+                      - {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
+                    </Typography>
                   </Box>
                 </Box>
               </Box>
