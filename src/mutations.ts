@@ -13,6 +13,8 @@ import {
   replaceCart,
   updateCartItemQuantity,
   addReview,
+  changePassword,
+  changeEmail
 } from './Api';
 
 import { queryKeys } from './queries';
@@ -20,6 +22,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from './hooks/useAuth.ts';
 import { cartStorage } from './cartStorage.ts';
 import { tokenStore } from './tokenStore.ts';
+import {type ChangePasswordRequest, type UpdateEmailRequest} from './models/UserRequests';
 
 export const useRegisterMutation = () => {
   const { mutate } = useMutation({
@@ -72,10 +75,13 @@ export const useLoginMutation = () => {
 };
 
 export const useLogoutMutation = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
       tokenStore.set(null);
+      queryClient.clear();
     },
   });
 };
@@ -182,6 +188,26 @@ export const useCreateOrderMutation = () => {
     },
   });
 };
+
+export const useChangePasswordMutation = () => {
+  return useMutation<void, Error, ChangePasswordRequest>({
+    mutationFn: changePassword,
+  });
+};
+
+export const useChangeEmailMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, UpdateEmailRequest>({
+    mutationFn: changeEmail,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.currentUser(),
+      });
+    },
+  });
+};
+
 
 export const useAddReviewMutation = (listingId: string) => {
   const queryClient = useQueryClient();
