@@ -16,7 +16,7 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
   const pointsAmount = paymentDetails.completedPayments.reduce(
     (total, payment) => total + payment.usedStorePoints,
     0,
-  );
+  ) * 0.05;
   const amountPayed = orderTotal - pointsAmount;
 
   const columns: GridColDef[] = [
