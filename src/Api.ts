@@ -31,9 +31,6 @@ export const registerUnauthorizedHandler = (handler: UnauthorizedHandler) => {
   onUnauthorized = handler;
 };
 
-// Temporary direct URL until review routes are added to the Gateway.
-const TEMP_REVIEW_API_URL = 'http://localhost:4002/listing';
-
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
@@ -119,7 +116,7 @@ export const fetchCurrentUser = () => {
 };
 
 export const fetchListings = () => {
-  return getWithConfig<Listing[]>('/catalogue/listings');
+  return getWithConfig<ListingItem[]>('/catalogue/listings');
 };
 
 export const fetchOrders = () => {
@@ -213,21 +210,9 @@ export const clearCart = () => {
 };
 
 export const fetchReviews = async (listingId: string) => {
-  const response = await axios.get<ReviewPage>(
-    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
-    { params: { page: 0, size: 20 } },
-  );
-
-  return response.data;
+  return getWithConfig<ReviewPage>(`/catalogue/listing/${listingId}/review`);
 };
 
-export const addReview = async (request: AddReviewRequest) => {
-  const { listingId, ...body } = request;
-
-  const response = await axios.post(
-    `${TEMP_REVIEW_API_URL}/${listingId}/review`,
-    body,
-  );
-
-  return response.data;
+export const addReview = async (listingId: string, data: AddReviewRequest) => {
+  return postWithConfig<AddReviewRequest, void>(`/catalogue/listing/${listingId}/review`, data); 
 };
