@@ -5,6 +5,6 @@ import { orderDetailsQueryOptions } from '../../../queries.ts';
 export const Route = createFileRoute('/orders/$orderId/')({
   component: OrderDetails,
   loader: ({ context: { queryClient }, params: { orderId } }) => {
-    queryClient.ensureQueryData(orderDetailsQueryOptions(orderId));
+    return queryClient.ensureQueryData(orderDetailsQueryOptions(orderId));
   },
 });

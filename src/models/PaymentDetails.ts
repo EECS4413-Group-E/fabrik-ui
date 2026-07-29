@@ -14,7 +14,7 @@ export type PaymentDetails = {
     createdDate: string;
     usedStorePoints: number;
     awardedStorePoints: number;
-    installments?: number;
+    installment?: number;
     totalInstallments: number;
   }[];
   scheduledPayments: {
@@ -25,7 +25,7 @@ export type PaymentDetails = {
     paymentMethod: PaymentMethod;
     paymentReference: string;
     paymentDate: string;
-    installments?: number;
-    totalinstallments: number;
+    installment?: number;
+    totalInstallments: number;
   }[];
 };
