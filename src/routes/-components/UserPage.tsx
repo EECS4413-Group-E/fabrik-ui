@@ -1,5 +1,7 @@
 import { type ReactNode, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useForm } from '@tanstack/react-form';
+import { useAuth } from '../../hooks/useAuth';
 
 import {
   Alert,
@@ -31,9 +33,8 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import StarsOutlinedIcon from '@mui/icons-material/StarsOutlined';
 
-import { fetchCurrentUser, fetchOrders, fetchWishlist } from '../../Api';
 import { useChangeEmailMutation, useChangePasswordMutation, useLogoutMutation } from '../../mutations';
-import { queryKeys } from '../../queries';
+import { currentUserQueryOptions, ordersQueryOptions, wishlistQueryOptions } from '../../queries';
 import { fabrikColors } from '../../theme';
 
 const UserPage = () => {
@@ -41,30 +42,14 @@ const UserPage = () => {
   const changePasswordMutation = useChangePasswordMutation();
   const changeEmailMutation = useChangeEmailMutation();
 
-  const [emailInput, setEmailInput] = useState('');
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { isLoggedIn } = useAuth();
 
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordValidationError, setPasswordValidationError] = useState('');
-
-  const { data: user, isLoading: isUserLoading, isError: isUserError } = useQuery({
-    queryKey: queryKeys.currentUser(),
-    queryFn: fetchCurrentUser,
-  });
-
-  const { data: wishlist = [], isLoading: isWishlistLoading } = useQuery({
-    queryKey: queryKeys.wishlist(),
-    queryFn: fetchWishlist,
-  });
-
-  const { data: orders = [], isLoading: isOrdersLoading } = useQuery({
-    queryKey: queryKeys.orders(),
-    queryFn: fetchOrders,
-  });
+  const { data: user, isLoading: isUserLoading, isError: isUserError } = useQuery(currentUserQueryOptions());
+  const { data: wishlist = [],isLoading: isWishlistLoading } = useQuery(wishlistQueryOptions(isLoggedIn));
+  const { data: orders = [], isLoading: isOrdersLoading } = useQuery(ordersQueryOptions());
 
   const displayedEmail = user?.email ?? '';
   const avatarInitial = displayedEmail.charAt(0).toUpperCase();
@@ -85,42 +70,66 @@ const UserPage = () => {
     year: 'numeric',
     timeZone: 'UTC',
   }).format(createdDate);
-})();
+  })();
 
   const accountType = user?.role === 'ADMIN' ? 'Administrator' : 'Customer';
-  const handleSaveEmail = () => {
-    const normalizedEmail = emailInput.trim();
-    if (!normalizedEmail) {
-      return;
-    }
-    if (normalizedEmail === displayedEmail) {
-      setIsEmailDialogOpen(false);
-      return;
-    }
-    changeEmailMutation.mutate(
-      {newEmail: normalizedEmail},
-      {
-        onSuccess: () => {
-          setIsEmailDialogOpen(false);
-          setSnackbarMessage('Your email address was updated successfully.');
+  const emailForm = useForm({
+    defaultValues: {
+      email: '',
+    },
+    onSubmit: ({ value }) => {
+      const normalizedEmail = value.email.trim();
+
+      if (normalizedEmail === displayedEmail) {
+        setIsEmailDialogOpen(false);
+        return;
+      }
+
+      changeEmailMutation.mutate(
+        { newEmail: normalizedEmail },
+        {
+          onSuccess: () => {
+            setIsEmailDialogOpen(false);
+            setSnackbarMessage(
+              'Your email address was updated successfully.',
+            );
+          },
         },
-      },
-    );
-  };
+      );
+    },
+  });
+
+  const passwordForm = useForm({
+    defaultValues: { oldPassword: '', newPassword: '', confirmPassword: ''},
+    onSubmit: ({ value }) => {
+      changePasswordMutation.mutate(
+        {
+          oldPassword: value.oldPassword,
+          newPassword: value.newPassword,
+        },
+        {
+          onSuccess: () => {
+            setIsPasswordDialogOpen(false);
+            passwordForm.reset();
+            setSnackbarMessage(
+              'Your password was changed successfully.',
+            );
+          },
+        },
+      );
+    },
+  });
+
+  
 
   const handleLogout = () => {
     logoutMutation.mutate();
   };
 
-  const resetPasswordForm = () => {
-    setOldPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setPasswordValidationError('');
-  };
+  
 
   const handleOpenPasswordDialog = () => {
-    resetPasswordForm();
+    passwordForm.reset();
     changePasswordMutation.reset();
     setIsPasswordDialogOpen(true);
   };
@@ -131,7 +140,7 @@ const UserPage = () => {
     }
 
     setIsPasswordDialogOpen(false);
-    resetPasswordForm();
+    passwordForm.reset();
     changePasswordMutation.reset();
   };
 
@@ -145,49 +154,12 @@ const UserPage = () => {
   };
 
   const handleOpenEmailDialog = () => {
-    setEmailInput(displayedEmail);
+    emailForm.reset({ email: displayedEmail });
     changeEmailMutation.reset();
     setIsEmailDialogOpen(true);
   };
 
-  const handleChangePassword = () => {
-    setPasswordValidationError('');
-
-    if (
-      !oldPassword.trim() ||
-      !newPassword.trim() ||
-      !confirmPassword.trim()
-    ) {
-      setPasswordValidationError('All password fields are required.');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordValidationError('The new passwords do not match.');
-      return;
-    }
-
-    if (oldPassword === newPassword) {
-      setPasswordValidationError(
-        'Your new password must be different from your current password.',
-      );
-      return;
-    }
-
-    changePasswordMutation.mutate(
-      {
-        oldPassword,
-        newPassword,
-      },
-      {
-        onSuccess: () => {
-          setIsPasswordDialogOpen(false);
-          resetPasswordForm();
-          setSnackbarMessage('Your password was changed successfully.');
-        },
-      },
-    );
-  };
+  
 
   if (isUserLoading) {
     return (
@@ -572,20 +544,45 @@ const UserPage = () => {
                 Your email address could not be updated. Please try again.
               </Alert>
             )}
+            <emailForm.Field
+              name="email"
+              validators={{
+                onChange: ({ value }) => {
+                  const normalizedEmail = value.trim();
 
-            <TextField
-              autoFocus
-              fullWidth
-              required
-              type="email"
-              label="Email address"
-              value={emailInput}
-              disabled={changeEmailMutation.isPending}
-              onChange={(event) => {
-                setEmailInput(event.target.value);
-                changeEmailMutation.reset();
-              }}
-            />
+                  if (!normalizedEmail) {
+                    return 'Email is required';
+                  }
+
+                  if ( !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) ) {
+                    return 'Please enter a valid email address';
+                  }
+                  return undefined;
+                },
+              }}> 
+              {(field) => (
+                <TextField
+                  autoFocus
+                  fullWidth
+                  required
+                  type="email"
+                  label="Email address"
+                  value={field.state.value}
+                  disabled={changeEmailMutation.isPending}
+                  error={field.state.meta.errors.length > 0}
+                  helperText={field.state.meta.errors[0] ?? ' '}
+                  onChange={(event) => {
+                    field.handleChange(event.target.value);
+                    changeEmailMutation.reset();
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      void emailForm.handleSubmit();
+                    }
+                  }}
+                />
+              )}
+            </emailForm.Field>
           </DialogContent>
 
           <DialogActions sx={{ px: 3, pb: 3 }}>
@@ -597,17 +594,20 @@ const UserPage = () => {
               Cancel
             </Button>
 
-            <Button
-              variant="contained"
-              disabled={
-                changeEmailMutation.isPending ||
-                !emailInput.trim() ||
-                emailInput.trim() === displayedEmail
-              }
-              onClick={handleSaveEmail}
-            >
-              {changeEmailMutation.isPending ? 'Saving...' : 'Save'}
-            </Button>
+            <emailForm.Subscribe
+              selector={(state) => state}>
+              {(state) => (
+                <Button
+                  variant="contained"
+                  disabled={ changeEmailMutation.isPending ||
+                    !state.canSubmit ||
+                    state.values.email.trim() === displayedEmail }
+                  onClick={() => void emailForm.handleSubmit()}
+                >
+                  {changeEmailMutation.isPending ? 'Saving...' : 'Save'}
+                </Button>
+              )}
+            </emailForm.Subscribe>
           </DialogActions>
         </Dialog>
 
@@ -639,66 +639,129 @@ const UserPage = () => {
                 Enter your current password and choose a new password.
               </Typography>
 
-              {passwordValidationError && (
-                <Alert severity="error">{passwordValidationError}</Alert>
-              )}
-
               {changePasswordMutation.isError && (
                 <Alert severity="error">
                   Your password could not be changed. Check your current password and try again.
                 </Alert>
               )}
 
-              <TextField
-                autoFocus
-                fullWidth
-                required
-                type="password"
-                label="Current password"
-                value={oldPassword}
-                disabled={changePasswordMutation.isPending}
-                onChange={(event) => {
-                  setOldPassword(event.target.value);
-                  setPasswordValidationError('');
-                }}
-              />
+              <passwordForm.Field
+                name="oldPassword"
+                validators={{
+                  onChange: ({ value }) =>
+                    value.trim()
+                      ? undefined
+                      : 'Current password is required',
+                }}>
+                {(field) => (
+                  <TextField
+                    autoFocus
+                    fullWidth
+                    required
+                    type="password"
+                    label="Current password"
+                    value={field.state.value}
+                    disabled={changePasswordMutation.isPending}
+                    error={field.state.meta.errors.length > 0}
+                    helperText={field.state.meta.errors[0] ?? ' '}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value);
+                      changePasswordMutation.reset();
+                    }}/>
+                )}
+              </passwordForm.Field>
 
-              <TextField
-                fullWidth
-                required
-                type="password"
-                label="New password"
-                value={newPassword}
-                disabled={changePasswordMutation.isPending}
-                onChange={(event) => {
-                  setNewPassword(event.target.value);
-                  setPasswordValidationError('');
-                }}
-              />
+              <passwordForm.Field
+                name="newPassword"
+                validators={{
+                  onChangeListenTo: ['oldPassword'],
+                  onChange: ({ value, fieldApi }) => {
+                    if (!value) {
+                      return 'New password is required';
+                    }
 
-              <TextField
-                fullWidth
-                required
-                type="password"
-                label="Confirm new password"
-                value={confirmPassword}
-                disabled={changePasswordMutation.isPending}
-                error={Boolean(confirmPassword) && newPassword !== confirmPassword}
-                helperText={
-                  Boolean(confirmPassword) && newPassword !== confirmPassword
-                    ? 'The passwords do not match.'
-                    : ' '
-                }
-                onChange={(event) => {
-                  setConfirmPassword(event.target.value);
-                  setPasswordValidationError('');
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    handleChangePassword();
-                  }
-                }}
-              />
+                    if (value.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
+
+                    if (!/[A-Z]/.test(value)) {
+                      return 'Password must contain an uppercase letter';
+                    }
+
+                    if (!/[a-z]/.test(value)) {
+                      return 'Password must contain a lowercase letter';
+                    }
+
+                    if (!/[0-9]/.test(value)) {
+                      return 'Password must contain a number';
+                    }
+
+                    if (!/[^A-Za-z0-9]/.test(value)) {
+                      return 'Password must contain a special character';
+                    }
+
+                    if ( value === fieldApi.form.getFieldValue('oldPassword')) {
+                      return ( 'Your new password must be different from your current password'
+                      );
+                    }
+
+                    return undefined;
+                  },
+                }}>
+                {(field) => (
+                  <TextField
+                    fullWidth
+                    required
+                    type="password"
+                    label="New password"
+                    value={field.state.value}
+                    disabled={changePasswordMutation.isPending}
+                    error={field.state.meta.errors.length > 0}
+                    helperText={field.state.meta.errors[0] ?? ' '}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value);
+                      changePasswordMutation.reset();
+                    }}
+                  />
+                )}
+              </passwordForm.Field>
+
+              <passwordForm.Field
+                name="confirmPassword"
+                validators={{
+                  onChangeListenTo: ['newPassword'],
+                  onChange: ({ value, fieldApi }) => {
+                    if (!value) {
+                      return 'Please confirm your new password';
+                    }
+                    if ( value !== fieldApi.form.getFieldValue('newPassword')) {
+                      return 'The new passwords do not match';
+                    }
+                    return undefined;
+                  },
+                }}>
+                {(field) => (
+                  <TextField
+                    fullWidth
+                    required
+                    type="password"
+                    label="Confirm new password"
+                    value={field.state.value}
+                    disabled={changePasswordMutation.isPending}
+                    error={field.state.meta.errors.length > 0}
+                    helperText={field.state.meta.errors[0] ?? ' '}
+                    onChange={(event) => {
+                      field.handleChange(event.target.value);
+                      changePasswordMutation.reset();
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        void passwordForm.handleSubmit();
+                      }
+                    }}
+                  />
+                )}
+              </passwordForm.Field>
             </Stack>
           </DialogContent>
 
@@ -711,21 +774,19 @@ const UserPage = () => {
               Cancel
             </Button>
 
-            <Button
-              variant="contained"
-              disabled={
-                changePasswordMutation.isPending ||
-                !oldPassword.trim() ||
-                !newPassword.trim() ||
-                !confirmPassword.trim() ||
-                newPassword !== confirmPassword
-              }
-              onClick={handleChangePassword}
+            <passwordForm.Subscribe
+              selector={(state) => state.canSubmit}
             >
-              {changePasswordMutation.isPending
-                ? 'Changing password...'
-                : 'Change password'}
-            </Button>
+              {(canSubmit) => (
+                <Button
+                  variant="contained"
+                  disabled={ changePasswordMutation.isPending || !canSubmit }
+                  onClick={() => void passwordForm.handleSubmit()}
+                >
+                  {changePasswordMutation.isPending ? 'Changing password...' : 'Change password'}
+                </Button>
+              )}
+            </passwordForm.Subscribe>
           </DialogActions>
         </Dialog>
 
