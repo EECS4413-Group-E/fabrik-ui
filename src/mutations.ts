@@ -22,6 +22,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from './hooks/useAuth.ts';
 import { cartStorage } from './cartStorage.ts';
 import { tokenStore } from './tokenStore.ts';
+import type { AddReviewRequest } from './models/Review.ts';
 import {type ChangePasswordRequest, type UpdateEmailRequest} from './models/UserRequests';
 
 export const useRegisterMutation = () => {
@@ -211,12 +212,13 @@ export const useChangeEmailMutation = () => {
 
 export const useAddReviewMutation = (listingId: string) => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: addReview,
+    mutationFn: (review: AddReviewRequest) => addReview(listingId, review),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.reviews(listingId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.listing(listingId) });
+      return queryClient.invalidateQueries({
+        queryKey: queryKeys.reviews(listingId),
+      });
     },
   });
 };

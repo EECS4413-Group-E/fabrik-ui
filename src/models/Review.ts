@@ -16,8 +16,6 @@ export interface ReviewPage {
 }
 
 export interface AddReviewRequest {
-  listingId: string;
-  userId: string;
   rating: number;
   comment?: string;
 }

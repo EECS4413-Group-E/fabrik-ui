@@ -23,7 +23,7 @@ function AppRouter() {
   const auth = useAuth();
   if (auth?.loading) {
     return (
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <CircularProgress aria-label="Loading…" />
       </Box>
     );
