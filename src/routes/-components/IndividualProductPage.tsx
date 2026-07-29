@@ -179,12 +179,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                       navigate({
                         to: '/products',
                         search: {
-                          keyword: '',
-                          pageNumber: 0,
-                          pageSize: 10,
-                          department: listing.departmentCategory,
-                          ...(listing.clothingCategory && { category: listing.clothingCategory }),
-                          deals: false,
+                          department: listing.departmentCategory
                         },
                       })
                     }
@@ -192,17 +187,13 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   >
                     <Typography color="text.secondary">{listing.departmentCategory}</Typography>
                   </Button>
-                  <Button
+                  <Button 
                     onClick={() =>
                       navigate({
                         to: '/products',
                         search: {
-                          keyword: '',
-                          pageNumber: 0,
-                          pageSize: 10,
                           department: listing.departmentCategory,
                           category: listing.clothingCategory,
-                          deals: false,
                         },
                       })
                     }
@@ -426,7 +417,15 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
           <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
         </Typography>
       )}
-      <ReviewsSection listingId={listing.id} />
+
+    </Box>
+          </Box>
+          {/* Reviews */}
+          <Box sx={{ mx: { md: 10, lg: 20, xl: 30 } }}>
+            <ReviewsSection listingId={listing.id} />
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };
