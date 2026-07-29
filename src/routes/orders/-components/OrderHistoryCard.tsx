@@ -14,70 +14,21 @@ import {
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+
+import ProductImage from './ProductImage.tsx';
 
 import { fabrikColors } from '../../../theme.ts';
-import type { Order, OrderItem, ShippingStatusType } from '../../../models/Order.ts';
-import { ShippingStatus } from '../../../models/Order.ts';
+import type { Order } from '../../../models/Order.ts';
 
-const formatCurrency = (amount: number): string =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'CAD',
-  }).format(amount);
+import {
+  formatCurrency,
+  formatEnumLabel,
+  formatOrderDate,
+  getShippingStatusColor,
+  getTotalQuantity,
+ } from '../-utils/orderUtils.ts';
 
-const formatOrderDate = (dateValue: string): string => {
-  const date = new Date(dateValue);
 
-  if (Number.isNaN(date.getTime())) {
-    return 'Date unavailable';
-  }
-
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(date);
-};
-
-const formatShippingStatus = (
-  status: ShippingStatusType,
-): string => {
-  switch (status) {
-    case ShippingStatus.Preparing:
-      return 'Preparing';
-
-    case ShippingStatus.Shipped:
-      return 'Shipped';
-
-    case ShippingStatus.Delivered:
-      return 'Delivered';
-
-    default:
-      return status;
-  }
-};
-
-const getShippingStatusColor = (
-  status: ShippingStatusType,
-): 'default' | 'info' | 'success' => {
-  switch (status) {
-    case ShippingStatus.Shipped:
-      return 'info';
-
-    case ShippingStatus.Delivered:
-      return 'success';
-
-    default:
-      return 'default';
-  }
-};
-
-const getTotalQuantity = (items: OrderItem[]): number =>
-  items.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  );
 interface OrderHistoryCardProps {
   order: Order;
 }
@@ -143,9 +94,7 @@ const OrderHistoryCard = ({
 
             <Chip
               icon={<LocalShippingOutlinedIcon />}
-              label={formatShippingStatus(
-                order.shippingDetails.shippingStatus,
-              )}
+              label={formatEnumLabel( order.shippingDetails.shippingStatus )}
               color={getShippingStatusColor(
                 order.shippingDetails.shippingStatus,
               )}
@@ -302,44 +251,9 @@ const OrderHistoryCard = ({
 };
 
 
-interface ProductImageProps {
-  item: OrderItem;
-}
 
-const ProductImage = ({ item }: ProductImageProps) => (
-  <Box
-    sx={{
-      width: { xs: '100%', sm: 120 },
-      height: { xs: 220, sm: 140 },
-      flexShrink: 0,
-      overflow: 'hidden',
-      display: 'grid',
-      placeItems: 'center',
-      backgroundColor: fabrikColors.parchment,
-      border: `1px solid ${fabrikColors.border}`,
-    }}
-  >
-    {item.imageLink ? (
-      <Box
-        component="img"
-        src={item.imageLink}
-        alt={item.name}
-        sx={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-        }}
-      />
-    ) : (
-      <Inventory2OutlinedIcon
-        sx={{
-          fontSize: 42,
-          color: 'text.secondary',
-        }}
-      />
-    )}
-  </Box>
-);
+
+
 
 
 export default OrderHistoryCard;
