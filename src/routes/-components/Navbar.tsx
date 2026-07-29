@@ -21,7 +21,7 @@ import { fabrikColors } from '../../theme';
 import { useCart } from '../../hooks/useCart.ts';
 import { useAuth } from '../../hooks/useAuth.ts';
 import { useLogoutMutation } from '../../mutations.ts';
-import type { ClothingCategory, DepartmentCategory } from '../../models/Filter.ts';
+import type { ClothingCategory } from '../../models/Filter.ts';
 
 const CATEGORIES = [
   'SHOP ALL',

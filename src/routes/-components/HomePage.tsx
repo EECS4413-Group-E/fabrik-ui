@@ -1,12 +1,12 @@
-import { Link, useSearch } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
-import { listingsQueryOptions, searchQueryOptions } from '../../queries';
+import { searchQueryOptions } from '../../queries';
 import { fabrikColors } from '../../theme';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeProductCard from './HomeProductCard';
-import type { ClothingCategory, DepartmentCategory, Filter, SortStrategy } from '../../models/Filter';
+import type { DepartmentCategory, Filter, SortStrategy } from '../../models/Filter';
 
 const PRODUCTS_SEARCH_DEFAULTS = {
   keyword: '',

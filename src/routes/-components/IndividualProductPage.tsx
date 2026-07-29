@@ -56,17 +56,17 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
   } = useQuery(singleListingQueryOptions(listingId));
 
   const addCartItemMutation = useAddCartItemMutation();
-  const [selectedProductIndex, setSelectedProductIndex] = useState(0);
+  const [selectedProductIndex, setSelectedProductIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState(1);
 
   if (!listing) {
     return <Typography>Product not found.</Typography>;
   }
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(
-    listing.products[selectedProductIndex],
+  const [selectedProduct, setSelectedProduct] = useState<Product>(
+    listing.products[0],
   );
-  const [selectedSize, setSelectedSize] = useState<Size>(listing.products[selectedProductIndex].availabilities[0]?.size);
+  const [selectedSize, setSelectedSize] = useState<Size | undefined>(undefined);
 
   if (!selectedProduct) {
     return <Typography>No product variations available.</Typography>;
@@ -87,7 +87,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     setSelectedImage(nextProduct.images[0]);
   };
 
-  const handleSizeSelection = (size: Size) => {
+  const handleSizeSelection = (size: Size | undefined) => {
     setSelectedSize(size);
     setQuantity(1);
   };

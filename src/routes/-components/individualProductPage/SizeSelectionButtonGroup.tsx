@@ -4,6 +4,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   toggleButtonGroupClasses,
+  Tooltip,
 } from '@mui/material';
 import type { Size } from '../../../models/Size';
 
@@ -15,8 +16,8 @@ export default function SizeSelectionButtonGroup({
   handleSizeSelection,
 }: {
   availabilities: { size: Size; availability: number }[];
-  selectedSize: Size;
-  handleSizeSelection: (size: Size) => void;
+  selectedSize: Size | undefined; 
+  handleSizeSelection: (size: Size | undefined) => void;
 }) {
     const StyledToggleButtonGroup = styled(ToggleButtonGroup)(() => ({
     display: 'flex',
@@ -34,7 +35,11 @@ export default function SizeSelectionButtonGroup({
       [`&:not(.${toggleButtonGroupClasses.selected})`]: {
         color: 'black',
       },
-      '&:not(:first-of-type)': {},
+      [`&:disabled`]: {
+        color: 'gray',
+        backgroundColor: '#c9c6c6',
+      },
+
     },
   }));      
   const sortedAvailabilities = [...availabilities].sort(
@@ -50,6 +55,7 @@ export default function SizeSelectionButtonGroup({
           gap: 2,
           px: 0,
           mx: 0,
+          
         }}
         exclusive
         value={selectedSize}
@@ -57,20 +63,24 @@ export default function SizeSelectionButtonGroup({
       >
         {sortedAvailabilities.map((availability) => {
           return (
+            <Tooltip title={availability.availability > 0 ? `${availability.availability} in stock` : 'Out of stock'}>
+
             <ToggleButton
               sx={{
-                    width: 50,
-                height: 50,
-                px: 0,
-                mx: 0,
-              }}
-              key={availability.size}
-              value={availability.size}
-              onChange={() => handleSizeSelection(availability.size)}
-              disabled={availability.availability === 0}
-            >
+                  width: 50,
+                  height: 50,
+                  px: 0,
+                  mx: 0,
+                    textDecoration: availability.availability === 0 ? 'line-through' : 'none',
+                }}
+                key={availability.size}
+                value={availability.size}
+                onChange={() => handleSizeSelection(availability.size)}
+                disabled={availability.availability === 0}
+                >
               {availability.size}
             </ToggleButton>
+                </Tooltip>
           );
         })}
       </StyledToggleButtonGroup>
