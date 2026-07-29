@@ -2,6 +2,7 @@ import {
   Box,
   Breadcrumbs,
   Button,
+  Chip,
   CircularProgress,
   Rating,
   Tooltip,
@@ -15,6 +16,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import HeartBrokenOutlinedIcon from '@mui/icons-material/HeartBrokenOutlined';
 import { useWishlistMutation } from '../../mutations';
+import { fabrikColors } from '../../theme';
 
 const formatPrice = (price: number) => {
   return `$${price.toFixed(2)}`;
@@ -30,7 +32,11 @@ const ListingCard = ({
   wishlistItems: WishListItem[];
 }) => {
   const isInWishlist = wishlistItems?.some((item) => item.listingId === listing.id) ?? false;
-
+  const discountedPrice =
+    listing.discountPercentage && listing.discountPercentage > 0
+      ? listing.minPrice * (1 - listing.discountPercentage / 100)
+      : null;
+      
   const getWishlistTooltipText = () => {
     if (!isLoggedIn) {
       return 'Log in to add items to your wishlist';
@@ -51,10 +57,15 @@ const ListingCard = ({
     }
     return <FavoriteBorderIcon />;
   };
+
   const hasPriceRange = listing.minPrice !== listing.maxPrice;
 
   return (
-    <Box component="article" key={listing.id} sx={{ minWidth: 0 }}>
+    <Box
+      component="article"
+      key={listing.id}
+      sx={{ minWidth: 0, backgroundColor: fabrikColors.linen }}
+    >
       <Box
         sx={{
           position: 'relative',
@@ -103,6 +114,13 @@ const ListingCard = ({
             </Box>
           )}
         </Link>
+        {listing.discountPercentage && listing.discountPercentage > 0 && (
+          <Chip
+            label={`-${listing.discountPercentage}%`}
+            color="primary"
+            sx={{ height: 38, width: 80, position: 'absolute', top: 10, left: 10, zIndex: 1 }}
+          />
+        )}
         <Box>
           <Tooltip title={getWishlistTooltipText()} placement="right">
             <Button
@@ -139,7 +157,7 @@ const ListingCard = ({
           </Tooltip>
         </Box>
       </Box>
-      <Box sx={{ pt: 1.5 }}>
+      <Box sx={{ pt: 1.5, px: 2 }}>
         <Box
           sx={{
             display: 'flex',
@@ -167,18 +185,48 @@ const ListingCard = ({
               {listing.productName}
             </Typography>
           </Link>
-          <Typography
-            sx={{
-              flexShrink: 0,
-              fontSize: '0.95rem',
-              fontWeight: 600,
-              lineHeight: 1.4,
-            }}
-          >
-            {hasPriceRange
-              ? `${formatPrice(listing.minPrice)} – ${formatPrice(listing.maxPrice)}`
-              : formatPrice(listing.minPrice)}
-          </Typography>
+          {listing.discountPercentage && listing.discountPercentage > 0 ? (
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                <Typography
+                sx={{
+                  flexShrink: 0,
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  lineHeight: 1.4,
+                  color: fabrikColors.terracotta,
+                }}
+              >
+                  {formatPrice(discountedPrice ?? listing.minPrice)}
+              </Typography>
+              <Typography
+                sx={{
+                  flexShrink: 0,
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  lineHeight: 1.4,
+                  color: 'text.secondary',
+                  textDecoration: 'line-through',
+                }}
+              >
+                  {formatPrice(listing.minPrice)}
+              </Typography>
+            </Box>
+          ) : (
+            <Box>
+              <Typography
+                sx={{
+                  flexShrink: 0,
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  lineHeight: 1.4,
+                }}
+              >
+                {hasPriceRange
+                  ? `${formatPrice(listing.minPrice)} – ${formatPrice(listing.maxPrice)}`
+                  : formatPrice(listing.minPrice)}
+              </Typography>
+            </Box>
+          )}
         </Box>
         <Box
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}
@@ -189,7 +237,7 @@ const ListingCard = ({
           </Breadcrumbs>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography>
-                {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
+              {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
             </Typography>
             <Rating
               name="half-rating-read"

@@ -39,8 +39,7 @@ export interface ListingItem {
   id: string;
   productDescription: string;
   productName: string;
-  clothingCategory: ClothingCategory;
-  departmentCategory: DepartmentCategory;
+  discountPercentage: number;
   clothingCategory: ClothingCategory;
   departmentCategory: DepartmentCategory;
   colors: string[];

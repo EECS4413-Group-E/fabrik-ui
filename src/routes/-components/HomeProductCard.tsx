@@ -9,12 +9,12 @@ type HomeProductCardProps = {
 };
 
 const HomeProductCard = ({ listing }: HomeProductCardProps) => {
-  const discount = listing.discountPercentage ?? 0;
+
 
   const lowestPrice = listing.minPrice;
 
   const discountedPrice =
-    discount > 0 ? lowestPrice * (1 - discount / 100) : null;
+    listing.discountPercentage > 0 ? lowestPrice * (1 - listing.discountPercentage / 100) : null;
 
   return (
     <Link
@@ -31,9 +31,9 @@ const HomeProductCard = ({ listing }: HomeProductCardProps) => {
           '&:hover': { transform: 'translateY(-4px)' },
         }}
       >
-        {discount > 0 && (
+        {listing.discountPercentage > 0 && (
           <Chip
-            label={`-${discount}%`}
+            label={`-${listing.discountPercentage}%`}
             color="primary"
             size="small"
             sx={{ position: 'absolute', top: 12, left: 12, zIndex: 1 }}

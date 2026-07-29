@@ -1,33 +1,26 @@
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { wishlistQueryOptions } from '../../queries';
-import { useRemoveWishlistMutation } from '../../mutations.ts';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  IconButton,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Divider, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import type { ListingItem } from '../../models/Listing.ts';
+import type { WishListItem } from '../../models/WishList.ts';
+import ListingCard from './ListingCard.tsx';
+import { useAuth } from '../../hooks/useAuth.ts';
 
-const formatPrice = (price: number) => {
-  return `$${price.toFixed(2)}`;
-};
+function toListingItems(wishListItems: WishListItem[]): ListingItem[] {
+  return wishListItems.map(({ id, listingId, ...rest }) => ({
+    id: listingId,
+    ...rest,
+  }));
+}
 
 const WishlistPage = () => {
   const { data: wishlistItems, isLoading, isError, error } = useQuery(wishlistQueryOptions(true));
 
-  const {
-    mutate: removeWishlistItem,
-    isPending: isRemoving,
-    variables: removingListingId,
-  } = useRemoveWishlistMutation();
-
   const itemCount = wishlistItems?.length ?? 0;
+  const { isLoggedIn } = useAuth();
 
   return (
     <Box
@@ -200,149 +193,14 @@ const WishlistPage = () => {
               alignItems: 'start',
             }}
           >
-            {wishlistItems?.map((item) => {
-              const itemIsRemoving = isRemoving && removingListingId === item.listingId;
-              const hasPriceRange = item.minPrice !== item.maxPrice;
-
+            {toListingItems(wishlistItems ?? []).map((item) => {
               return (
-                <Box component="article" key={item.id} sx={{ minWidth: 0 }}>
-                  <Box
-                    sx={{
-                      position: 'relative',
-                      overflow: 'hidden',
-                      backgroundColor: '#eeeae3',
-                      aspectRatio: '3 / 4',
-                    }}
-                  >
-                    <Link
-                      to="/products/$listingId"
-                      params={{ listingId: item.listingId }}
-                      aria-label={`View ${item.productName}`}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        height: '100%',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      {item.imageLink ? (
-                        <Box
-                          component="img"
-                          src={item.imageLink}
-                          alt={item.productName}
-                          sx={{
-                            display: 'block',
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 250ms ease',
-                            '&:hover': { transform: 'scale(1.025)' },
-                          }}
-                        />
-                      ) : (
-                        <Box
-                          sx={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            px: 2,
-                          }}
-                        >
-                          <Typography color="text.secondary">Image unavailable</Typography>
-                        </Box>
-                      )}
-                    </Link>
-
-                    <IconButton
-                      type="button"
-                      aria-label={`Remove ${item.productName} from wishlist`}
-                      title="Remove from wishlist"
-                      onClick={() => removeWishlistItem(item.listingId)}
-                      disabled={itemIsRemoving}
-                      sx={{
-                        position: 'absolute',
-                        top: 10,
-                        right: 10,
-                        width: 38,
-                        height: 38,
-                        borderRadius: 0,
-                        backgroundColor: 'rgba(248, 245, 239, 0.94)',
-                        color: '#bd7a4a',
-                        '&:hover': { backgroundColor: '#ffffff' },
-                        '&.Mui-disabled': { backgroundColor: 'rgba(248, 245, 239, 0.8)' },
-                      }}
-                    >
-                      {itemIsRemoving ? (
-                        <CircularProgress size={18} color="inherit" />
-                      ) : (
-                        <FavoriteIcon sx={{ fontSize: 20 }} />
-                      )}
-                    </IconButton>
-                  </Box>
-
-                  <Box sx={{ pt: 1.5 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        gap: 2,
-                      }}
-                    >
-                      <Link
-                        to="/products/$listingId"
-                        params={{ listingId: item.listingId }}
-                        style={{ minWidth: 0, color: 'inherit', textDecoration: 'none' }}
-                      >
-                        <Typography
-                          sx={{
-                            color: 'text.primary',
-                            fontSize: '0.95rem',
-                            lineHeight: 1.4,
-                            '&:hover': {
-                              textDecoration: 'underline',
-                              textUnderlineOffset: '3px',
-                            },
-                          }}
-                        >
-                          {item.productName}
-                        </Typography>
-                      </Link>
-
-                      <Typography
-                        sx={{
-                          flexShrink: 0,
-                          fontSize: '0.95rem',
-                          fontWeight: 600,
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {hasPriceRange
-                          ? `${formatPrice(item.minPrice)} – ${formatPrice(item.maxPrice)}`
-                          : formatPrice(item.minPrice)}
-                      </Typography>
-                    </Box>
-
-                    {item.productDescription && (
-                      <Typography
-                        sx={{
-                          mt: 0.5,
-                          color: 'text.secondary',
-                          fontSize: '0.8rem',
-                          lineHeight: 1.5,
-                          overflow: 'hidden',
-                          display: '-webkit-box',
-                          WebkitBoxOrient: 'vertical',
-                          WebkitLineClamp: 1,
-                        }}
-                      >
-                        {item.productDescription}
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
+                <ListingCard
+                  key={item.id}
+                  listing={item}
+                  isLoggedIn={isLoggedIn}
+                  wishlistItems={wishlistItems ?? []}
+                />
               );
             })}
           </Box>
