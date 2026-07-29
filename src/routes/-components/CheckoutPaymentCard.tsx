@@ -1,5 +1,6 @@
 import { PaymentMethod, type CheckoutFormValues } from '../../models/Checkout';
 import { Box, FormControlLabel, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { formatCardNumber, formatExpiryDate } from '../../utils.ts';
 
 interface CheckoutPaymentCardProps {
   form: any;
@@ -34,111 +35,74 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
       >
         {(paymentMethod: CheckoutFormValues['paymentMethod']) =>
           paymentMethod === PaymentMethod.CreditCard ? (
-            <fieldset>
+            <fieldset style={{ width: '390px' }}>
               <legend>Credit Card Information</legend>
-
-              <form.Field
-                name="cardNumber"
-                validators={{
-                  onChange: ({ value }: { value: string }) => {
-                    if (!value) {
-                      return 'Card number is required';
-                    }
-
-                    return undefined;
-                  },
-                }}
-              >
+              <form.Field name="cardNumber">
                 {(field: any) => (
-                  <Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
                     <TextField
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
+                      error={!!field.state.meta.errors.length}
+                      helperText={field.state.meta.errors[0]}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        const { formatted } = formatCardNumber(e.target.value);
+                        field.handleChange(formatted);
+                      }}
                       label={'Card Number:'}
+                      fullWidth
                     />
-                    {field.state.meta.errors.map((err: string) => (
-                      <Box key={err}>{err}</Box>
-                    ))}
                   </Box>
                 )}
               </form.Field>
-              <form.Field
-                name="expiryDate"
-                validators={{
-                  onChange: ({ value }: { value: string }) => {
-                    if (!value) {
-                      return 'Expiry date is required';
-                    }
-
-                    return undefined;
-                  },
-                }}
-              >
-                {(field: any) => (
-                  <Box>
-                    <TextField
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="MM/YY"
-                      label={'Expiry Date:'}
-                    />
-                    {field.state.meta.errors.map((err: string) => (
-                      <Box key={err}>{err}</Box>
-                    ))}
-                  </Box>
-                )}
-              </form.Field>
-              <form.Field
-                name="cvv"
-                validators={{
-                  onChange: ({ value }: { value: string }) => {
-                    if (!value) {
-                      return 'CVV is required';
-                    }
-
-                    return undefined;
-                  },
-                }}
-              >
-                {(field: any) => (
-                  <Box>
-                    <TextField
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      label={'CVV:'}
-                    />
-                    {field.state.meta.errors.map((err: string) => (
-                      <Box key={err}>{err}</Box>
-                    ))}
-                  </Box>
-                )}
-              </form.Field>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <form.Field name="cvv">
+                  {(field: any) => (
+                    <Box>
+                      <TextField
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        error={!!field.state.meta.errors.length}
+                        helperText={field.state.meta.errors[0]}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        label={'CVV:'}
+                        fullWidth
+                      />
+                    </Box>
+                  )}
+                </form.Field>
+                <form.Field name="expiryDate">
+                  {(field: any) => (
+                    <Box>
+                      <TextField
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        error={!!field.state.meta.errors.length}
+                        helperText={field.state.meta.errors[0]}
+                        onChange={(e) => {
+                          const formatted = formatExpiryDate(e.target.value);
+                          field.handleChange(formatted);
+                        }}
+                        placeholder="MM/YY"
+                        label={'Expiry Date:'}
+                        fullWidth
+                      />
+                    </Box>
+                  )}
+                </form.Field>
+              </Box>
             </fieldset>
           ) : (
-            <fieldset>
+            <fieldset style={{ width: '390px' }}>
               <legend>PayPal Information</legend>
 
-              <form.Field
-                name="paypalEmail"
-                validators={{
-                  onChange: ({ value }: { value: string }) => {
-                    if (!value) {
-                      return 'PayPal email is required';
-                    }
-
-                    return undefined;
-                  },
-                }}
-              >
+              <form.Field name="paypalEmail">
                 {(field: any) => (
                   <Box>
                     <TextField
@@ -146,13 +110,13 @@ const CheckoutPaymentCard = ({ form }: CheckoutPaymentCardProps) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
+                      error={!!field.state.meta.errors.length}
+                      helperText={field.state.meta.errors[0]}
                       onChange={(e) => field.handleChange(e.target.value)}
                       type="email"
                       label={'PayPal Email:'}
+                      fullWidth
                     />
-                    {field.state.meta.errors.map((err: string) => (
-                      <Box key={err}>{err}</Box>
-                    ))}
                   </Box>
                 )}
               </form.Field>

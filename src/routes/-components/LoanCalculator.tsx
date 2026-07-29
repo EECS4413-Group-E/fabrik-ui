@@ -24,8 +24,7 @@ const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
   const [payInInstallments, setPayInInstallments] = useState(false);
   const [installments, setInstallments] = useState(2);
 
-  const totalRepaid =
-    orderTotal * (1 + INTEREST_RATE_PER_INSTALLMENT * installments);
+  const totalRepaid = orderTotal * (1 + INTEREST_RATE_PER_INSTALLMENT * (installments - 1));
 
   const monthlyPayment = totalRepaid / installments;
 
@@ -50,8 +49,8 @@ const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-        Optional. Spread the cost over monthly payments instead of paying the
-        full amount today. Store points cannot be used with installments.
+        Optional. Spread the cost over monthly payments instead of paying the full amount today.
+        Store points cannot be used with installments.
       </Typography>
 
       <FormControlLabel
@@ -73,9 +72,7 @@ const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
               labelId="installments-label"
               label="Installments"
               value={installments}
-              onChange={(event) =>
-                handleInstallmentsChange(Number(event.target.value))
-              }
+              onChange={(event) => handleInstallmentsChange(Number(event.target.value))}
             >
               {TERM_OPTIONS.map((option) => (
                 <MenuItem key={option} value={option}>
@@ -91,16 +88,14 @@ const LoanCalculator = ({ orderTotal, onChange }: LoanCalculatorProps) => {
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
-              Total ${totalRepaid.toFixed(2)} · Interest $
-              {totalInterest.toFixed(2)} (
-              {(INTEREST_RATE_PER_INSTALLMENT * 100).toFixed(0)}% per
-              installment)
+              Total ${totalRepaid.toFixed(2)} · Interest ${totalInterest.toFixed(2)} (
+              {(INTEREST_RATE_PER_INSTALLMENT * 100).toFixed(0)}% per installment)
             </Typography>
           </Box>
 
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            The first payment is charged today, the rest monthly to the card or
-            PayPal account entered above.
+            The first payment is charged today, the rest monthly to the card or PayPal account
+            entered above.
           </Typography>
         </Box>
       )}

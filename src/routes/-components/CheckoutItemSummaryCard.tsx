@@ -2,17 +2,21 @@ import type { CartItem } from '../../models/CartItem';
 import type { GridColDef } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Typography } from '@mui/material';
+import PriceRow from './PriceRow.tsx';
 
 interface CheckoutItemSummaryCardProps {
   checkoutItems: CartItem[];
+  points: number;
 }
 
-const CheckoutItemSummaryCard = ({ checkoutItems }: CheckoutItemSummaryCardProps) => {
+const CheckoutItemSummaryCard = ({ checkoutItems, points }: CheckoutItemSummaryCardProps) => {
   const getDiscountedPrice = (price: number, discountPercentage?: number) => {
     const discount = discountPercentage ?? 0;
 
     return discount > 0 ? price * (1 - discount / 100) : price;
   };
+
+  const pointsPrice = points * 0.05;
 
   const orderTotal = checkoutItems.reduce(
     (total, item) =>
@@ -45,11 +49,6 @@ const CheckoutItemSummaryCard = ({ checkoutItems }: CheckoutItemSummaryCardProps
       width: 150,
     },
     {
-      field: 'description',
-      headerName: 'Description',
-      width: 150,
-    },
-    {
       field: 'colorName',
       headerName: 'Colour',
       width: 100,
@@ -57,23 +56,18 @@ const CheckoutItemSummaryCard = ({ checkoutItems }: CheckoutItemSummaryCardProps
     {
       field: 'size',
       headerName: 'Size',
-      width: 80,
-    },
-    {
-      field: 'sku',
-      headerName: 'SKU',
-      width: 100,
+      width: 60,
     },
     {
       field: 'quantity',
       headerName: 'Quantity',
-      width: 100,
+      width: 90,
       type: 'number',
     },
     {
       field: 'price',
       headerName: 'Price',
-      width: 140,
+      width: 100,
       renderCell: (params) => {
         const discount = params.row.discountPercentage ?? 0;
 
@@ -105,8 +99,7 @@ const CheckoutItemSummaryCard = ({ checkoutItems }: CheckoutItemSummaryCardProps
       filterable: false,
       renderCell: (params) =>
         `$${(
-          params.row.quantity *
-          getDiscountedPrice(params.row.price, params.row.discountPercentage)
+          params.row.quantity * getDiscountedPrice(params.row.price, params.row.discountPercentage)
         ).toFixed(2)}`,
     },
   ];
@@ -132,9 +125,9 @@ const CheckoutItemSummaryCard = ({ checkoutItems }: CheckoutItemSummaryCardProps
       />
 
       <Box sx={{ mt: 2 }}>
-        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-          Total: ${orderTotal.toFixed(2)}
-        </Typography>
+        {pointsPrice > 0 && <PriceRow label="Subtotal:" value={orderTotal} />}
+        {pointsPrice > 0 && <PriceRow label="Points Discount:" value={pointsPrice} />}
+        <PriceRow label="Total:" value={orderTotal - pointsPrice} />
       </Box>
     </Box>
   );
