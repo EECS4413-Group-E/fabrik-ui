@@ -78,7 +78,7 @@ export const getShippingStatusColor = (
         return 'info';
 
       case 'PREPARING':
-        return 'warning';
+        return 'default';
     }
   };
 
