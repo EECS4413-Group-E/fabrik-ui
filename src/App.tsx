@@ -15,7 +15,7 @@ import { useAuth } from './hooks/useAuth.ts';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useState } from 'react';
 
-import FabrikAiChat from './routes/components/FabrikAiChat';
+import FabrikAiChat from './routes/-components/FabrikAiChat.tsx';
 
 // Register things for typesafety
 declare module '@tanstack/react-router' {
@@ -56,14 +56,7 @@ function App() {
         </Box>
         <Box sx={{ position: 'fixed', bottom: 30, right: 30, zIndex: 1000 }}>
           <Collapse in={chatBoxOpen} timeout="auto" unmountOnExit>
-          <FabrikAiChat
-            sx={{
-              height: 500,
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 1,
-            }}
-          />
+          <FabrikAiChat/>
           </Collapse>
           <IconButton sx={{ height: 65, width: 65, color: 'white', backgroundColor: fabrikColors.mutedCharcoal, '&:hover': { backgroundColor: fabrikColors.charcoal } }} aria-label="Chat with us">
             <ChatIcon />
