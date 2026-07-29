@@ -2,19 +2,17 @@ import { Box, ToggleButton } from '@mui/material';
 import type { ProductImage } from '../../../models/Listing';
 
 export default function ImageButton({
-  imageSet,
-  imageIndex,
+  image,
   setSelectedIndex,
 }: {
-  imageSet: ProductImage[];
-  imageIndex: number;
+  image: ProductImage
   setSelectedIndex: (image: ProductImage) => void;
 }) {
   return (
 
       <ToggleButton
-        value = {imageSet[imageIndex]?.imageLink}
-        onChange={() => setSelectedIndex(imageSet[imageIndex])}
+        value = {image.imageLink}
+        onChange={() => setSelectedIndex(image)}
         sx={{
           width: 120,
           height: 160,
@@ -24,10 +22,10 @@ export default function ImageButton({
           border: '1px solid black',
         }}
       >
-        {imageSet[imageIndex]?.imageLink && (
+        {image.imageLink && (
           <img
-            src={imageSet[imageIndex]?.imageLink}
-            alt={imageSet[imageIndex]?.id}
+            src={image.imageLink}
+            alt={image.id}
             width={100}
             height={160}
             style={{

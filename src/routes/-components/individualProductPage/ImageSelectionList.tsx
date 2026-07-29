@@ -118,11 +118,10 @@ export default function ImageSelectionList({
             gap: 2,
           }}
         >
-          {availableImages.map((image, index) => (
+          {availableImages.map((image) => (
             <ImageButton
               key={image.id}
-              imageSet={availableImages}
-              imageIndex={index}
+              image={image}
               setSelectedIndex={handleImageSelection}
             />
           ))}
