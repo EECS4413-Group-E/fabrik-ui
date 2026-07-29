@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { useForm, useStore } from '@tanstack/react-form';
 import { useQuery } from '@tanstack/react-query';
 
-import { currentUserQueryOptions } from '../../queries';
+import { optionalCurrentUserQueryOptions } from '../../queries';
 import { useCreateOrderMutation } from '../../mutations';
 import { useCart } from '../../hooks/useCart.ts';
 
@@ -17,6 +17,7 @@ import LoanCalculator from './LoanCalculator';
 
 import { Alert, Box, Button, Divider, TextField, Typography } from '@mui/material';
 import { detectCardType, validateLuhn } from '../../utils.ts';
+import { useAuth } from '../../hooks/useAuth.ts';
 
 const PRODUCTS_SEARCH_DEFAULTS = {
   keyword: '',
@@ -46,8 +47,9 @@ const getErrorMessage = (error: unknown) => {
 
 const CheckoutPage = () => {
   const cartQuery = useCart();
+  const { isLoggedIn } = useAuth();
 
-  const userQuery = useQuery(currentUserQueryOptions());
+  const userQuery = useQuery(optionalCurrentUserQueryOptions(isLoggedIn));
 
   const checkoutItems = cartQuery.data ?? [];
 
@@ -149,7 +151,7 @@ const CheckoutPage = () => {
       },
     },
     onSubmit: async ({ value }) => {
-      if (checkoutItems.length === 0 || !userQuery.data) {
+      if (checkoutItems.length === 0) {
         return;
       }
 
@@ -171,8 +173,7 @@ const CheckoutPage = () => {
             };
 
       const orderRequest: PlaceOrderRequest = {
-        userId: userQuery.data.id,
-
+        userId: userQuery.data?.id,
         orderItems: checkoutItems.map((item) => ({
           productId: item.productId,
           size: item.size,
@@ -369,8 +370,9 @@ const CheckoutPage = () => {
         </Typography>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          You have {availablePoints} points available. Points are applied as a discount on this
-          order.
+          {userQuery.data
+            ? `You have ${availablePoints} points available. Points are applied as a discount on this order.`
+            : 'You are not logged in. Log in to use your store points.'}
         </Typography>
 
         <form.Field name="storePoints">

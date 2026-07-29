@@ -19,7 +19,7 @@ export interface PlaceOrderItem {
 }
 
 export interface PlaceOrderRequest {
-  userId: string;
+  userId: string | undefined;
   orderItems: PlaceOrderItem[];
   paymentDetails: PaymentDetailsRequest;
   shippingDetails: ShippingDetailsRequest;
