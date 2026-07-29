@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { LoginRegisterRequest, User } from './models/User';
-import type { Listing } from './models/Listing';
+import type { Listing } from "./models/Listing";
 import type { Order, PlaceOrderRequest } from './models/Order';
 
 import { tokenStore } from './tokenStore';
