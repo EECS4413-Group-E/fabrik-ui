@@ -1,5 +1,6 @@
-import { Box, Breadcrumbs, Divider, ToggleButton, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Divider, ToggleButton, Typography } from '@mui/material';
+import { useState } from 'react';
+
 import { useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
@@ -12,69 +13,32 @@ import type {
 } from '../../models/Filter';
 
 import { searchQueryOptions } from '../../queries';
-
 import DepartmentFilterButtonGroup from './filter/DepartmentFilterButtonGroup';
 import SortingSelector from './filter/SortingSelector';
 
 import FilterListIcon from '@mui/icons-material/FilterList';
-import ListingsPageableSection from './ListingsPageableSection';
-import FilterBox from './filter/FilterBox';
+import ListingsPageableSection from './ListingsPageableSection.tsx';
+import FilterBox from './filter/FilterBox.tsx';
 
-const ProductsPage = () => {
+const SearchPage = () => {
   const {
     keyword = '',
     pageNumber = 0,
     pageSize = 10,
-    department = '',
-    category = '',
-    deals = false,
-  } = useSearch({ from: '/products/' }) as {
+  } = useSearch({ from: '/search' }) as {
     keyword: string;
     pageNumber: number;
     pageSize: number;
-    department: DepartmentCategory;
-    category: ClothingCategory;
-    deals: boolean;
   };
 
   const [departmentCategories, setDepartmentCategories] = useState<DepartmentCategory | undefined>(
-    () => (department === '' ? undefined : (department as DepartmentCategory)),
+    () => undefined,
   );
-
   const [clothingCategories, setClothingCategories] = useState<ClothingCategory[]>(() => []);
   const [colors, setColors] = useState<ColorCategory[]>(() => []);
   const [priceRange, setPriceRange] = useState<number[]>([0, 500]);
   const [discounted, setDiscounted] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(pageNumber);
-
-  const [hideDepartmentFilter, setHideDepartmentFilter] = useState<boolean>(department !== '');
-  const [hideCategoryFilter, setHideCategoryFilter] = useState<boolean>(category !== '');
-
-  useEffect(() => {
-    if (department !== '') {
-      setDepartmentCategories(department);
-      setHideDepartmentFilter(true);
-    } else {
-      setHideDepartmentFilter(false);
-    }
-  }, [department]);
-
-  useEffect(() => {
-    if (category !== '') {
-      setClothingCategories([category]);
-      setHideCategoryFilter(true);
-    } else {
-      setHideCategoryFilter(false);
-    }
-  }, [category]);
-
-  useEffect(() => {
-    if (deals) {
-      setDiscounted(true);
-    } else {
-      setDiscounted(false);
-    }
-  }, [deals]);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -109,7 +73,7 @@ const ProductsPage = () => {
   } = useQuery(searchQueryOptions(keyword, filter, currentPage, pageSize));
 
   return (
-    <Box>
+    <div>
       {/* Search results header */}
       <Box
         sx={{
@@ -117,18 +81,12 @@ const ProductsPage = () => {
           my: 5,
         }}
       >
-        <Breadcrumbs
-          aria-label="breadcrumb"
-          sx={{
-            mb: 2,
-            letterSpacing: '0.25em',
-            color: 'text.secondary',
-          }}
-        >
-          {department !== '' && <Box>{department}</Box>}
-          {category !== '' && <Box>{category}</Box>}
-          {deals && <Box>HOT SALE</Box>}
-        </Breadcrumbs>
+        <Typography sx={{ letterSpacing: '0.25em', color: 'text.secondary' }} gutterBottom>
+          SEARCH RESULTS FOR
+        </Typography>
+        <Typography variant="h2" gutterBottom>
+          "{keyword}"
+        </Typography>
         <Typography
           variant="body1"
           gutterBottom
@@ -137,7 +95,8 @@ const ProductsPage = () => {
           {pageable?.totalElements} items found
         </Typography>
       </Box>
-      <Divider sx={{ my: 2 }} />
+
+      <Divider />
       {/* Main content */}
       <Box
         sx={{
@@ -150,25 +109,20 @@ const ProductsPage = () => {
             display: 'flex',
             paddingTop: 10,
             paddingBottom: 10,
-
             justifyContent: 'space-between',
           }}
         >
-          {!hideDepartmentFilter && (
-            <DepartmentFilterButtonGroup
-              department={departmentCategories}
-              setDepartment={(department) => {
-                setDepartmentCategories(department);
-              }}
-            />
-          )}
-
+          <DepartmentFilterButtonGroup
+            department={departmentCategories}
+            setDepartment={(department) => {
+              setDepartmentCategories(department);
+            }}
+          />
           {/* Sorting + Filter button  -- grouped */}
           <Box
             style={{
               display: 'flex',
               alignItems: 'center',
-              marginLeft: 'auto',
             }}
           >
             <SortingSelector
@@ -177,6 +131,7 @@ const ProductsPage = () => {
                 setSort(sort);
               }}
             />
+
             <ToggleButton
               value="filters"
               onChange={() => setFiltersOpen(!filtersOpen)}
@@ -222,7 +177,7 @@ const ProductsPage = () => {
             setDiscounted(discounted);
           }}
           handleFilterClear={handleFilterClear}
-          hideCategoryFilter={hideCategoryFilter}
+          hideCategoryFilter={false}
         />
         <Divider sx={{ my: 2 }} />
       </Box>
@@ -242,8 +197,8 @@ const ProductsPage = () => {
           setCurrentPage={setCurrentPage}
         />
       </Box>
-    </Box>
+    </div>
   );
 };
 
-export default ProductsPage;
+export default SearchPage;

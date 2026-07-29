@@ -13,7 +13,7 @@ const OrderDetails = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
       <Typography variant={'h1'}>Order Details</Typography>
       <Box>Order number: {orderDetails.orderNumber}</Box>
-      <OrderItemSummary orderItems={orderDetails.items} />
+      <OrderItemSummary order={orderDetails} />
     </Box>
   );
 };

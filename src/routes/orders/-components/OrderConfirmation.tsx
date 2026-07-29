@@ -13,7 +13,7 @@ const OrderConfirmation = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
       <Typography variant={'h1'}>Thank you for your purchase!</Typography>
       <Box>Order number: {orderDetails.orderNumber}</Box>
-      <OrderItemSummary orderItems={orderDetails.items} />
+      <OrderItemSummary order={orderDetails} />
     </Box>
   );
 };

@@ -26,4 +26,19 @@ export interface Listing {
   clothingCategory: string;
   departmentCategory: string;
   products: Product[];
+  averageRating?: number;
+  reviewCount?: number;
+}
+
+export interface ListingItem {
+  id: string;
+  productDescription: string;
+  productName: string;
+  clothingCategory: string;
+  departmentCategory: string;
+  colors: string[];
+  imageLink: string;
+  minPrice: number;
+  maxPrice: number;
+  createdDate: string;
 }

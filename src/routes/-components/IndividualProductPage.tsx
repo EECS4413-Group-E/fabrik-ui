@@ -6,6 +6,8 @@ import { singleListingQueryOptions } from '../../queries';
 import { useAddCartItemMutation } from '../../mutations';
 import type { Product } from '../../models/Listing';
 
+import ReviewsSection from './ReviewsSection';
+
 import WishlistButton from './WishlistButton';
 import {
   Box,
@@ -13,6 +15,7 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  Rating,
   TextField,
   Typography,
 } from '@mui/material';
@@ -123,6 +126,17 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
 
       <WishlistButton listingId={listing.id} showText />
 
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 1 }}>
+        <Rating value={listing.averageRating ?? 0} precision={0.5} readOnly size="small" />
+        <Typography variant="body2">
+          {!listing.reviewCount
+            ? 'No reviews yet'
+            : `${(listing.averageRating ?? 0).toFixed(1)} (${listing.reviewCount} ${
+                listing.reviewCount === 1 ? 'review' : 'reviews'
+              })`}
+        </Typography>
+      </Box>
+
       {selectedImage && <img src={selectedImage.imageLink} alt={listing.productName} width={300} />}
 
       <Typography>{listing.productDescription}</Typography>
@@ -196,6 +210,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
           <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
         </Typography>
       )}
+      <ReviewsSection listingId={listing.id} />
     </Box>
   );
 };

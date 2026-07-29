@@ -1,4 +1,5 @@
 import { queryOptions, skipToken } from '@tanstack/react-query';
+import type { Filter } from './models/Filter';
 
 import {
   fetchCurrentUser,
@@ -6,7 +7,9 @@ import {
   fetchListings,
   fetchOrderDetails,
   fetchOrders,
+  fetchSearchResults,
   fetchWishlist,
+  fetchReviews,
 } from './Api';
 
 // --- Query keys ---
@@ -18,7 +21,15 @@ export const queryKeys = {
   orders: () => ['orders'] as const,
   order: (id: string) => ['order', id] as const,
   cart: () => ['cart'] as const,
+  search: (keyword: string, filter: Filter) => ['search', keyword, filter] as const,
+  reviews: (listingId: string) => ['reviews', listingId] as const,
 };
+
+export const optionalCurrentUserQueryOptions = (isLoggedIn: boolean) =>
+  queryOptions({
+    queryKey: queryKeys.currentUser(),
+    queryFn: isLoggedIn ? fetchCurrentUser : skipToken,
+  });
 
 export const currentUserQueryOptions = () =>
   queryOptions({
@@ -54,4 +65,21 @@ export const ordersQueryOptions = () =>
   queryOptions({
     queryKey: queryKeys.orders(),
     queryFn: fetchOrders,
+  });
+
+export const searchQueryOptions = (
+  keyword: string,
+  filter: Filter,
+  pageNumber: number,
+  pageSize: number,
+) =>
+  queryOptions({
+    queryKey: ['search', keyword, filter, pageNumber, pageSize],
+    queryFn: () => fetchSearchResults(keyword, filter, pageNumber, pageSize),
+  });
+
+export const reviewsQueryOptions = (listingId: string) =>
+  queryOptions({
+    queryKey: queryKeys.reviews(listingId),
+    queryFn: () => fetchReviews(listingId),
   });
