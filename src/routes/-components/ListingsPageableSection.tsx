@@ -1,8 +1,8 @@
-import {
-  Box,
-  CircularProgress,
-  Pagination,
-  Typography,
+import { 
+  Box, 
+  CircularProgress, 
+  Pagination, 
+  Typography 
 } from '@mui/material';
 import type { ListingItem } from '../../models/Listing';
 import type { PageableResponse } from '../../models/PageableResponse';
@@ -96,9 +96,9 @@ const ListingsPageableSection = ({
                 display: 'grid',
                 gridTemplateColumns: {
                   xs: '1fr',
-                  sm: 'repeat(2, minmax(0, 1fr))',
-                  md: 'repeat(3, minmax(0, 1fr))',
-                  lg: 'repeat(4, minmax(0, 1fr))',
+                  sm: 'repeat(1, minmax(0, 1fr))',
+                  md: 'repeat(2, minmax(0, 1fr))',
+                  lg: 'repeat(3, minmax(0, 1fr))',
                   xl: 'repeat(5, minmax(0, 1fr))',
                 },
                 gap: { xs: 4, sm: 2.5 },
@@ -106,7 +106,6 @@ const ListingsPageableSection = ({
               }}
             >
               {pageable?.content?.map((item) => {
-
                 return (
                   <ListingCard
                     key={item.id}
@@ -121,6 +120,7 @@ const ListingsPageableSection = ({
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
+                my: 4,
               }}
             >
               {pageable?.content?.length !== 0 && (

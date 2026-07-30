@@ -14,7 +14,7 @@ export default function ImageSelectionList({
   selectedImage: string;
   handleImageSelection: (image: ProductImage) => void;
 }) {
-  const [selectedIndex, setSelectedIndex] = useState(
+  const [, setSelectedIndex] = useState(
     availableImages.findIndex((img) => img.imageLink === selectedImage),
   );
 
