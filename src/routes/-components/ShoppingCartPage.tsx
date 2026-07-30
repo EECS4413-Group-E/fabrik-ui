@@ -12,6 +12,7 @@ import {
 import { useCart } from '../../hooks/useCart.ts';
 import { useState } from 'react';
 import ConfirmationDialog from './ConfirmationDialog.tsx';
+import { fabrikColors } from '../../theme.ts';
 
 const getErrorMessage = (error: unknown) => {
   const possibleApiError = error as {
@@ -291,7 +292,12 @@ const ShoppingCartPage = () => {
         }}
       >
         <Button
-          color="inherit"
+          sx={{ backgroundColor: fabrikColors.linen, color: fabrikColors.mutedCharcoal, height: 40,
+            '&:hover': {
+              backgroundColor: fabrikColors.mutedCharcoal,
+              color: fabrikColors.linen,
+            },
+          }}
           disabled={clearCartMutation.isPending}
           onClick={() => {
             setOpenClearDialog(true);
@@ -302,7 +308,6 @@ const ShoppingCartPage = () => {
 
         <Box sx={{ textAlign: 'right' }}>
           <Typography variant="h3">Total ${cartTotal.toFixed(2)}</Typography>
-
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             Availability and final prices are confirmed at checkout.
           </Typography>
