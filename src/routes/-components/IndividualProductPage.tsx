@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import {  useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
 import { singleListingQueryOptions } from '../../queries';
@@ -25,34 +25,16 @@ import ImageSelectionList from './individualProductPage/ImageSelectionList';
 import { fabrikColors } from '../../theme';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import ColorSelectionButtonGroup from './individualProductPage/ColorSelectionButtonGroup';
+import TimedSuccessAlert from './TimedSuccessAlert';
+import TimedErrorAlert from './TimedErrorAlert';
 
 type IndividualProductPageProps = {
   listingId: string;
 };
 
-const getErrorMessage = (error: unknown) => {
-  const possibleApiError = error as {
-    response?: {
-      data?: {
-        message?: string;
-        error?: string;
-      };
-    };
-  };
-
-  return (
-    possibleApiError.response?.data?.message ??
-    possibleApiError.response?.data?.error ??
-    'Unable to add this item to the cart.'
-  );
-};
 
 const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
-  const {
-    data: listing,
-    isError,
-    isLoading,
-  } = useQuery(singleListingQueryOptions(listingId));
+  const { data: listing, isError, isLoading } = useQuery(singleListingQueryOptions(listingId));
 
   const addCartItemMutation = useAddCartItemMutation();
   const [selectedProductIndex, setSelectedProductIndex] = useState<number>(0);
@@ -62,9 +44,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     return <Typography>Product not found.</Typography>;
   }
 
-  const [selectedProduct, setSelectedProduct] = useState<Product>(
-    listing.products[0],
-  );
+  const [selectedProduct, setSelectedProduct] = useState<Product>(listing.products[0]);
   const [selectedSize, setSelectedSize] = useState<Size | undefined>(undefined);
 
   if (!selectedProduct) {
@@ -81,7 +61,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     const nextProduct = listing.products[index];
     setSelectedProductIndex(index);
     setSelectedProduct(nextProduct);
-    setSelectedSize(nextProduct.availabilities[0]?.size);
+    setSelectedSize(undefined);
     setQuantity(1);
     setSelectedImage(nextProduct.images[0]);
   };
@@ -123,6 +103,8 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
       size: selectedSize,
       quantity,
     });
+    setSelectedSize(undefined);
+    setQuantity(1);
   };
 
   const navigate = useNavigate();
@@ -178,7 +160,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                       navigate({
                         to: '/products',
                         search: {
-                          department: listing.departmentCategory
+                          department: listing.departmentCategory,
                         },
                       })
                     }
@@ -186,7 +168,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   >
                     <Typography color="text.secondary">{listing.departmentCategory}</Typography>
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() =>
                       navigate({
                         to: '/products',
@@ -244,22 +226,29 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                 <Box>
                   <Box>
                     {listing.discountPercentage > 0 ? (
-                      <Box sx= {{my: 5}}>
+                      <Box sx={{ my: 5 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant={'h5'} sx={{ my: 0, textDecoration: 'line-through', color: 'text.secondary' }} >
+                          <Typography
+                            variant={'h5'}
+                            sx={{ my: 0, textDecoration: 'line-through', color: 'text.secondary' }}
+                          >
                             ${selectedProduct.price.toFixed(2)}
                           </Typography>
                           <Typography variant={'h5'} sx={{ my: 0, color: 'red' }}>
                             {listing.discountPercentage}% OFF
                           </Typography>
                         </Box>
-                        <Typography variant={'h4'} sx={{ my: 0 }} >
-                          Now ${(selectedProduct.price * (1 - listing.discountPercentage / 100)).toFixed(2)}!
+                        <Typography variant={'h4'} sx={{ my: 0 }}>
+                          Now $
+                          {(selectedProduct.price * (1 - listing.discountPercentage / 100)).toFixed(
+                            2,
+                          )}
+                          !
                         </Typography>
                       </Box>
                     ) : (
-                      <Box sx= {{my: 5}}>
-                        <Typography variant={'h4'} sx={{ my: 0 }} >
+                      <Box sx={{ my: 5 }}>
+                        <Typography variant={'h4'} sx={{ my: 0 }}>
                           ${selectedProduct.price.toFixed(2)}
                         </Typography>
                       </Box>
@@ -267,8 +256,13 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   </Box>
 
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Rating name="product rating" defaultValue={listing.averageRating} precision={0.5} readOnly />
-                    <Typography variant={'body1'} sx={{ my: 0, alignItems: 'center' }} >  
+                    <Rating
+                      name="product rating"
+                      defaultValue={listing.averageRating}
+                      precision={0.5}
+                      readOnly
+                    />
+                    <Typography variant={'body1'} sx={{ my: 0, alignItems: 'center' }}>
                       - {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
                     </Typography>
                   </Box>
@@ -407,20 +401,18 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   {listing.productDescription}
                 </Typography>
               </Box>
+              {/* Cart Alert */}
+              <Box sx={{ my: 2, minHeight: 50 }}>
 
               {addCartItemMutation.isSuccess && (
-                <Typography>
-                  Item added successfully. <Link to="/cart">View Cart</Link>
-                </Typography>
+                <TimedSuccessAlert/>
               )}
 
-      {addCartItemMutation.isError && (
-        <Typography color="error">
-          <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
-        </Typography>
-      )}
-
-    </Box>
+              {addCartItemMutation.isError && (
+                <TimedErrorAlert/>
+              )}
+              </Box>
+            </Box>
           </Box>
           {/* Reviews */}
           <Box sx={{ mx: { md: 10, lg: 20, xl: 30 } }}>
