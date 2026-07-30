@@ -91,7 +91,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
       return;
     }
     addCartItemMutation.mutate({
-      id: selectedProduct.id,
+      id: crypto.randomUUID(),
       price: selectedProduct.price,
       imageLink: selectedImage.imageLink,
       colorName: selectedProduct.colorName,
