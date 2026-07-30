@@ -123,7 +123,7 @@ export const fetchListings = () => {
 };
 
 export const fetchOrders = () => {
-  return getWithConfig<Order[]>('/order/user');
+  return getWithConfig<Order[]>('/order/user/all');
 };
 
 export const fetchOrderDetails = (orderId: string) => {
