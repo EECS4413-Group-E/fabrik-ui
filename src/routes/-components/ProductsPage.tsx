@@ -65,6 +65,7 @@ const ProductsPage = () => {
       setHideCategoryFilter(true);
     } else {
       setHideCategoryFilter(false);
+      setClothingCategories([]);
     }
   }, [category]);
 
