@@ -10,14 +10,14 @@ type OrderItemSummaryProps = {
 
 const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
   const { items, paymentDetails } = order;
-  const orderTotal =
-    paymentDetails.completedPayments.reduce((total, payment) => total + payment.amount, 0) +
-    paymentDetails.scheduledPayments.reduce((total, payment) => total + payment.amount, 0);
+  const orderTotal = order.totalPrice;
   const pointsAmount = paymentDetails.completedPayments.reduce(
     (total, payment) => total + payment.usedStorePoints,
     0,
   ) * 0.05;
-  const amountPayed = orderTotal - pointsAmount;
+  const amountPayed = 
+    paymentDetails.completedPayments.reduce((total, payment) => total + payment.amount, 0) +
+    paymentDetails.scheduledPayments.reduce((total, payment) => total + payment.amount, 0);
 
   const getDiscountedPrice = (price: number, discountPercentage?: number) => {
     const discount = discountPercentage ?? 0;
@@ -98,9 +98,18 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
             <Divider />
           </Box>
         )}
-        <PriceRow label="Total:" value={orderTotal} />
-        {pointsAmount > 0 && <PriceRow label="Points Amount:" value={pointsAmount} />}
-        {pointsAmount > 0 && <PriceRow label="Amount Payed:" value={amountPayed} />}
+        { pointsAmount > 0 ? (
+            <>
+              <PriceRow label="Total:" value={orderTotal} />
+              <PriceRow label="Points Amount:" value={pointsAmount} />
+              <PriceRow label="Amount Payed:" value={amountPayed} />
+            </>
+          ) :
+          (
+            <PriceRow label="Total:" value={amountPayed} />
+          )
+        }
+
       </Box>
     </Box>
   );
