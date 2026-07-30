@@ -9,6 +9,12 @@ import {
 } from '@mui/x-chat/headless';
 import type { ChatMessage, ChatUser } from '@mui/x-chat/headless';
 
+import { chatAdapter } from './chatAdapter';
+import { fabrikColors } from '../../theme';
+import { Box, } from '@mui/material';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 
 // ---------------------------------------------------------------------------
 // Intercom-style brand tokens
@@ -18,7 +24,7 @@ const intercom = {
   headerBg: '#ffffff',
   headerBorder: '#e8e8e8',
   bubbleAssistant: '#f4f4f4',
-  bubbleUser: '#1a1a1a',
+  bubbleUser: fabrikColors.terracotta,
   textPrimary: '#1a1a1a',
   textSecondary: '#737373',
   textOnUser: '#ffffff',
@@ -38,21 +44,21 @@ function createAvatarDataUrl(label: string, bg: string, fg = '#ffffff') {
 }
 
 const finAgent: ChatUser = {
-  id: 'fin',
-  displayName: 'Fin',
-  avatarUrl: createAvatarDataUrl('F', '#1a1a1a'),
+  id: 'fab',
+  displayName: 'Fab',
+  avatarUrl: createAvatarDataUrl('F', fabrikColors.terracotta),
 };
 
 const you: ChatUser = {
   id: 'you',
   displayName: 'You',
-  avatarUrl: createAvatarDataUrl('Y', '#ff7a45'),
+  avatarUrl: createAvatarDataUrl('Y', fabrikColors.mutedCharcoal, '#ffffff'),
 };
 
 const conversation = {
   id: 'intercom',
-  title: 'Fin',
-  subtitle: 'The team can also help',
+  title: 'Fab',
+  subtitle: 'What are we shopping for today?',
   participants: [you, finAgent],
   readState: 'read' as const,
   unreadCount: 0,
@@ -70,30 +76,7 @@ const initialMessages: ChatMessage[] = [
     parts: [
       {
         type: 'text',
-        text: "Hi there! I'm Fin, an AI assistant. I noticed you've been looking at our customer service solutions. How can I help you today?",
-      },
-    ],
-  },
-  {
-    id: 'ic-u1',
-    conversationId: 'intercom',
-    role: 'user',
-    status: 'sent',
-    createdAt: '2026-03-15T12:02:00.000Z',
-    author: you,
-    parts: [{ type: 'text', text: 'Hello, how are you?' }],
-  },
-  {
-    id: 'ic-a2',
-    conversationId: 'intercom',
-    role: 'assistant',
-    status: 'sent',
-    createdAt: '2026-03-15T12:04:00.000Z',
-    author: finAgent,
-    parts: [
-      {
-        type: 'text',
-        text: "Hi there! I'm doing well, thanks for asking. I'm Fin, an AI assistant with Intercom.\n\nBefore I can help you further, could I get your email address?",
+        text: "Hey, I'm Fab, an AI assistant. I noticed you've been looking at our products! How can I help you today?",
       },
     ],
   },
@@ -174,29 +157,92 @@ const IntercomMessageRoot = React.forwardRef(function IntercomMessageRoot(
   );
 });
 
-const IntercomAvatar = React.forwardRef(function IntercomAvatar(
-  props: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>> & {
-    ownerState?: { role?: string };
-  },
-  ref: React.Ref<HTMLDivElement>,
-) {
-  const { children, ownerState, style, ...other } = props;
-  if (ownerState?.role === 'user') {
-    return null;
-  }
-  return (
-    <div
-      ref={ref}
-      style={{
-        display: 'none',
-        ...style,
-      }}
-      {...other}
+const markdownComponents: Components = {
+  p: ({ children }) => (
+    <p style={{ margin: 0 }}>{children}</p>
+  ),
+  strong: ({ children }) => (
+    <strong style={{ fontWeight: 700 }}>{children}</strong>
+  ),
+  em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
+  a: ({ children, href }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: 'currentColor', textDecoration: 'underline' }}
     >
       {children}
+    </a>
+  ),
+  ul: ({ children }) => (
+    <ul style={{ margin: '4px 0', paddingLeft: 20 }}>{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol style={{ margin: '4px 0', paddingLeft: 20 }}>{children}</ol>
+  ),
+  li: ({ children }) => <li style={{ marginTop: 2 }}>{children}</li>,
+  h1: ({ children }) => (
+    <div style={{ fontSize: 17, fontWeight: 700, margin: '4px 0' }}>
+      {children}
     </div>
-  );
-});
+  ),
+  h2: ({ children }) => (
+    <div style={{ fontSize: 16, fontWeight: 700, margin: '4px 0' }}>
+      {children}
+    </div>
+  ),
+  h3: ({ children }) => (
+    <div style={{ fontSize: 15, fontWeight: 700, margin: '4px 0' }}>
+      {children}
+    </div>
+  ),
+  code: ({ children, className }) => {
+    const isBlock = Boolean(className);
+    return (
+      <code
+        style={{
+          background: 'rgba(127,127,127,0.2)',
+          borderRadius: 4,
+          padding: isBlock ? '8px 10px' : '2px 4px',
+          display: isBlock ? 'block' : 'inline',
+          overflowX: isBlock ? 'auto' : undefined,
+          fontFamily:
+            'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+          fontSize: 13,
+          whiteSpace: isBlock ? 'pre' : 'pre-wrap',
+        }}
+      >
+        {children}
+      </code>
+    );
+  },
+  pre: ({ children }) => <pre style={{ margin: '4px 0' }}>{children}</pre>,
+  blockquote: ({ children }) => (
+    <blockquote
+      style={{
+        margin: '4px 0',
+        paddingLeft: 10,
+        borderLeft: '3px solid rgba(127,127,127,0.4)',
+        opacity: 0.85,
+      }}
+    >
+      {children}
+    </blockquote>
+  ),
+  hr: () => (
+    <hr
+      style={{
+        border: 'none',
+        borderTop: '1px solid rgba(127,127,127,0.4)',
+        margin: '8px 0',
+      }}
+    />
+  ),
+};
+function renderMarkdownText(text: string) {
+  return <ReactMarkdown components={markdownComponents}>{text}</ReactMarkdown>;
+}
 
 const IntercomBubble = React.forwardRef(function IntercomBubble(
   props: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>> & {
@@ -219,7 +265,7 @@ const IntercomBubble = React.forwardRef(function IntercomBubble(
         maxWidth: '85%',
         fontSize: 14,
         lineHeight: 1.5,
-        whiteSpace: 'pre-wrap',
+        whiteSpace: isUser ? 'pre-wrap' : 'normal',
         ...style,
       }}
       {...other}
@@ -229,36 +275,6 @@ const IntercomBubble = React.forwardRef(function IntercomBubble(
   );
 });
 
-const IntercomMeta = React.forwardRef(function IntercomMeta(
-  props: React.HTMLAttributes<HTMLDivElement> & {
-    ownerState?: {
-      role?: string;
-      message?: { createdAt?: string; status?: string; author?: ChatUser };
-    };
-  },
-  ref: React.Ref<HTMLDivElement>,
-) {
-  const { ownerState, style, ...other } = props;
-  const isUser = ownerState?.role === 'user';
-  const author = ownerState?.message?.author;
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        color: intercom.textSecondary,
-        fontSize: 12,
-        textAlign: isUser ? 'right' : 'left',
-        marginTop: 4,
-        ...style,
-      }}
-      {...other}
-    >
-      {!isUser && author?.displayName ? `${author.displayName} · AI Agent · ` : null}
-      {/* {formatMessageTime(ownerState?.message?.createdAt)} */}
-    </div>
-  );
-});
 
 const IntercomComposerRoot = React.forwardRef(function IntercomComposerRoot(
   props: React.PropsWithChildren<React.FormHTMLAttributes<HTMLFormElement>> & {
@@ -315,58 +331,15 @@ const IntercomTextArea = React.forwardRef(function IntercomTextArea(
   );
 });
 
-const IntercomSendButton = React.forwardRef(function IntercomSendButton(
-  props: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    ownerState?: unknown;
-  },
-  ref: React.Ref<HTMLButtonElement>,
-) {
-  const { ownerState, style, disabled, children, ...other } = props;
-  return (
-    <button
-      ref={ref}
-      disabled={disabled}
-      type="submit"
-      style={{
-        width: 36,
-        height: 36,
-        borderRadius: '50%',
-        border: 'none',
-        background: disabled ? intercom.border : intercom.accent,
-        color: '#ffffff',
-        cursor: disabled ? 'default' : 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 18,
-        justifySelf: 'end',
-        ...style,
-      }}
-      {...other}
-    >
-      {'\u2191'}
-    </button>
-  );
-});
-
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 export default function FabrikAiChat() {
   const [messages, setMessages] = React.useState(initialMessages);
-  const adapter = React.useMemo(
-    () =>
-      createEchoAdapter({
-        agent: finAgent,
-        respond: (text) =>
-          `Thanks for your message! I understand you're asking about "${text}". Let me look into that for you. Is there anything specific you'd like me to focus on?`,
-      }),
-    [],
-  );
 
   return (
     <Chat.Root
-      adapter={adapter}
+      adapter={chatAdapter}
       conversations={[conversation]}
       initialActiveConversationId="intercom"
       messages={messages}
@@ -375,7 +348,7 @@ export default function FabrikAiChat() {
         root: {
           style: {
             background: intercom.bg,
-            borderRadius: 20,
+            borderRadius: 6,
             border: `1px solid ${intercom.border}`,
             overflow: 'hidden',
             maxWidth: 400,
@@ -390,7 +363,7 @@ export default function FabrikAiChat() {
       }}
     >
       {/* Header */}
-      <div
+      <Box
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -399,45 +372,27 @@ export default function FabrikAiChat() {
           borderBottom: `1px solid ${intercom.headerBorder}`,
         }}
       >
-        <span style={{ fontSize: 18, cursor: 'pointer' }}>{'\u2039'}</span>
+
         <img
-          alt="Fin"
+          alt="Fab"
           src={finAgent.avatarUrl}
           style={{ width: 32, height: 32, borderRadius: '50%' }}
         />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
+        <Box style={{ flex: 1, minWidth: 0 }}>
+          <Box
             style={{
               fontWeight: 700,
               fontSize: 15,
               color: intercom.textPrimary,
             }}
           >
-            Fin
-          </div>
-          <div style={{ fontSize: 12, color: intercom.textSecondary }}>
-            The team can also help
-          </div>
-        </div>
-        <span
-          style={{
-            fontSize: 20,
-            color: intercom.textSecondary,
-            cursor: 'pointer',
-          }}
-        >
-          {'\u00b7\u00b7\u00b7'}
-        </span>
-        <span
-          style={{
-            fontSize: 20,
-            color: intercom.textSecondary,
-            cursor: 'pointer',
-          }}
-        >
-          {'\u00d7'}
-        </span>
-      </div>
+            Fab
+          </Box>
+          <Box style={{ fontSize: 12, color: intercom.textSecondary }}>
+            What are we shopping for today?
+          </Box>
+        </Box>
+      </Box>
 
       {/* Messages */}
       <Conversation.Root
@@ -464,9 +419,10 @@ export default function FabrikAiChat() {
               }}
             >
               <Message.Root messageId={id} slots={{ root: IntercomMessageRoot }}>
-                <Message.Avatar slots={{ avatar: IntercomAvatar }} />
-                <Message.Content slots={{ bubble: IntercomBubble }} />
-                <Message.Meta slots={{ meta: IntercomMeta }} />
+                <Message.Content
+                  slots={{ bubble: IntercomBubble }}
+                  partProps={{ text: { renderText: renderMarkdownText } }}
+                />
               </Message.Root>
             </MessageGroup>
           )}
@@ -478,24 +434,25 @@ export default function FabrikAiChat() {
               style: { padding: '0 16px' },
             },
           }}
-        />
+        >
+        </MessageList.Root>
       </Conversation.Root>
 
       {/* Composer */}
       <Composer.Root slots={{ root: IntercomComposerRoot }}>
-        <Composer.TextArea
-          aria-label="Message"
-          placeholder="Message…"
-          slots={{ input: IntercomTextArea }}
-        />
-        <div
+        <Box
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}
         >
-          <div
+          <Composer.TextArea
+            aria-label="Message"
+            placeholder="Message…"
+            slots={{ input: IntercomTextArea }}
+            />
+          <Box
             style={{
               display: 'flex',
               gap: 12,
@@ -503,33 +460,31 @@ export default function FabrikAiChat() {
               fontSize: 18,
             }}
           >
-            <span style={{ cursor: 'pointer' }} title="Attach">
-              {'\ud83d\udcce'}
-            </span>
-            <span style={{ cursor: 'pointer' }} title="Emoji">
-              {'\u263a'}
-            </span>
-            <span
-              style={{
-                cursor: 'pointer',
-                fontSize: 12,
-                fontWeight: 700,
-                border: `1px solid ${intercom.border}`,
-                borderRadius: 4,
-                padding: '0 4px',
-                lineHeight: '22px',
-              }}
-              title="GIF"
-            >
-              GIF
-            </span>
-          </div>
-          <Composer.SendButton slots={{ sendButton: IntercomSendButton }} />
-        </div>
+          </Box>
+          <Composer.SendButton
+            style={{
+              color: intercom.textSecondary,
+              fontSize: 18,
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}>
+            <ArrowCircleUpIcon
+            sx={{
+              color: intercom.textSecondary,
+              fontSize: 36,
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              '&:hover': { color: fabrikColors.terracotta },
+            }}
+            />
+          </Composer.SendButton>
+        </Box>
       </Composer.Root>
 
       {/* Footer */}
-      <div
+      <Box
         style={{
           textAlign: 'center',
           fontSize: 11,
@@ -537,8 +492,8 @@ export default function FabrikAiChat() {
           padding: '8px 16px',
         }}
       >
-        Powered by Fabrik AI
-      </div>
+        Powered by Gemini
+      </Box>
     </Chat.Root>
   );
 }

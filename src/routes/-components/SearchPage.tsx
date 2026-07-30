@@ -19,6 +19,7 @@ import SortingSelector from './filter/SortingSelector';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ListingsPageableSection from './ListingsPageableSection.tsx';
 import FilterBox from './filter/FilterBox.tsx';
+import ToggleChat from './ToggleChat.tsx';
 
 const SearchPage = () => {
   const {

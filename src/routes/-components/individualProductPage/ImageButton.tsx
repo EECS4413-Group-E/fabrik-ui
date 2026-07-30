@@ -1,4 +1,4 @@
-import { Box, ToggleButton } from '@mui/material';
+import { ToggleButton } from '@mui/material';
 import type { ProductImage } from '../../../models/Listing';
 
 export default function ImageButton({
