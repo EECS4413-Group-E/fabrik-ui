@@ -1,15 +1,6 @@
 import { Link } from '@tanstack/react-router';
 
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Divider,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, Divider, Stack, Typography } from '@mui/material';
 
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
@@ -26,16 +17,13 @@ import {
   formatOrderDate,
   getShippingStatusColor,
   getTotalQuantity,
- } from '../-utils/orderUtils.ts';
-
+} from '../-utils/orderUtils.ts';
 
 interface OrderHistoryCardProps {
   order: Order;
 }
 
-const OrderHistoryCard = ({
-  order,
-}: OrderHistoryCardProps) => {
+const OrderHistoryCard = ({ order }: OrderHistoryCardProps) => {
   const items = order.items ?? [];
   const firstItem = items[0];
   const remainingItemCount = Math.max(items.length - 1, 0);
@@ -84,20 +72,15 @@ const OrderHistoryCard = ({
                 </Typography>
               </Stack>
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
+              <Typography variant="body2" color="text.secondary">
                 Placed {formatOrderDate(order.createdDate)}
               </Typography>
             </Box>
 
             <Chip
               icon={<LocalShippingOutlinedIcon />}
-              label={formatEnumLabel( order.shippingDetails.shippingStatus )}
-              color={getShippingStatusColor(
-                order.shippingDetails.shippingStatus,
-              )}
+              label={formatEnumLabel(order.shippingDetails.shippingStatus)}
+              color={getShippingStatusColor(order.shippingDetails.shippingStatus)}
               variant="outlined"
             />
           </Stack>
@@ -128,16 +111,10 @@ const OrderHistoryCard = ({
                   {firstItem.name}
                 </Typography>
 
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 0.5 }}
-                >
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                   {[
                     firstItem.colorName,
-                    firstItem.size
-                      ? `Size ${firstItem.size}`
-                      : null,
+                    firstItem.size ? `Size ${firstItem.size}` : null,
                     `Quantity ${firstItem.quantity}`,
                   ]
                     .filter(Boolean)
@@ -155,15 +132,9 @@ const OrderHistoryCard = ({
                 </Typography>
 
                 {remainingItemCount > 0 && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
-                  >
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                     Plus {remainingItemCount}{' '}
-                    {remainingItemCount === 1
-                      ? 'other product'
-                      : 'other products'}
+                    {remainingItemCount === 1 ? 'other product' : 'other products'}
                   </Typography>
                 )}
               </Box>
@@ -187,10 +158,7 @@ const OrderHistoryCard = ({
               },
             }}
           >
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={{ xs: 0.5, sm: 3 }}
-            >
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 3 }}>
               <Box>
                 <Typography
                   variant="caption"
@@ -204,9 +172,7 @@ const OrderHistoryCard = ({
                   Items
                 </Typography>
 
-                <Typography sx={{ fontWeight: 500 }}>
-                  {totalQuantity}
-                </Typography>
+                <Typography sx={{ fontWeight: 500 }}>{totalQuantity}</Typography>
               </Box>
 
               <Box>
@@ -234,14 +200,10 @@ const OrderHistoryCard = ({
               </Box>
             </Stack>
 
-            <Button
-              component={Link}
-              to="/orders/$orderId"
-              params={{ orderId: order.id }}
-              variant="contained"
-              endIcon={<ArrowForwardOutlinedIcon />}
-            >
-              View details
+            <Button variant="contained" endIcon={<ArrowForwardOutlinedIcon />}>
+              <Link to={'/orders/$orderId'} params={{ orderId: order.id }}>
+                View details
+              </Link>
             </Button>
           </Stack>
         </Stack>
@@ -249,11 +211,5 @@ const OrderHistoryCard = ({
     </Card>
   );
 };
-
-
-
-
-
-
 
 export default OrderHistoryCard;

@@ -1,6 +1,4 @@
-import type { ClothingCategory, ColorCategory, DepartmentCategory } from "./Filter";
-
-
+import type { ClothingCategory, ColorCategory, DepartmentCategory } from './Filter';
 
 export interface WishListItem {
   id: string;
