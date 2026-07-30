@@ -19,7 +19,6 @@ import SortingSelector from './filter/SortingSelector';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ListingsPageableSection from './ListingsPageableSection';
 import FilterBox from './filter/FilterBox';
-import ToggleChat from './ToggleChat';
 
 const ProductsPage = () => {
   const {
