@@ -15,9 +15,36 @@ import CheckoutItemSummaryCard from './CheckoutItemSummaryCard';
 import CheckoutPaymentCard from './CheckoutPaymentCard';
 import LoanCalculator from './LoanCalculator';
 
-import { Alert, Box, Button, Divider, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { detectCardType, validateLuhn } from '../../utils.ts';
 import { useAuth } from '../../hooks/useAuth.ts';
+
+const provinces = [
+  'Alberta',
+  'British Columbia',
+  'Manitoba',
+  'New Brunswick',
+  'Newfoundland and Labrador',
+  'Northwest Territories',
+  'Nova Scotia',
+  'Nunavut',
+  'Ontario',
+  'Prince Edward Island',
+  'Quebec',
+  'Saskatchewan',
+  'Yukon',
+];
 
 const PRODUCTS_SEARCH_DEFAULTS = {
   keyword: '',
@@ -80,7 +107,7 @@ const CheckoutPage = () => {
       city: '',
       province: '',
       postalCode: '',
-      country: '',
+      country: 'Canada',
     } as CheckoutFormValues,
     validators: {
       onSubmit: ({ value }) => {
@@ -293,16 +320,40 @@ const CheckoutPage = () => {
             )}
           </form.Field>
 
-          <form.Field name="address">
+          <form.Field name="country">
             {(field) => (
               <TextField
-                label="Address"
-                value={field.state.value}
+                label="Country"
+                value={'Canada'}
+                disabled
                 error={!!field.state.meta.errors.length}
                 helperText={field.state.meta.errors[0]}
                 onChange={(event) => field.handleChange(event.target.value)}
                 fullWidth
               />
+            )}
+          </form.Field>
+
+          <form.Field name="province">
+            {(field) => (
+              <FormControl fullWidth size="small">
+                <InputLabel id="Province" sx={{ alignItems: 'center' }}>
+                  Province
+                </InputLabel>
+                <Select
+                  labelId="Province"
+                  value={field.state.value}
+                  label="Province"
+                  onChange={(event) => field.handleChange(event.target.value)}
+                  sx={{ height: '40px', alignItems: 'center' }}
+                >
+                  {provinces.map((province) => (
+                    <MenuItem key={province} value={province}>
+                      {province}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             )}
           </form.Field>
 
@@ -319,10 +370,10 @@ const CheckoutPage = () => {
             )}
           </form.Field>
 
-          <form.Field name="province">
+          <form.Field name="address">
             {(field) => (
               <TextField
-                label="Province"
+                label="Address"
                 value={field.state.value}
                 error={!!field.state.meta.errors.length}
                 helperText={field.state.meta.errors[0]}
@@ -332,27 +383,34 @@ const CheckoutPage = () => {
             )}
           </form.Field>
 
-          <form.Field name="postalCode">
+          <form.Field
+            name="postalCode"
+            validators={{
+              onChange: ({ value }) => {
+                const regex = /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/;
+                if (!value) return 'Postal code is required';
+                if (!regex.test(value)) return 'Enter a valid postal code (e.g. A1A 1A1)';
+                return undefined;
+              },
+            }}
+          >
             {(field) => (
               <TextField
                 label="Postal Code"
                 value={field.state.value}
                 error={!!field.state.meta.errors.length}
                 helperText={field.state.meta.errors[0]}
-                onChange={(event) => field.handleChange(event.target.value)}
-                fullWidth
-              />
-            )}
-          </form.Field>
-
-          <form.Field name="country">
-            {(field) => (
-              <TextField
-                label="Country"
-                value={field.state.value}
-                error={!!field.state.meta.errors.length}
-                helperText={field.state.meta.errors[0]}
-                onChange={(event) => field.handleChange(event.target.value)}
+                onChange={(event) => {
+                  let value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                  // insert space after 3rd character
+                  if (value.length > 3) {
+                    value = `${value.slice(0, 3)} ${value.slice(3, 6)}`;
+                  }
+                  field.handleChange(value);
+                }}
+                slotProps={{
+                  htmlInput: { maxLength: 7 },
+                }}
                 fullWidth
               />
             )}
