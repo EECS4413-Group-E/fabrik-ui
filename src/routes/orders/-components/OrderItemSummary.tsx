@@ -19,6 +19,12 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
   ) * 0.05;
   const amountPayed = orderTotal - pointsAmount;
 
+  const getDiscountedPrice = (price: number, discountPercentage?: number) => {
+    const discount = discountPercentage ?? 0;
+
+    return discount > 0 ? price * (1 - discount / 100) : price;
+  };
+
   const columns: GridColDef[] = [
     {
       field: 'name',
@@ -45,7 +51,7 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
       field: 'price',
       headerName: 'Price',
       width: 120,
-      renderCell: (params) => `$${params.row.price.toFixed(2)}`,
+      renderCell: (params) => `$${getDiscountedPrice(params.row.price, params.row.discountPercentage).toFixed(2)}`,
     },
     {
       field: 'subtotal',
@@ -53,7 +59,7 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
       width: 120,
       sortable: false,
       filterable: false,
-      renderCell: (params) => `$${(params.row.quantity * params.row.price).toFixed(2)}`,
+      renderCell: (params) => `$${(params.row.quantity * getDiscountedPrice(params.row.price, params.row.discountPercentage)).toFixed(2)}`,
     },
   ];
 

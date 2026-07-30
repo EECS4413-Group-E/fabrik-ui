@@ -101,6 +101,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
       listingId: listingId,
       productId: selectedProduct.id,
       size: selectedSize,
+      discountPercentage: listing.discountPercentage,
       quantity,
     });
     setSelectedSize(undefined);

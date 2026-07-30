@@ -30,5 +30,5 @@ export interface CartItem extends CartItemReference {
   colorName: string;
   imageLink: string | null;
   price: number;
-  discountPercentage?: number;
+  discountPercentage: number;
 }

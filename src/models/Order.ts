@@ -24,7 +24,7 @@ export interface PlaceOrderRequest {
   paymentDetails: PaymentDetailsRequest;
   shippingDetails: ShippingDetailsRequest;
 }
-
+  
 export interface OrderItem {
   id: string;
   productId: string;
@@ -37,6 +37,7 @@ export interface OrderItem {
   size: Size;
   quantity: number;
   price: number;
+  discountPercentage: number;
 }
 
 export interface Order {

@@ -10,7 +10,7 @@ const OrderConfirmation = () => {
   const { data: orderDetails } = useSuspenseQuery(orderDetailsQueryOptions(orderId));
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, my:2 }}>
       <Typography variant={'h1'}>Thank you for your purchase!</Typography>
       <Box>Order number: {orderDetails.orderNumber}</Box>
       <OrderItemSummary order={orderDetails} />

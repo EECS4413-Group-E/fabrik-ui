@@ -196,7 +196,7 @@ const ShoppingCartPage = () => {
                 SKU {item.sku}
               </Typography>
 
-              {(item.discountPercentage ?? 0) > 0 ? (
+              {item.discountPercentage > 0 ? (
                 <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mt: 1 }}>
                   <Typography sx={{ color: 'primary.main', fontWeight: 500 }}>
                     ${getDiscountedPrice(item.price, item.discountPercentage).toFixed(2)}
@@ -259,10 +259,17 @@ const ShoppingCartPage = () => {
                   );
                 }}
               />
-
-              <Typography sx={{ minWidth: 80, textAlign: 'right', fontWeight: 500 }}>
-                ${(item.price * item.quantity).toFixed(2)}
-              </Typography>
+              {item.discountPercentage > 0 ? (
+                <Typography
+                  sx={{ minWidth: 80, textAlign: 'right', fontWeight: 500, color: 'primary.main' }}
+                >
+                  ${getDiscountedPrice(item.price, item.discountPercentage).toFixed(2)}
+                </Typography>
+              ) : (
+                <Typography sx={{ minWidth: 80, textAlign: 'right', fontWeight: 500 }}>
+                  ${(item.price * item.quantity).toFixed(2)}
+                </Typography>
+              )}
 
               <IconButton
                 aria-label={`Remove ${item.name}`}
@@ -292,7 +299,10 @@ const ShoppingCartPage = () => {
         }}
       >
         <Button
-          sx={{ backgroundColor: fabrikColors.linen, color: fabrikColors.mutedCharcoal, height: 40,
+          sx={{
+            backgroundColor: fabrikColors.linen,
+            color: fabrikColors.mutedCharcoal,
+            height: 40,
             '&:hover': {
               backgroundColor: fabrikColors.mutedCharcoal,
               color: fabrikColors.linen,
