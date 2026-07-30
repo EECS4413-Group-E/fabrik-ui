@@ -1,5 +1,6 @@
 import { type SubmitEvent, type MouseEvent, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
+import MenuIcon from '@mui/icons-material/Menu';
 
 import {
   AppBar,
@@ -11,6 +12,7 @@ import {
   Menu,
   MenuItem,
   Toolbar,
+  useMediaQuery,
 } from '@mui/material';
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -22,6 +24,7 @@ import { useCart } from '../../hooks/useCart.ts';
 import { useAuth } from '../../hooks/useAuth.ts';
 import { useLogoutMutation } from '../../mutations.ts';
 import type { ClothingCategory } from '../../models/Filter.ts';
+import NavbarDrawer from './NavbarDrawer.tsx';
 
 const CATEGORIES = [
   'SHOP ALL',
@@ -40,9 +43,11 @@ const Navbar = () => {
   const { isLoggedIn } = useAuth();
   const { data } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
+  const renderDrawerIcon = useMediaQuery('(max-width: 860px)');
   const [userMenuAnchor, setUserMenuAnchor] = useState<HTMLElement | null>(null);
   const [mensMenuAnchor, setMensMenuAnchor] = useState<HTMLElement | null>(null);
   const [womensMenuAnchor, setWomensMenuAnchor] = useState<HTMLElement | null>(null);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
   const { mutate } = useLogoutMutation();
 
@@ -89,8 +94,6 @@ const Navbar = () => {
     department: 'MENS' | 'WOMENS' | 'OTHER' | '',
     category: ClothingCategory | 'SHOP ALL',
   ) => {
-    //TODO: add logic for filtering products by category and gender
-
     navigate({
       to: '/products',
       search: {
@@ -100,6 +103,7 @@ const Navbar = () => {
     });
     handleCloseMensMenu();
     handleCloseWomensMenu();
+    setOpenDrawer(false);
   };
 
   return (
@@ -110,162 +114,179 @@ const Navbar = () => {
           alignItems: 'center',
           gap: 3,
           py: 1.5,
-          justifyContent: 'center',
+          justifyContent: renderDrawerIcon ? 'flex-start' : 'center',
           position: 'relative',
         }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            left: 32,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2.5,
-          }}
-          component="nav"
-          aria-label="Shop departments"
-        >
-          <Button
-            id="mens-menu-button"
-            onClick={handleOpenMensMenu}
-            onMouseOver={handleOpenMensMenu}
-            variant="text"
+        {renderDrawerIcon ? (
+          <IconButton
             sx={{
-              color: fabrikColors.charcoal,
-              textDecoration: 'none',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontSize: '0.8rem',
-              fontWeight: 400,
-              padding: 0,
-              '&:hover': {
-                backgroundColor: 'transparent',
-              },
+              position: 'absolute',
+              left: 32,
             }}
+            onClick={() => setOpenDrawer(true)}
           >
-            Men
-          </Button>
-          <Menu
-            id="mens-menu"
-            anchorEl={mensMenuAnchor}
-            open={Boolean(mensMenuAnchor)}
-            onClose={handleCloseMensMenu}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
+            <MenuIcon />
+          </IconButton>
+        ) : (
+          <Box
+            sx={{
+              position: 'absolute',
+              left: 32,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2.5,
             }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            slotProps={{
-              paper: {
-                sx: {
-                  marginTop: '8px',
+            component="nav"
+            aria-label="Shop departments"
+          >
+            <Button
+              id="mens-menu-button"
+              onClick={handleOpenMensMenu}
+              onMouseOver={handleOpenMensMenu}
+              variant="text"
+              sx={{
+                color: fabrikColors.charcoal,
+                textDecoration: 'none',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontSize: '0.8rem',
+                fontWeight: 400,
+                padding: 0,
+                '&:hover': {
+                  backgroundColor: 'transparent',
                 },
-              },
-              list: {
-                onMouseLeave: handleCloseMensMenu,
-              },
-            }}
-          >
-            {CATEGORIES.map((category) => (
-              <MenuItem key={category} onClick={() => handleCategoryClick('MENS', category)}>
-                {category}
-              </MenuItem>
-            ))}
-          </Menu>
+              }}
+            >
+              Men
+            </Button>
+            <Menu
+              id="mens-menu"
+              anchorEl={mensMenuAnchor}
+              open={Boolean(mensMenuAnchor)}
+              onClose={handleCloseMensMenu}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              slotProps={{
+                paper: {
+                  sx: {
+                    marginTop: '8px',
+                  },
+                },
+                list: {
+                  onMouseLeave: handleCloseMensMenu,
+                },
+              }}
+            >
+              {CATEGORIES.map((category) => (
+                <MenuItem key={category} onClick={() => handleCategoryClick('MENS', category)}>
+                  {category}
+                </MenuItem>
+              ))}
+            </Menu>
 
-          <Button
-            id="womens-menu-button"
-            onClick={handleOpenWomensMenu}
-            variant="text"
-            onMouseOver={handleOpenWomensMenu}
-            sx={{
-              color: fabrikColors.charcoal,
-              textDecoration: 'none',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontSize: '0.8rem',
-              fontWeight: 400,
-              padding: 0,
-              '&:hover': {
-                backgroundColor: 'transparent',
-              },
-            }}
-          >
-            Women
-          </Button>
-          <Menu
-            id="womens-menu"
-            anchorEl={womensMenuAnchor}
-            open={Boolean(womensMenuAnchor)}
-            onClose={handleCloseWomensMenu}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            slotProps={{
-              paper: {
-                sx: {
-                  marginTop: '8px',
+            <Button
+              id="womens-menu-button"
+              onClick={handleOpenWomensMenu}
+              variant="text"
+              onMouseOver={handleOpenWomensMenu}
+              sx={{
+                color: fabrikColors.charcoal,
+                textDecoration: 'none',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontSize: '0.8rem',
+                fontWeight: 400,
+                padding: 0,
+                '&:hover': {
+                  backgroundColor: 'transparent',
                 },
-              },
-              list: {
-                onMouseLeave: handleCloseWomensMenu,
-              },
-            }}
-          >
-            {CATEGORIES.map((category) => (
-              <MenuItem key={category} onClick={() => handleCategoryClick('WOMENS', category)}>
-                {category}
-              </MenuItem>
-            ))}
-          </Menu>
-          <Button
-            id="others-button"
-            onClick={() => handleCategoryClick('OTHER', 'SHOP ALL')}
-            variant="text"
-            sx={{
-              color: fabrikColors.charcoal,
-              textDecoration: 'none',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontSize: '0.8rem',
-              fontWeight: 400,
-              padding: 0,
-              '&:hover': {
-                backgroundColor: 'transparent',
-              },
-            }}
-          >
-            Other
-          </Button>
-          <Button
-            id="deals-button"
-            component={Link}
-            to="/products?deals=true"
-            variant="text"
-            sx={{
-              color: fabrikColors.charcoal,
-              textDecoration: 'none',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontSize: '0.8rem',
-              fontWeight: 400,
-              padding: 0,
-              '&:hover': {
-                backgroundColor: 'transparent',
-              },
-            }}
-          >
-            HOT DEALS
-          </Button>
-        </Box>
+              }}
+            >
+              Women
+            </Button>
+            <Menu
+              id="womens-menu"
+              anchorEl={womensMenuAnchor}
+              open={Boolean(womensMenuAnchor)}
+              onClose={handleCloseWomensMenu}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              slotProps={{
+                paper: {
+                  sx: {
+                    marginTop: '8px',
+                  },
+                },
+                list: {
+                  onMouseLeave: handleCloseWomensMenu,
+                },
+              }}
+            >
+              {CATEGORIES.map((category) => (
+                <MenuItem key={category} onClick={() => handleCategoryClick('WOMENS', category)}>
+                  {category}
+                </MenuItem>
+              ))}
+            </Menu>
+            <Button
+              id="others-button"
+              onClick={() => handleCategoryClick('OTHER', 'SHOP ALL')}
+              variant="text"
+              sx={{
+                color: fabrikColors.charcoal,
+                textDecoration: 'none',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontSize: '0.8rem',
+                fontWeight: 400,
+                padding: 0,
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                },
+              }}
+            >
+              Other
+            </Button>
+            <Button
+              id="deals-button"
+              component={Link}
+              to="/products?deals=true"
+              variant="text"
+              sx={{
+                color: fabrikColors.charcoal,
+                textDecoration: 'none',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontSize: '0.8rem',
+                fontWeight: 400,
+                padding: 0,
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                },
+              }}
+            >
+              HOT DEALS
+            </Button>
+          </Box>
+        )}
+        <NavbarDrawer
+          handleCategoryClick={handleCategoryClick}
+          open={openDrawer}
+          onClose={() => setOpenDrawer(false)}
+        />
 
         <Button
           component={Link}
@@ -274,8 +295,8 @@ const Navbar = () => {
           sx={{
             color: fabrikColors.charcoal,
             textDecoration: 'none',
-            fontFamily: "'Italiana', serif",
             fontSize: '2rem',
+            marginLeft: renderDrawerIcon ? '4rem' : undefined,
             padding: 0,
             '&:hover': {
               backgroundColor: 'transparent',
