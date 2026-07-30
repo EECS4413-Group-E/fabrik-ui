@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
@@ -11,12 +11,10 @@ import ReviewsSection from './ReviewsSection';
 
 import WishlistButton from './WishlistButton';
 import {
-  Alert,
   Box,
   Breadcrumbs,
   Button,
   CircularProgress,
-  Collapse,
   Divider,
   Rating,
   TextField,
@@ -34,22 +32,6 @@ type IndividualProductPageProps = {
   listingId: string;
 };
 
-const getErrorMessage = (error: unknown) => {
-  const possibleApiError = error as {
-    response?: {
-      data?: {
-        message?: string;
-        error?: string;
-      };
-    };
-  };
-
-  return (
-    possibleApiError.response?.data?.message ??
-    possibleApiError.response?.data?.error ??
-    'Unable to add this item to the cart.'
-  );
-};
 
 const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
   const { data: listing, isError, isLoading } = useQuery(singleListingQueryOptions(listingId));
