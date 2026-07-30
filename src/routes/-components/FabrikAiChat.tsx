@@ -11,10 +11,11 @@ import type { ChatMessage, ChatUser } from '@mui/x-chat/headless';
 
 import { chatAdapter } from './chatAdapter';
 import { fabrikColors } from '../../theme';
-import { Box, } from '@mui/material';
+import { Box, CircularProgress, } from '@mui/material';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+import { useChatComposer } from '@mui/x-chat/headless';
 
 { /*
   Using the MUI intercom chat preset as a base
@@ -335,18 +336,48 @@ const IntercomTextArea = React.forwardRef(function IntercomTextArea(
     />
   );
 });
+const IntercomSendButton = () => {
+  const { isSubmitting } = useChatComposer();
 
+  return (
+    <Composer.SendButton
+      disabled={isSubmitting}
+      style={{
+        color: intercom.textSecondary,
+        fontSize: 18,
+        backgroundColor: 'transparent',
+        border: 'none',
+        cursor: isSubmitting ? 'default' : 'pointer',
+      }}
+    >
+      {isSubmitting ? (
+        <CircularProgress size={20} sx={{ color: fabrikColors.terracotta }} />
+      ) : (
+        <ArrowCircleUpIcon
+          sx={{
+            color: intercom.textSecondary,
+            fontSize: 36,
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            '&:hover': { color: fabrikColors.terracotta },
+          }}
+        />
+      )}
+    </Composer.SendButton>
+  );
+};
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 export default function FabrikAiChat() {
   const [messages, setMessages] = React.useState(initialMessages);
-
+  const conversationId = crypto.randomUUID(); 
   return (
     <Chat.Root
       adapter={chatAdapter}
       conversations={[conversation]}
-      initialActiveConversationId="intercom"
+      initialActiveConversationId={conversationId}
       messages={messages}
       onMessagesChange={setMessages}
       slotProps={{
@@ -466,7 +497,8 @@ export default function FabrikAiChat() {
             }}
           >
           </Box>
-          <Composer.SendButton
+          <IntercomSendButton />
+          {/* <Composer.SendButton
             style={{
               color: intercom.textSecondary,
               fontSize: 18,
@@ -484,7 +516,7 @@ export default function FabrikAiChat() {
               '&:hover': { color: fabrikColors.terracotta },
             }}
             />
-          </Composer.SendButton>
+          </Composer.SendButton> */}
         </Box>
       </Composer.Root>
 

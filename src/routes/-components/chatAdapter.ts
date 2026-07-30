@@ -21,12 +21,11 @@ function getMessageText(message: { parts?: Array<{ type: string; text?: string }
 }
 
 export const chatAdapter: ChatAdapter = {
-  async sendMessage({ message, signal }) {
-    const userText = getMessageText(message);
-    const conversationId = crypto.randomUUID(); 
+  async sendMessage({ message, conversationId, signal }) {
+    const userText = getMessageText(message);    
 
     const chatRequest: ChatMessage = {
-      conversationId: conversationId,
+      conversationId: conversationId ?? message.conversationId,
       message: userText,
     } as ChatMessage;
 
