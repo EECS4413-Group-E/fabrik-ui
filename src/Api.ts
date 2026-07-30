@@ -23,7 +23,7 @@ import type { AddReviewRequest, ReviewPage } from './models/Review';
 import type { ChatMessage } from './models/ChatMessage';
 import type { ChatResponse } from './models/ChatResponse';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = window._env_.GATEWAY_URL ?? 'http://localhost:5000/api';
 
 
 type UnauthorizedHandler = () => void;
