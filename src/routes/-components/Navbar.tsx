@@ -1,4 +1,4 @@
-import { type SubmitEvent, type MouseEvent, useState } from 'react';
+import { type SubmitEvent, type MouseEvent, useState, useEffect } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -48,6 +48,10 @@ const Navbar = () => {
   const [mensMenuAnchor, setMensMenuAnchor] = useState<HTMLElement | null>(null);
   const [womensMenuAnchor, setWomensMenuAnchor] = useState<HTMLElement | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
+
+  useEffect(() => {
+    window.addEventListener('resize', () => setOpenDrawer(false));
+  }, []);
 
   const { mutate } = useLogoutMutation();
 
