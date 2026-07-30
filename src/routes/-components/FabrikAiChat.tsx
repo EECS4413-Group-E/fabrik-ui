@@ -16,6 +16,11 @@ import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
 
+{ /*
+  Using the MUI intercom chat preset as a base
+  https://mui.com/x/react-chat/headless/examples/intercom-style/
+  */ }
+
 // ---------------------------------------------------------------------------
 // Intercom-style brand tokens
 // ---------------------------------------------------------------------------

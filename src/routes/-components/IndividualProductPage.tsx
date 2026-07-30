@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
 import { singleListingQueryOptions } from '../../queries';
@@ -27,6 +27,8 @@ import ImageSelectionList from './individualProductPage/ImageSelectionList';
 import { fabrikColors } from '../../theme';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import ColorSelectionButtonGroup from './individualProductPage/ColorSelectionButtonGroup';
+import TimedSuccessAlert from './TimedSuccessAlert';
+import TimedErrorAlert from './TimedErrorAlert';
 
 type IndividualProductPageProps = {
   listingId: string;
@@ -122,14 +124,6 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     setSelectedSize(undefined);
     setQuantity(1);
   };
-
-  const [cartAlertOpen, setCartAlertOpen] = useState(false);
-  const duration = 3000;
-
-  useEffect(() => {
-    const timer = setTimeout(() => setCartAlertOpen(false), duration);
-    return () => clearTimeout(timer);
-  }, [duration]);
 
   const navigate = useNavigate();
 
@@ -425,18 +419,17 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   {listing.productDescription}
                 </Typography>
               </Box>
+              {/* Cart Alert */}
+              <Box sx={{ my: 2, minHeight: 50 }}>
 
               {addCartItemMutation.isSuccess && (
-                <Collapse in={cartAlertOpen}>
-                  <Alert severity="success">Added to cart.</Alert>
-                </Collapse>
+                <TimedSuccessAlert/>
               )}
 
               {addCartItemMutation.isError && (
-                <Typography color="error">
-                  <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
-                </Typography>
+                <TimedErrorAlert/>
               )}
+              </Box>
             </Box>
           </Box>
           {/* Reviews */}
