@@ -20,7 +20,6 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import ListingsPageableSection from './ListingsPageableSection.tsx';
 import FilterBox from './filter/FilterBox.tsx';
 
-
 const SearchPage = () => {
   const {
     keyword = '',
