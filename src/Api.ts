@@ -219,3 +219,8 @@ export const fetchReviews = async (listingId: string) => {
 export const addReview = async (listingId: string, data: AddReviewRequest) => {
   return postWithConfig<AddReviewRequest, void>(`/catalogue/listing/${listingId}/review`, data); 
 };
+
+export const sendChatMessage = (message: ChatMessage, signal?: AbortSignal) => {
+  return postWithConfig<ChatMessage, ChatResponse>('/chatbot', message, signal);
+};
+ 

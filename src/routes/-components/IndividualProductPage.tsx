@@ -52,7 +52,6 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     data: listing,
     isError,
     isLoading,
-    error,
   } = useQuery(singleListingQueryOptions(listingId));
 
   const addCartItemMutation = useAddCartItemMutation();

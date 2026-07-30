@@ -42,7 +42,7 @@ export interface ListingItem {
   discountPercentage: number;
   clothingCategory: ClothingCategory;
   departmentCategory: DepartmentCategory;
-  colors: string[];
+  colors: ColorCategory[];
   imageLink: string;
   minPrice: number;
   maxPrice: number;
