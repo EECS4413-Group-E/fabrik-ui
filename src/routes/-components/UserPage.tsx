@@ -36,6 +36,7 @@ import StarsOutlinedIcon from '@mui/icons-material/StarsOutlined';
 import { useChangeEmailMutation, useChangePasswordMutation, useLogoutMutation } from '../../mutations';
 import { currentUserQueryOptions, ordersQueryOptions, wishlistQueryOptions } from '../../queries';
 import { fabrikColors } from '../../theme';
+import { useNavigate } from '@tanstack/react-router';
 
 const UserPage = () => {
   const logoutMutation = useLogoutMutation();
@@ -396,6 +397,7 @@ const UserPage = () => {
                       icon={<ShoppingBagOutlinedIcon />}
                       label="Orders"
                       value={isOrdersLoading ? '—' : orders.length}
+                      link="/orders"
                     />
                   </Grid>
 
@@ -404,6 +406,7 @@ const UserPage = () => {
                       icon={<FavoriteBorderOutlinedIcon />}
                       label="Wishlist"
                       value={isWishlistLoading ? '—' : wishlist.length}
+                      link="/wishlist"
                     />
                   </Grid>
 
@@ -839,11 +842,22 @@ interface StatCardProps {
   icon: ReactNode;
   label: string;
   value: number | string;
+  link?: string;
 }
 
-const StatCard = ({ icon, label, value }: StatCardProps) => (
-  <Card sx={{ height: '100%' }}>
-    <CardContent>
+const StatCard = ({ icon, label, value, link }: StatCardProps) => {
+  const navigate = useNavigate();
+
+  return (
+    <Card sx={{ height: '100%' }}>
+      <CardContent
+        onClick={() => {
+          if (link) {
+            navigate({ to: link })
+          }
+        }}
+        sx={{ ":hover": { cursor: link ? 'pointer' : 'default' } }}
+      >
       <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
         <Box
           sx={{
@@ -871,6 +885,6 @@ const StatCard = ({ icon, label, value }: StatCardProps) => (
       </Stack>
     </CardContent>
   </Card>
-);
+)};
 
 export default UserPage;

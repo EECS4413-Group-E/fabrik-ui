@@ -36,7 +36,7 @@ function App() {
         
         <Box
           sx={{
-            minHeight: '200vh',
+            minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
           }}

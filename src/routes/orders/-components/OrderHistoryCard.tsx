@@ -201,7 +201,7 @@ const OrderHistoryCard = ({ order }: OrderHistoryCardProps) => {
             </Stack>
 
             <Button variant="contained" endIcon={<ArrowForwardOutlinedIcon />}>
-              <Link to={'/orders/$orderId'} params={{ orderId: order.id }}>
+              <Link style={{ color: 'inherit', textDecoration: 'none' }} to={'/orders/$orderId'} params={{ orderId: order.id }}>
                 View details
               </Link>
             </Button>

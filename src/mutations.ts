@@ -76,6 +76,7 @@ export const useLoginMutation = () => {
 };
 
 export const useLogoutMutation = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -83,6 +84,7 @@ export const useLogoutMutation = () => {
     onSuccess: () => {
       tokenStore.set(null);
       queryClient.clear();
+       navigate({ to: '/' });
     },
   });
 };
