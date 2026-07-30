@@ -1,6 +1,6 @@
 import { Box, IconButton, styled, ToggleButtonGroup, toggleButtonGroupClasses } from '@mui/material';
 import type { ProductImage } from '../../../models/Listing';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import ImageButton from './ImageButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -14,9 +14,6 @@ export default function ImageSelectionList({
   selectedImage: string;
   handleImageSelection: (image: ProductImage) => void;
 }) {
-  const [selectedIndex, setSelectedIndex] = useState(
-    availableImages.findIndex((img) => img.imageLink === selectedImage),
-  );
 
   const getSelectedImage = () => {
     return availableImages.findIndex((img) => img.imageLink === selectedImage);
@@ -35,12 +32,10 @@ export default function ImageSelectionList({
         color: 'white',
         backgroundColor: 'black',
         border: `4px solid black`,
-
       },
       [`&:not(.${toggleButtonGroupClasses.selected})`]: {
         color: 'black',
         border: `0px solid black`,
-
       },
     },
   }));      
@@ -86,7 +81,6 @@ export default function ImageSelectionList({
         onClick={() => {
           const newIndex =
             (getSelectedImage() - 1 + availableImages.length) % availableImages.length;
-          setSelectedIndex(newIndex);
           handleImageSelection(availableImages[newIndex]);
         }}
       >
@@ -130,7 +124,6 @@ export default function ImageSelectionList({
       <IconButton
         onClick={() => {
           const newIndex = (getSelectedImage() + 1) % availableImages.length;
-          setSelectedIndex(newIndex);
           handleImageSelection(availableImages[newIndex]);
         }}
       >

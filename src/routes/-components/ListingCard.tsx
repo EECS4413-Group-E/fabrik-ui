@@ -17,6 +17,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import HeartBrokenOutlinedIcon from '@mui/icons-material/HeartBrokenOutlined';
 import { useWishlistMutation } from '../../mutations';
 import { fabrikColors } from '../../theme';
+import ColorSwatch from './ColorSwatch';
 
 const formatPrice = (price: number) => {
   return `$${price.toFixed(2)}`;
@@ -36,7 +37,7 @@ const ListingCard = ({
     listing.discountPercentage && listing.discountPercentage > 0
       ? listing.minPrice * (1 - listing.discountPercentage / 100)
       : null;
-      
+
   const getWishlistTooltipText = () => {
     if (!isLoggedIn) {
       return 'Log in to add items to your wishlist';
@@ -187,7 +188,7 @@ const ListingCard = ({
           </Link>
           {listing.discountPercentage && listing.discountPercentage > 0 ? (
             <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-                <Typography
+              <Typography
                 sx={{
                   flexShrink: 0,
                   fontSize: '0.95rem',
@@ -196,7 +197,7 @@ const ListingCard = ({
                   color: fabrikColors.terracotta,
                 }}
               >
-                  {formatPrice(discountedPrice ?? listing.minPrice)}
+                {formatPrice(discountedPrice ?? listing.minPrice)}
               </Typography>
               <Typography
                 sx={{
@@ -208,7 +209,7 @@ const ListingCard = ({
                   textDecoration: 'line-through',
                 }}
               >
-                  {formatPrice(listing.minPrice)}
+                {formatPrice(listing.minPrice)}
               </Typography>
             </Box>
           ) : (
@@ -231,21 +232,26 @@ const ListingCard = ({
         <Box
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}
         >
-          <Breadcrumbs sx={{ py: 2 }} separator=">">
+          <Breadcrumbs sx={{}} separator=">">
             <Typography color="text.secondary">{listing.departmentCategory}</Typography>
             <Typography color="text.secondary">{listing.clothingCategory}</Typography>
           </Breadcrumbs>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography>
-              {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
-            </Typography>
-            <Rating
-              name="half-rating-read"
-              defaultValue={listing.averageRating}
-              precision={0.5}
-              readOnly
-            />
-          </Box>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 2 }}>
+          <Typography>
+            {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
+          </Typography>
+          <Rating
+            name="half-rating-read"
+            defaultValue={listing.averageRating}
+            precision={0.5}
+            readOnly
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 2 }}>
+          {listing.colors.map((color) => (
+            <ColorSwatch key={color} color={color} />
+          ))}
         </Box>
       </Box>
     </Box>

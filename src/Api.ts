@@ -20,6 +20,8 @@ import type { PageableResponse } from './models/PageableResponse';
 import type { Filter } from './models/Filter';
 
 import type { AddReviewRequest, ReviewPage } from './models/Review';
+import type { ChatMessage } from './models/ChatMessage';
+import type { ChatResponse } from './models/ChatResponse';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -85,8 +87,9 @@ const putWithConfig = async <Request, Response>(url: string, data?: Request): Pr
 const postWithConfig = async <Request, Response>(
   url: string,
   data?: Request,
+  signal?: AbortSignal,
 ): Promise<Response> => {
-  const response = await apiClient.post<Response>(url, data);
+  const response = await apiClient.post<Response>(url, data, { signal });
   return response.data;
 };
 
@@ -216,3 +219,8 @@ export const fetchReviews = async (listingId: string) => {
 export const addReview = async (listingId: string, data: AddReviewRequest) => {
   return postWithConfig<AddReviewRequest, void>(`/catalogue/listing/${listingId}/review`, data); 
 };
+
+export const sendChatMessage = (message: ChatMessage, signal?: AbortSignal) => {
+  return postWithConfig<ChatMessage, ChatResponse>('/chatbot', message, signal);
+};
+ 

@@ -1,16 +1,15 @@
 import { Link } from '@tanstack/react-router';
-import { Box, Chip, Typography } from '@mui/material';
+import { Box, Chip, Rating, Typography } from '@mui/material';
 
 import type { ListingItem } from '../../models/Listing';
 import { fabrikColors } from '../../theme';
+import ColorSwatch from './ColorSwatch';
 
 type HomeProductCardProps = {
   listing: ListingItem;
 };
 
 const HomeProductCard = ({ listing }: HomeProductCardProps) => {
-
-
   const lowestPrice = listing.minPrice;
 
   const discountedPrice =
@@ -26,7 +25,7 @@ const HomeProductCard = ({ listing }: HomeProductCardProps) => {
         sx={{
           position: 'relative',
           backgroundColor: fabrikColors.linen,
-          border: `1px solid ${fabrikColors.border}`,
+          border: `0px solid ${fabrikColors.border}`,
           transition: 'transform 0.2s ease',
           '&:hover': { transform: 'translateY(-4px)' },
         }}
@@ -66,7 +65,7 @@ const HomeProductCard = ({ listing }: HomeProductCardProps) => {
         <Box sx={{ p: 2 }}>
           <Typography sx={{ fontWeight: 500 }}>
             {listing.productName}
-          </Typography>
+            </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {listing.departmentCategory}
@@ -74,10 +73,10 @@ const HomeProductCard = ({ listing }: HomeProductCardProps) => {
 
           <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
             {discountedPrice !== null ? (
-              <>
+              <Box>
                 <Typography
-                  sx={{ color: fabrikColors.terracotta, fontWeight: 500 }}
-                >
+                 sx={{ color: fabrikColors.terracotta, fontWeight: 500 }}
+                 >
                   ${discountedPrice.toFixed(2)}
                 </Typography>
                 <Typography
@@ -89,12 +88,28 @@ const HomeProductCard = ({ listing }: HomeProductCardProps) => {
                 >
                   ${lowestPrice.toFixed(2)}
                 </Typography>
-              </>
+              </Box>
             ) : (
               <Typography sx={{ fontWeight: 500 }}>
                 ${lowestPrice.toFixed(2)}
-              </Typography>
+                </Typography>
             )}
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 2 }}>
+            <Typography>
+              {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
+            </Typography>
+            <Rating
+              name="half-rating-read"
+              defaultValue={listing.averageRating}
+              precision={0.5}
+              readOnly
+            />
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, my: 2 }}>
+            {listing.colors.map((color) => (
+              <ColorSwatch key={color} color={color} />
+            ))}
           </Box>
         </Box>
       </Box>
