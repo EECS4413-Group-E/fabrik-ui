@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 
@@ -11,10 +11,12 @@ import ReviewsSection from './ReviewsSection';
 
 import WishlistButton from './WishlistButton';
 import {
+  Alert,
   Box,
   Breadcrumbs,
   Button,
   CircularProgress,
+  Collapse,
   Divider,
   Rating,
   TextField,
@@ -48,11 +50,7 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
-  const {
-    data: listing,
-    isError,
-    isLoading,
-  } = useQuery(singleListingQueryOptions(listingId));
+  const { data: listing, isError, isLoading } = useQuery(singleListingQueryOptions(listingId));
 
   const addCartItemMutation = useAddCartItemMutation();
   const [selectedProductIndex, setSelectedProductIndex] = useState<number>(0);
@@ -62,9 +60,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     return <Typography>Product not found.</Typography>;
   }
 
-  const [selectedProduct, setSelectedProduct] = useState<Product>(
-    listing.products[0],
-  );
+  const [selectedProduct, setSelectedProduct] = useState<Product>(listing.products[0]);
   const [selectedSize, setSelectedSize] = useState<Size | undefined>(undefined);
 
   if (!selectedProduct) {
@@ -81,7 +77,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
     const nextProduct = listing.products[index];
     setSelectedProductIndex(index);
     setSelectedProduct(nextProduct);
-    setSelectedSize(nextProduct.availabilities[0]?.size);
+    setSelectedSize(undefined);
     setQuantity(1);
     setSelectedImage(nextProduct.images[0]);
   };
@@ -123,7 +119,17 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
       size: selectedSize,
       quantity,
     });
+    setSelectedSize(undefined);
+    setQuantity(1);
   };
+
+  const [cartAlertOpen, setCartAlertOpen] = useState(false);
+  const duration = 3000;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setCartAlertOpen(false), duration);
+    return () => clearTimeout(timer);
+  }, [duration]);
 
   const navigate = useNavigate();
 
@@ -178,7 +184,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                       navigate({
                         to: '/products',
                         search: {
-                          department: listing.departmentCategory
+                          department: listing.departmentCategory,
                         },
                       })
                     }
@@ -186,7 +192,7 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   >
                     <Typography color="text.secondary">{listing.departmentCategory}</Typography>
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() =>
                       navigate({
                         to: '/products',
@@ -244,22 +250,29 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                 <Box>
                   <Box>
                     {listing.discountPercentage > 0 ? (
-                      <Box sx= {{my: 5}}>
+                      <Box sx={{ my: 5 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant={'h5'} sx={{ my: 0, textDecoration: 'line-through', color: 'text.secondary' }} >
+                          <Typography
+                            variant={'h5'}
+                            sx={{ my: 0, textDecoration: 'line-through', color: 'text.secondary' }}
+                          >
                             ${selectedProduct.price.toFixed(2)}
                           </Typography>
                           <Typography variant={'h5'} sx={{ my: 0, color: 'red' }}>
                             {listing.discountPercentage}% OFF
                           </Typography>
                         </Box>
-                        <Typography variant={'h4'} sx={{ my: 0 }} >
-                          Now ${(selectedProduct.price * (1 - listing.discountPercentage / 100)).toFixed(2)}!
+                        <Typography variant={'h4'} sx={{ my: 0 }}>
+                          Now $
+                          {(selectedProduct.price * (1 - listing.discountPercentage / 100)).toFixed(
+                            2,
+                          )}
+                          !
                         </Typography>
                       </Box>
                     ) : (
-                      <Box sx= {{my: 5}}>
-                        <Typography variant={'h4'} sx={{ my: 0 }} >
+                      <Box sx={{ my: 5 }}>
+                        <Typography variant={'h4'} sx={{ my: 0 }}>
                           ${selectedProduct.price.toFixed(2)}
                         </Typography>
                       </Box>
@@ -267,8 +280,13 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
                   </Box>
 
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Rating name="product rating" defaultValue={listing.averageRating} precision={0.5} readOnly />
-                    <Typography variant={'body1'} sx={{ my: 0, alignItems: 'center' }} >  
+                    <Rating
+                      name="product rating"
+                      defaultValue={listing.averageRating}
+                      precision={0.5}
+                      readOnly
+                    />
+                    <Typography variant={'body1'} sx={{ my: 0, alignItems: 'center' }}>
                       - {listing.reviewCount} review{listing.reviewCount !== 1 ? 's' : ''}
                     </Typography>
                   </Box>
@@ -409,18 +427,17 @@ const IndividualProductPage = ({ listingId }: IndividualProductPageProps) => {
               </Box>
 
               {addCartItemMutation.isSuccess && (
-                <Typography>
-                  Item added successfully. <Link to="/cart">View Cart</Link>
-                </Typography>
+                <Collapse in={cartAlertOpen}>
+                  <Alert severity="success">Added to cart.</Alert>
+                </Collapse>
               )}
 
-      {addCartItemMutation.isError && (
-        <Typography color="error">
-          <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
-        </Typography>
-      )}
-
-    </Box>
+              {addCartItemMutation.isError && (
+                <Typography color="error">
+                  <strong>Error:</strong> {getErrorMessage(addCartItemMutation.error)}
+                </Typography>
+              )}
+            </Box>
           </Box>
           {/* Reviews */}
           <Box sx={{ mx: { md: 10, lg: 20, xl: 30 } }}>
