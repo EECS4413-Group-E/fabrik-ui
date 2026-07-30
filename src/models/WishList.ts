@@ -1,4 +1,4 @@
-import type { ClothingCategory, DepartmentCategory } from "./Filter";
+import type { ClothingCategory, ColorCategory, DepartmentCategory } from "./Filter";
 
 
 
@@ -10,7 +10,7 @@ export interface WishListItem {
   discountPercentage: number;
   clothingCategory: ClothingCategory;
   departmentCategory: DepartmentCategory;
-  colors: string[];
+  colors: ColorCategory[];
   imageLink: string;
   minPrice: number;
   maxPrice: number;

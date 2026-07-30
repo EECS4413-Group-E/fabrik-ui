@@ -127,7 +127,7 @@ const ListingsPageableSection = ({
                 <Pagination
                   count={pageable?.totalPages}
                   page={currentPage + 1}
-                  onChange={(event, page) => setCurrentPage(page - 1)}
+                  onChange={(_, page) => setCurrentPage(page - 1)}
                   defaultPage={1}
                   siblingCount={0}
                   boundaryCount={2}
