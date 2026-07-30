@@ -98,20 +98,15 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
             <Divider />
           </Box>
         )}
-{ pointsAmount > 0 ? (
+        { pointsAmount > 0 ? (
             <>
               <PriceRow label="Total:" value={orderTotal} />
               <PriceRow label="Points Amount:" value={pointsAmount} />
-              <PriceRow label="Tax Value:" value={amountPayed * 0.13} />
-              <PriceRow label="Amount Payed:" value={amountPayed * 1.13} />
+              <PriceRow label="Amount Payed:" value={amountPayed} />
             </>
           ) :
           (
-            <>
-              <PriceRow label="Total:" value={amountPayed} />
-              <PriceRow label="Tax Value:" value={amountPayed * 0.13} />
-              <PriceRow label="Amount Payed:" value={amountPayed * 1.13} />
-            </>
+            <PriceRow label="Total:" value={amountPayed} />
           )
         }
 
