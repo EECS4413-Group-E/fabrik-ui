@@ -378,7 +378,7 @@ const Navbar = () => {
             </MenuItem>
             <MenuItem component={Link} to="/wishlist" preload={false} onClick={handleCloseUserMenu}>
               Wishlist
-            </MenuItem>
+            </MenuItem>ch
             <MenuItem
               component={Link}
               preload={false}
