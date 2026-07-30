@@ -102,16 +102,15 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
             <>
               <PriceRow label="Total:" value={orderTotal} />
               <PriceRow label="Points Amount:" value={pointsAmount} />
-              <PriceRow label="Amount Payed:" value={amountPayed} />
               <PriceRow label="Tax Value:" value={amountPayed * 0.13} />
-              <PriceRow label="Total:" value={amountPayed * 1.13} />
+              <PriceRow label="Amount Payed:" value={amountPayed * 1.13} />
             </>
           ) :
           (
             <>
               <PriceRow label="Total:" value={amountPayed} />
               <PriceRow label="Tax Value:" value={amountPayed * 0.13} />
-              <PriceRow label="Total:" value={amountPayed * 1.13} />
+              <PriceRow label="Amount Payed:" value={amountPayed * 1.13} />
             </>
           )
         }
