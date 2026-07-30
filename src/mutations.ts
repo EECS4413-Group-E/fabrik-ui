@@ -84,7 +84,7 @@ export const useLogoutMutation = () => {
     onSuccess: () => {
       tokenStore.set(null);
       queryClient.clear();
-       navigate({ to: '/' });
+      navigate({ to: '/', replace : true });
     },
   });
 };
