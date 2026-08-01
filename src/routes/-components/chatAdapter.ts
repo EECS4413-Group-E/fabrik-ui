@@ -4,11 +4,14 @@ import type { ChatMessage } from '../../models/ChatMessage';
 import type { ChatResponse } from '../../models/ChatResponse';
 
 function textToChunkStream(messageId: string, text: string): ReadableStream {
+  const textId = `text-${messageId}`;
   return new ReadableStream({
     start(controller) {
-      controller.enqueue({ type: 'text-start', id: messageId });
-      controller.enqueue({ type: 'text-delta', id: messageId, delta: text });
-      controller.enqueue({ type: 'text-end', id: messageId });
+      controller.enqueue({ type: 'start', messageId });
+      controller.enqueue({ type: 'text-start', id: textId });
+      controller.enqueue({ type: 'text-delta', id: textId, delta: text });
+      controller.enqueue({ type: 'text-end', id: textId });
+      controller.enqueue({ type: 'finish', messageId });
       controller.close();
     },
   });
@@ -22,7 +25,7 @@ function getMessageText(message: { parts?: Array<{ type: string; text?: string }
 
 export const chatAdapter: ChatAdapter = {
   async sendMessage({ message, conversationId, signal }) {
-    const userText = getMessageText(message);    
+    const userText = getMessageText(message);
 
     const chatRequest: ChatMessage = {
       conversationId: conversationId ?? message.conversationId,
@@ -30,9 +33,12 @@ export const chatAdapter: ChatAdapter = {
     } as ChatMessage;
 
     const response = await sendChatMessage(chatRequest, signal);
+    const replyText = (response as ChatResponse | undefined)?.answer;
 
-    const replyText = (response as ChatResponse).answer;
-    
+    if (typeof replyText !== 'string') {
+      throw new Error('Chat backend returned no answer text.');
+    }
+
     return textToChunkStream(`response-${message.id}`, replyText);
   },
 };
