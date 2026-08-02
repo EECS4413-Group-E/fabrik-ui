@@ -1,4 +1,4 @@
-import type { ChatAdapter } from '@mui/x-chat/headless';
+import { type ChatAdapter } from '@mui/x-chat/headless';
 import { sendChatMessage } from '../../Api';
 import type { ChatMessage } from '../../models/ChatMessage';
 import type { ChatResponse } from '../../models/ChatResponse';
@@ -32,12 +32,15 @@ export const chatAdapter: ChatAdapter = {
       message: userText,
     } as ChatMessage;
 
-    const response = await sendChatMessage(chatRequest, signal);
-    const replyText = (response as ChatResponse | undefined)?.answer;
-
-    if (typeof replyText !== 'string') {
-      throw new Error('Chat backend returned no answer text.');
+    let response: ChatResponse = {answer: 'An error occurred while processing your message. Please try again later.'};
+    try {
+      response = await sendChatMessage(chatRequest, signal);
+    } catch (error) {
+      console.error('Error sending chat message:', error);
     }
+
+    
+    const replyText = (response as ChatResponse).answer;
 
     return textToChunkStream(`response-${message.id}`, replyText);
   },
