@@ -1,3 +1,5 @@
+import type { Province } from "./Provinces";
+
 export const PaymentMethod = {
   CreditCard: "CREDIT_CARD",
   PayPal: "PAYPAL",
@@ -13,6 +15,7 @@ export interface PaymentDetailsRequest {
   paypalEmail?: string;
   storePoints?: number;
   installments?: number;
+  province: Province;
 }
 
 export interface CheckoutFormValues {

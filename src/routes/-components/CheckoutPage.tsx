@@ -27,23 +27,78 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+
 import { detectCardType, validateLuhn } from '../../utils.ts';
 import { useAuth } from '../../hooks/useAuth.ts';
+import PricingSummary from './PricingSummary.tsx';
+import { PROVINCES, type Province } from '../../models/Provinces.ts';
 
-const provinces = [
-  'Alberta',
-  'British Columbia',
-  'Manitoba',
-  'New Brunswick',
-  'Newfoundland and Labrador',
-  'Northwest Territories',
-  'Nova Scotia',
-  'Nunavut',
-  'Ontario',
-  'Prince Edward Island',
-  'Quebec',
-  'Saskatchewan',
-  'Yukon',
+const provinceInfo = [
+  {
+    label: 'Alberta',
+    rate: 5,
+    value: 'ALBERTA',
+  },
+  {
+    label: 'British Columbia',
+    rate: 12,
+    value: 'BRITISH_COLUMBIA',
+  },
+  {
+    label: 'Manitoba',
+    rate: 12,
+    value: 'MANITOBA',
+  },
+  {
+    label: 'New Brunswick',
+    rate: 15,
+    value: 'NEW_BRUNSWICK',
+  },
+  {
+    label: 'Newfoundland and Labrador',
+    rate: 15,
+    value: 'NEWFOUNDLAND_AND_LABRADOR',
+  },
+  {
+    label: 'Northwest Territories',
+    rate: 5,
+    value: 'NORTHWEST_TERRITORIES',
+  },
+  {
+    label: 'Nova Scotia',
+    rate: 14,
+    value: 'NOVA_SCOTIA',
+  },
+  {
+    label: 'Nunavut',
+    rate: 5,
+    value: 'NUNAVUT',
+  },
+  {
+    label: 'Ontario',
+    rate: 13,
+    value: 'ONTARIO',
+  },
+  {
+    label: 'Prince Edward Island',
+    rate: 15,
+    value: 'PRINCE_EDWARD_ISLAND',
+  },
+  {
+    label: 'Quebec',
+    rate: 14.975,
+    value: 'QUEBEC',
+  },
+  {
+    label: 'Saskatchewan',
+    rate: 11,
+    value: 'SASKATCHEWAN',
+  },
+  {
+    label: 'Yukon',
+    rate: 5,
+    value: 'YUKON',
+  },
 ];
 
 const PRODUCTS_SEARCH_DEFAULTS = {
@@ -191,12 +246,14 @@ const CheckoutPage = () => {
               cvv: value.cvv,
               storePoints: value.storePoints,
               installments: value.installments || undefined,
+              province: value.province as Province,
             }
           : {
               paymentMethod: value.paymentMethod,
               paypalEmail: value.paypalEmail,
               storePoints: value.storePoints,
               installments: value.installments || undefined,
+              province: value.province as Province,
             };
 
       const orderRequest: PlaceOrderRequest = {
@@ -213,7 +270,7 @@ const CheckoutPage = () => {
           fullName: value.fullName,
           address: value.address,
           city: value.city,
-          province: value.province,
+          province: value.province as Province,
           postalCode: value.postalCode,
           country: value.country,
         },
@@ -222,7 +279,7 @@ const CheckoutPage = () => {
       mutate(orderRequest);
     },
   });
-
+  const currentProvince = useStore(form.store, (state) => state.values.province);
   const points = useStore(form.store, (state) => state.values.storePoints);
 
   if (cartQuery.isLoading || userQuery.isLoading) {
@@ -347,9 +404,9 @@ const CheckoutPage = () => {
                   onChange={(event) => field.handleChange(event.target.value)}
                   sx={{ height: '40px', alignItems: 'center' }}
                 >
-                  {provinces.map((province) => (
+                  {PROVINCES.map((province) => (
                     <MenuItem key={province} value={province}>
-                      {province}
+                      {provinceInfo.find((p) => p.value === province)?.label ?? province}
                     </MenuItem>
                   ))}
                 </Select>
@@ -479,6 +536,20 @@ const CheckoutPage = () => {
         </form.Field>
 
         <Divider sx={{ my: 4 }} />
+        {currentProvince && (
+          <>
+            <PricingSummary
+              subTotal={orderTotal}
+              totalPrice={
+                (orderTotal -
+                (points * 0.05))*(1 + ((provinceInfo.find((t) => t.value === currentProvince)?.rate as number | 0) / 100))
+              }
+              harmonizedSalesTaxRate={(orderTotal - (points * 0.05)) * ((provinceInfo.find((t) => t.value === currentProvince)?.rate as number | 0) / 100)}
+              pointsPrice={points * 0.05}
+            />
+            <Divider sx={{ my: 4 }} />
+          </>
+        )}
 
         <Button
           type="submit"

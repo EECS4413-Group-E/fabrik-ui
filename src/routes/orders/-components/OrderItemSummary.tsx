@@ -3,6 +3,7 @@ import type { GridColDef } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Divider, Typography } from '@mui/material';
 import PriceRow from '../../-components/PriceRow.tsx';
+import PricingSummary from '../../-components/PricingSummary.tsx';
 
 type OrderItemSummaryProps = {
   order: Order;
@@ -15,16 +16,21 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
     (total, payment) => total + payment.usedStorePoints,
     0,
   ) * 0.05;
-  const amountPayed = 
-    paymentDetails.completedPayments.reduce((total, payment) => total + payment.amount, 0) +
-    paymentDetails.scheduledPayments.reduce((total, payment) => total + payment.amount, 0);
+
+  const tax = 
+    paymentDetails.completedPayments.reduce((tax, payment) => tax + payment.tax, 0) +
+    paymentDetails.scheduledPayments.reduce((tax, payment) => tax + payment.tax, 0);
+
+  const finalAmount = 
+    paymentDetails.completedPayments.reduce((total, payment) => total + payment.finalAmount, 0) +
+    paymentDetails.scheduledPayments.reduce((total, payment) => total + payment.finalAmount, 0);
 
   const getDiscountedPrice = (price: number, discountPercentage?: number) => {
     const discount = discountPercentage ?? 0;
 
     return discount > 0 ? price * (1 - discount / 100) : price;
   };
-
+  
   const columns: GridColDef[] = [
     {
       field: 'name',
@@ -98,17 +104,13 @@ const OrderItemSummary = ({ order }: OrderItemSummaryProps) => {
             <Divider />
           </Box>
         )}
-        { pointsAmount > 0 ? (
-            <>
-              <PriceRow label="Total:" value={orderTotal} />
-              <PriceRow label="Points Amount:" value={pointsAmount} />
-              <PriceRow label="Amount Payed:" value={amountPayed} />
-            </>
-          ) :
-          (
-            <PriceRow label="Total:" value={amountPayed} />
-          )
-        }
+        <Divider />
+        <PricingSummary
+          subTotal={orderTotal}
+          totalPrice={finalAmount}
+          harmonizedSalesTaxRate={tax}
+          pointsPrice={pointsAmount}
+        />
 
       </Box>
     </Box>
