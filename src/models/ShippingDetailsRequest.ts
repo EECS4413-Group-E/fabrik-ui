@@ -1,7 +1,9 @@
+import type { Province } from "./Provinces";
+
 export interface ShippingDetailsRequest {
   country: string;
   postalCode: string;
-  province: string;
+  province: Province;
   city: string;
   address: string;
   fullName: string;

@@ -6,6 +6,8 @@ export type PaymentDetails = {
     paymentNumber: string;
     orderId: string;
     amount: number;
+    tax: number;
+    finalAmount: number;
     currency: string;
     paymentMethod: PaymentMethod;
     status: 'APPROVED' | 'DECLINED';
@@ -21,6 +23,8 @@ export type PaymentDetails = {
     id: string;
     orderId: string;
     amount: number;
+    tax: number;
+    finalAmount: number;
     currency: string;
     paymentMethod: PaymentMethod;
     paymentReference: string;

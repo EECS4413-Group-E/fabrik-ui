@@ -125,9 +125,7 @@ const CheckoutItemSummaryCard = ({ checkoutItems, points }: CheckoutItemSummaryC
       />
 
       <Box sx={{ mt: 2 }}>
-        {pointsPrice > 0 && <PriceRow label="Subtotal:" value={orderTotal} />}
-        {pointsPrice > 0 && <PriceRow label="Points Discount:" value={pointsPrice} />}
-        <PriceRow label="Total:" value={orderTotal - pointsPrice} />
+        <PriceRow label="Subtotal:" value={orderTotal - pointsPrice} />
       </Box>
     </Box>
   );
